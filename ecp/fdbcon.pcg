@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include "../inc/fdbcon.h"
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+  char dbname[1024];
+EXEC SQL END DECLARE SECTION;
+
+void print_sqlca(){
+  fprintf(stderr, "sqlerrm.sqlerrmc: %s\n", sqlca.sqlerrm.sqlerrmc);
+}
+
+void connectToDB(){
+  EXEC SQL CONNECT TO jadedev USER gianpietro;
+    
+  EXEC SQL SELECT current_database() INTO :dbname;    
+
+  printf("current=%s\n", dbname);
+
+  EXEC SQL WHENEVER SQLERROR CALL print_sqlca();
+
+  if(dbname == NULL)
+    print_sqlca();
+  else
+    printf("connection successful\n");
+
+//  EXEC SQL DISCONNECT;
+}

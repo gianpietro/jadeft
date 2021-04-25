@@ -1,0 +1,14 @@
+#include <stdio.h>
+#include "../inc/prolib.h"
+
+EXEC SQL BEGIN DECLARE SECTION;
+  int activeInd;
+  char providerName[30];
+EXEC SQL END DECLARE SECTION;
+
+void providerInsert() {
+  printf("Enter active indicator\n");
+  scanf("%d",&activeInd);
+  printf("Active indicator value is: %d\n", activeInd);
+  }
+

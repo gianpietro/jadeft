@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <libpq-fe.h>
+#include "../inc/prolib.h"
+
+
+ EXEC SQL BEGIN DECLARE SECTION;
+   int v_activeInd;
+   char v_proName[30];
+ EXEC SQL END DECLARE SECTION;
+
+void providerInsert(int activeInd, char proName[])
+{
+   v_activeInd = activeInd;
+   strcpy(v_proName,proName);
+
+   EXEC SQL
+    INSERT INTO provider(active_ind,provider_name) VALUES(:v_activeInd,:v_proName);
+   EXEC SQL COMMIT;
+}
+
