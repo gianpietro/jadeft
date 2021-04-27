@@ -52,11 +52,9 @@ void providerWindow()
   move(6,22);     /* move cursor */
   refresh();
 
-  int y = 0;
 
   while((ch = getch()) != KEY_F(1))
     {
-
       switch(ch)
         {
 	case KEY_DOWN:
@@ -87,12 +85,29 @@ void providerWindow()
   actInd = atoi(field_buffer(providerField[0],0));
   strcpy(pname, field_buffer(providerField[1],0));
     
-  //mvprintw(11,5,"rows %d cols d%", *prows, *pcols);
   int l = strlen(pname);
   mvprintw(20,5,"pname length %d",l);
 
   /* Trim the railing whitespace from the field buffer value */
-  i = 0;
+  /*  i = 0;
+  while (pname[i] != '\0')
+    {
+      if(pname[i] != ' ' && pname[i] != '\t' && pname[i] != '\n')
+	{
+	  index = i;
+	}
+      i++;
+      } */
+
+   /* Mark next character to last non-white space character as NULL */
+  /*    pname[index + 1] = '\0';
+     int nl = strlen(pname);
+     mvprintw(22,5,"new pname length %d",nl); */
+    
+    
+  if ((form_driver(providerForm,REQ_VALIDATION) == E_OK) && (actInd >= 1) && (!isspace(*pname)))
+    {
+        i = 0;
   while (pname[i] != '\0')
     {
       if(pname[i] != ' ' && pname[i] != '\t' && pname[i] != '\n')
@@ -101,17 +116,18 @@ void providerWindow()
 	}
       i++;
     }
-
    /* Mark next character to last non-white space character as NULL */
-    pname[index + 1] = '\0';
+      pname[index + 1] = '\0';
+    
      int nl = strlen(pname);
-     mvprintw(22,5,"new pname length %d",nl);
-    
-    
-    if ((form_driver(providerForm,REQ_VALIDATION) == E_OK) && (actInd >= 1) && (!isspace(*pname)))
+     mvprintw(22,5,"new pname length %d",nl); 
      mvprintw(12,5, "Form completed\n");
-  else
+    }
+    else
+    {
      mvprintw(12,5, "Data invalid\n");
+    }
+
   
   // actInd = atoi(field_buffer(providerField[0],0));
   //strcpy(pname, field_buffer(providerField[1],0));
