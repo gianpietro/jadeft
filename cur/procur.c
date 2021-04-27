@@ -45,7 +45,7 @@ void providerWindow()
   providerField[2] = NULL;
  
   set_field_type(providerField[0],TYPE_INTEGER,1,1,2);
-  set_field_type(providerField[1],TYPE_REGEXP,"^[A-Za-z0-9- ]+$");
+  set_field_type(providerField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
  
   providerForm = new_form(providerField);
   post_form(providerForm);
@@ -70,7 +70,7 @@ void providerWindow()
 	  break;
 	case KEY_BACKSPACE:
 	  form_driver(providerForm, REQ_CLR_FIELD);
-        case 10:                                           // ASCII value for new line feed(Enter Key) 
+        case 10:                                           /* ASCII value for new line feed(Enter Key) */
           form_driver(providerForm, REQ_VALIDATION);
 	  form_driver(providerForm, REQ_NEXT_FIELD);
 	  break;
@@ -89,43 +89,30 @@ void providerWindow()
   if ((form_driver(providerForm,REQ_VALIDATION) == E_OK) && (actInd >= 1) && (!isspace(*pname)))
     {
       strcpy(pname, trimWS(pname));
-      /*
-      i = 0;
-       while (pname[i] != '\0')        
-	 {
-	   if(pname[i] != ' ' && pname[i] != '\t' && pname[i] != '\n')
-	     {
-	       index = i;
-	     }
-	   i++;
-	 }       
-       pname[index + 1] = '\0';
-      */
-      
-       int nl = strlen(pname);
-       mvprintw(22,5,"new pname length %d",nl); 
-       mvprintw(12,5, "Form completed\n");
-       mvprintw(14,5, "Value Active Ind: %d",actInd);
-       mvprintw(15,5,"Value Provider Name: %s", pname);
-       echo();
-       mvprintw(16,5,"Save: y/n :");
-       move(16, 18);
-       while((cf = getch()) != 'y')
-	 {
-	   move(16, 18);
-	   if (cf == 'n')
-	     {
-	       mvprintw(18,5, "Not saved");
-	       break;
-	     }
-	 }
-       if (cf == 'y')
-	 {
-	   mvprintw(18,5, "Data saved");
-	   providerInsert(actInd,pname);
-	 }
-       noecho();
-    }
+      int nl = strlen(pname);
+      mvprintw(22,5,"new pname length %d",nl); 
+      mvprintw(12,5, "Form completed\n");
+      mvprintw(14,5, "Value Active Ind: %d",actInd);
+      mvprintw(15,5,"Value Provider Name: %s", pname);
+      echo();
+      mvprintw(16,5,"Save: y/n :");
+      move(16, 18);
+      while((cf = getch()) != 'y')
+	{
+	  move(16, 18);
+	  if (cf == 'n')
+	    {
+	      mvprintw(18,5, "Not saved");
+	      break;
+	    }
+	}
+      if (cf == 'y')
+	{
+	  mvprintw(18,5, "Data saved");
+	  providerInsert(actInd,pname);
+	}
+      noecho();
+   }
   else
     {
       mvprintw(12,5, "Data invalid\n");
