@@ -25,6 +25,7 @@ char * trimWS(char *s)
   return s;
 }       
 
+/* Function to display Provider form for data entry */
 void providerWindow()
 {
   FIELD *providerField[3];
@@ -41,15 +42,17 @@ void providerWindow()
   noecho();
   keypad(stdscr,TRUE);
 
-  while (newRec == 'y')  /* Allows option to add subsequent records to form */
+  while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
       /* Add the fields required in the form */
       /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
       providerField[0] = new_field(1, 1, 6, 22, 0, 0);      
       providerField[1] = new_field(1, 30, 8, 22, 0, 0);
       providerField[2] = NULL;
- 
+
+      /* Field 1 digit allowed in range from 1 to 2 */
       set_field_type(providerField[0],TYPE_INTEGER,1,1,2);
+      /* Field allowed values of A-Z a-z and hyphen */
       set_field_type(providerField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
  
       providerForm = new_form(providerField);
@@ -58,7 +61,7 @@ void providerWindow()
       mvprintw(2,5,"Jade Finacial Tracker\n");
       mvprintw(6, 5, "Active Ind:");
       mvprintw(8, 5, "Provider Name:");  
-      move(6,22);     // move cursor 
+      move(6,22);     /* move cursor */
       refresh();
 
       while((ch = getch()) != KEY_F(1))
@@ -85,6 +88,7 @@ void providerWindow()
 	    }
 	}
 
+      /* Assign data entered in field */
       actInd = atoi(field_buffer(providerField[0],0));
       strcpy(pname, field_buffer(providerField[1],0));
     
