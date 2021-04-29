@@ -30,19 +30,23 @@ void providerWindow()
 {
   FIELD *providerField[3];
   FORM *providerForm;
+  WINDOW *proWin;
   int ch;
   int cf;            /* confirm save data */
   int actInd;        /* active_Ind */
   char pname[30];    /* provider_name */ 
   int index , i;
   int newRec= 'y';   /* Add another new record */
+  int rows, cols;
+  int y = 2;
+  int x = 2;
     
   initscr();
   cbreak();
   noecho();
   keypad(stdscr,TRUE);
 
-  while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
+    while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
       /* Add the fields required in the form */
       /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
@@ -56,15 +60,50 @@ void providerWindow()
       set_field_type(providerField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
  
       providerForm = new_form(providerField);
-      post_form(providerForm);
- 
-      mvprintw(2,5,"Jade Finacial Tracker\n");
-      mvprintw(6, 5, "Active Ind:");
-      mvprintw(8, 5, "Provider Name:");  
-      move(6,22);     /* move cursor */
-      refresh();
+      scale_form(providerForm, &rows, &cols);
 
-      while((ch = getch()) != KEY_F(1))
+      /* Add window which will be associated to form */
+      proWin = newwin(rows+25, cols+30,1,1);   //was rows+30 cols+30      
+      keypad(proWin, TRUE);
+       
+      /* Set main and sub windows */
+      set_form_win(providerForm, proWin);
+      set_form_sub(providerForm, derwin(proWin,rows,cols,y,x));
+      getmaxyx(proWin,rows,cols);
+      
+
+      box(proWin, 0,0);
+          
+      //post_form(providerForm);
+      if (proWin == NULL)
+	{
+	  addstr("Unable to create window");
+	  refresh();
+	  getch();	  
+	}
+           /* else
+	{
+	  waddstr(proWin,"Provider Window");
+	  wrefresh(proWin);
+	  wgetch(proWin);
+	  }*/
+
+      waddstr(proWin,"Provider Entry Form");
+      post_form(providerForm); 
+      wrefresh(proWin);
+
+      //mvwprintw(proWin, 1,1,"y = %d x = %d", rows,cols);
+      mvwprintw(proWin,rows-2,x+5,"Press F1 when form complete");
+      mvwprintw(proWin,y+2,x+5,"Jade Finacial Tracker");
+      mvwprintw(proWin,y+6, x+5, "Active Ind:");
+      mvwprintw(proWin,y+8, x+5, "Provider Name:");  
+      wmove(proWin,y+6,x+22);     /* move cursor */
+      refresh;
+      //  post_form(providerForm); 
+      // wrefresh(proWin);
+      
+
+      while((ch = wgetch(proWin)) != KEY_F(1))
 	{
 	  switch(ch)
 	    {
@@ -91,54 +130,54 @@ void providerWindow()
       /* Assign data entered in field */
       actInd = atoi(field_buffer(providerField[0],0));
       strcpy(pname, field_buffer(providerField[1],0));
-    
-      int l = strlen(pname);
-      mvprintw(20,5,"pname length %d",l);
+      
+      // int l = strlen(pname);
+      //mvwprintw(proWin,20,5,"pname length %d",l);
 
       if ((form_driver(providerForm,REQ_VALIDATION) == E_OK) && (actInd >= 1) && (!isspace(*pname)))
 	{
 	  strcpy(pname, trimWS(pname));
 	  int nl = strlen(pname);
-	  mvprintw(22,5,"new pname length %d",nl); 
-	  mvprintw(12,5, "Form completed\n");
-	  mvprintw(14,5, "Value Active Ind: %d",actInd);
-	  mvprintw(15,5,"Value Provider Name: %s", pname);
+	  //  mvwprintw(proWin,22,5,"new pname length %d",nl); 
+	  //mvwprintw(proWin,12,5, "Form completed");
+	  // mvwprintw(proWin,14,5, "Value Active Ind: %d",actInd);
+	  // mvwprintw(proWin,15,5,"Value Provider Name: %s", pname);
 	  echo();
-	  mvprintw(16,5,"Save: y/n :");
+	  mvwprintw(proWin,16,x+5,"Save: y/n : ");
 	  move(16, 18);	  
-	  while((cf = getch()) != 'y')
+	  while((cf = wgetch(proWin)) != 'y')
 	    {
 	      move(16, 18);
 	      if (cf == 'n')
 		{
-		  mvprintw(18,5, "Not saved");
+		  mvwprintw(proWin,18,x+5, "Not saved");
 		  break;
 		}
 	    }	  
 	  if (cf == 'y')
 	    {
-	      mvprintw(18,5, "Data saved");
+	      mvwprintw(proWin,18,x+5, "Data saved");
 	      providerInsert(actInd,pname);   /* Save data to database */
 	    }	  
 	  noecho();
 	}
       else
 	{
-	  mvprintw(12,5, "Data invalid\n");
+	  mvwprintw(proWin,12,x+5, "Data invalid");
 	}
    
-      getch();
-  
+      //getch();
+
       unpost_form(providerForm);
       free_form(providerForm);
       free_field(providerField[0]);
       free_field(providerField[1]);
       free_field(providerField[2]);
 
-      mvprintw(10,5,"Provider Entry Form");
-      mvprintw(12,5,"Do you want to add a new record y/n: ");
-      newRec = getch();      
-    }
+      mvwprintw(proWin,23,x+5,"Provider Entry Form");
+      mvwprintw(proWin,25,x+5,"Do you want to add a new record y/n: ");
+      newRec = wgetch(proWin);
+    }    
   
   endwin();
   
