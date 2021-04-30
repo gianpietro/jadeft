@@ -26,7 +26,9 @@
 #line 11 "prolib.pcg"
 
 
-void providerInsert(int activeInd, char proName[]) {
+
+void providerInsert(int activeInd, char proName[])
+{
    v_activeInd = activeInd;
    strcpy(v_proName,proName);
 
@@ -35,10 +37,11 @@ void providerInsert(int activeInd, char proName[]) {
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_proName),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 18 "prolib.pcg"
+#line 20 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 19 "prolib.pcg"
+#line 21 "prolib.pcg"
 
-  }
+
+}
 

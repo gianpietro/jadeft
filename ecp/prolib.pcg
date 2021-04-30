@@ -10,6 +10,7 @@
    char v_proName[30];
  EXEC SQL END DECLARE SECTION;
 
+
 void providerInsert(int activeInd, char proName[])
 {
    v_activeInd = activeInd;
@@ -18,5 +19,6 @@ void providerInsert(int activeInd, char proName[])
    EXEC SQL
     INSERT INTO provider(active_ind,provider_name) VALUES(:v_activeInd,:v_proName);
    EXEC SQL COMMIT;
+
 }
 
