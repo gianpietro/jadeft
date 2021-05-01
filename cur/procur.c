@@ -34,12 +34,13 @@ void providerWindow()
   int ch;
   int cf;            /* confirm save data */
   int actInd;        /* active_Ind */
-  char pname[30];    /* provider_name */ 
+  char pname[30];    /* provider_name DEBUG CODE to be 30*/ 
   int index , i;
   int newRec= 'y';   /* Add another new record */
   int rows, cols;
   int y = 2;         /* sub_form window row */
   int x = 2;         /* fsub_orm window col */
+  //  int pStatus = 0;       /* ack value from providerInsert */
     
   initscr();
   cbreak();
@@ -142,24 +143,29 @@ void providerWindow()
 	      wmove(proWin,y+10,18);
 	      if (cf == 'n')
 		{
-		  mvwprintw(proWin,y+12,x+5, "Not saved");
+		  mvwprintw(proWin,y+12,x+5, "Data not saved");
 		  break;
 		}
 	    }	  
 	  if (cf == 'y')
 	    {
-	      mvwprintw(proWin,y+12,x+5, "Data saved");
+	      //mvwprintw(proWin,y+11,x+10, "ack %d ", pStatus);
+	      //mvwprintw(proWin,y+12,x+5, "Data saved");
 	      providerInsert(actInd,pname);   /* Save data to database */
-	      // providerInsert(actInd, pname);
-	      
-	    }	  
-	  noecho();
+	      //if (pStatus == 1)
+	      //{
+		mvwprintw(proWin,y+12,x+5, "Data saved");
+    	        //mvwprintw(proWin,y+13,x+10, "ack %d ", pStatus);
+		//pStatus = 0;		   	  
+	//noecho();
+          	}
 	}
       else
 	{
 	  mvwprintw(proWin,y+10,x+5, "Data invalid");
 	}
-   
+          noecho();
+    
       //getch();
 
       unpost_form(providerForm);
