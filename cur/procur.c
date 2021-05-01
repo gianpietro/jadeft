@@ -34,13 +34,12 @@ void providerWindow()
   int ch;
   int cf;            /* confirm save data */
   int actInd;        /* active_Ind */
-  char pname[30];    /* provider_name DEBUG CODE to be 30*/ 
+  char pname[30];    /* provider_name */ 
   int index , i;
   int newRec= 'y';   /* Add another new record */
   int rows, cols;
   int y = 2;         /* sub_form window row */
   int x = 2;         /* fsub_orm window col */
-  //  int pStatus = 0;       /* ack value from providerInsert */
     
   initscr();
   cbreak();
@@ -85,14 +84,11 @@ void providerWindow()
       post_form(providerForm); 
       wrefresh(proWin);
 
-      // mvwprintw(proWin,1,1,"y = %d x = %d",rows,cols);
-
       //mvwprintw(proWin,y+2,x+5,"Jade Finacial Tracker");
-      mvwprintw(proWin,y+2,x+5, "Active Ind:");                           //was y+6
+      mvwprintw(proWin,y+2,x+5, "Active Ind:");                           
       mvwprintw(proWin,y+4,x+5, "Provider Name:");
       mvwprintw(proWin,rows-2,x+5,"Press F1 when form complete");
       wmove(proWin,y+2,x+22);     /* move cursor */
-      //refresh;
       
       while((ch = wgetch(proWin)) != KEY_F(1))
 	{
@@ -121,25 +117,15 @@ void providerWindow()
       /* Assign data entered in field */
       actInd = atoi(field_buffer(providerField[0],0));
       strcpy(pname, field_buffer(providerField[1],0));
-      
-      // int l = strlen(pname);
-      //mvwprintw(proWin,20,5,"pname length %d",l);
 
       if ((form_driver(providerForm,REQ_VALIDATION) == E_OK) && (actInd >= 1) && (!isspace(*pname)))
 	{
-	  strcpy(pname, trimWS(pname)); //DEBUG CODE need to reapply
-	  //int nl = strlen(pname);
-	  //  mvwprintw(proWin,22,5,"new pname length %d",nl); 
-	  //mvwprintw(proWin,12,5, "Form completed");
-	  // mvwprintw(proWin,14,5, "Value Active Ind: %d",actInd);
-	  // mvwprintw(proWin,15,5,"Value Provider Name: %s", pname);
+	  strcpy(pname, trimWS(pname));  
 	  echo();
-	  mvwprintw(proWin,y+10,x+5,"Save: y/n: ");     //was y+12
-	  //move(y+10, 18);
+	  mvwprintw(proWin,y+10,x+5,"Save: y/n: ");     
 	  wmove(proWin,y+10,18);
 	  while((cf = wgetch(proWin)) != 'y')
 	    {
-	      //move(y+10, 18);
 	      wmove(proWin,y+10,18);
 	      if (cf == 'n')
 		{
@@ -149,24 +135,15 @@ void providerWindow()
 	    }	  
 	  if (cf == 'y')
 	    {
-	      //mvwprintw(proWin,y+11,x+10, "ack %d ", pStatus);
-	      //mvwprintw(proWin,y+12,x+5, "Data saved");
 	      providerInsert(actInd,pname);   /* Save data to database */
-	      //if (pStatus == 1)
-	      //{
-		mvwprintw(proWin,y+12,x+5, "Data saved");
-    	        //mvwprintw(proWin,y+13,x+10, "ack %d ", pStatus);
-		//pStatus = 0;		   	  
-	//noecho();
-          	}
+	      mvwprintw(proWin,y+12,x+5, "Data saved");
+	    }
 	}
       else
 	{
 	  mvwprintw(proWin,y+10,x+5, "Data invalid");
 	}
           noecho();
-    
-      //getch();
 
       unpost_form(providerForm);
       free_form(providerForm);

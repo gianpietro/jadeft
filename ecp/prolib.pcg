@@ -12,7 +12,6 @@
    char v_proName[30];
  EXEC SQL END DECLARE SECTION;
 
-
 void providerInsert(int activeInd, char proName[])
 {
    connectToDB();
@@ -25,6 +24,5 @@ void providerInsert(int activeInd, char proName[])
    EXEC SQL COMMIT;
 
   EXEC SQL DISCONNECT;
-
 }
 

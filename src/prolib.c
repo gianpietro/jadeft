@@ -28,7 +28,6 @@
 #line 13 "prolib.pcg"
 
 
-
 void providerInsert(int activeInd, char proName[])
 {
    connectToDB();
@@ -41,15 +40,14 @@ void providerInsert(int activeInd, char proName[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_proName),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 24 "prolib.pcg"
+#line 23 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 25 "prolib.pcg"
+#line 24 "prolib.pcg"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 27 "prolib.pcg"
-
+#line 26 "prolib.pcg"
 
 }
 
