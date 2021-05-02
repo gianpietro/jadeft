@@ -15,21 +15,22 @@
 
 //EXEC SQL INCLUDE sqlca;
 
- /* exec sql begin declare section */
-    
-    
- 
-#line 11 "prolib.pcg"
- int v_activeInd ;
- 
-#line 12 "prolib.pcg"
- char v_proName [ 30 ] ;
-/* exec sql end declare section */
-#line 13 "prolib.pcg"
-
 
 void providerInsert(int activeInd, char proName[])
 {
+   /* exec sql begin declare section */
+       
+       
+   
+#line 14 "prolib.pcg"
+ int v_activeInd ;
+ 
+#line 15 "prolib.pcg"
+ char v_proName [ 30 ] ;
+/* exec sql end declare section */
+#line 16 "prolib.pcg"
+
+   
    connectToDB();
      
    v_activeInd = activeInd;
@@ -40,14 +41,43 @@ void providerInsert(int activeInd, char proName[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_proName),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 23 "prolib.pcg"
-
-   { ECPGtrans(__LINE__, NULL, "commit");}
 #line 24 "prolib.pcg"
 
+   { ECPGtrans(__LINE__, NULL, "commit");}
+#line 25 "prolib.pcg"
 
-  { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 26 "prolib.pcg"
+
+   { ECPGdisconnect(__LINE__, "CURRENT");}
+#line 27 "prolib.pcg"
 
 }
 
+void proTypeInsert(char proTypeDesc[])
+{
+   /* exec sql begin declare section */
+      
+   
+#line 33 "prolib.pcg"
+ char v_proTypeDesc [ 30 ] ;
+/* exec sql end declare section */
+#line 34 "prolib.pcg"
+
+  
+   connectToDB();
+
+   strcpy(v_proTypeDesc, proTypeDesc);
+
+   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into provider_type ( description ) values ( $1  )", 
+	ECPGt_char,(v_proTypeDesc),(long)30,(long)1,(30)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
+#line 41 "prolib.pcg"
+
+   { ECPGtrans(__LINE__, NULL, "commit");}
+#line 42 "prolib.pcg"
+
+
+   { ECPGdisconnect(__LINE__, "CURRENT");}
+#line 44 "prolib.pcg"
+
+}
+ 

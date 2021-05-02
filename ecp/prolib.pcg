@@ -7,13 +7,14 @@
 
 //EXEC SQL INCLUDE sqlca;
 
- EXEC SQL BEGIN DECLARE SECTION;
-   int v_activeInd;
-   char v_proName[30];
- EXEC SQL END DECLARE SECTION;
 
 void providerInsert(int activeInd, char proName[])
 {
+   EXEC SQL BEGIN DECLARE SECTION;
+      int v_activeInd;
+      char v_proName[30];
+   EXEC SQL END DECLARE SECTION;
+   
    connectToDB();
      
    v_activeInd = activeInd;
@@ -23,6 +24,23 @@ void providerInsert(int activeInd, char proName[])
     INSERT INTO provider(active_ind,provider_name) VALUES(:v_activeInd,:v_proName);
    EXEC SQL COMMIT;
 
-  EXEC SQL DISCONNECT;
+   EXEC SQL DISCONNECT;
 }
 
+void proTypeInsert(char proTypeDesc[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     char v_proTypeDesc[30];
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   strcpy(v_proTypeDesc, proTypeDesc);
+
+   EXEC SQL
+     INSERT INTO provider_type(description) VALUES(:v_proTypeDesc);
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+ 

@@ -3,5 +3,6 @@
 
 char * trimWS(char *);
 void providerWindow();
+void providerTypeWindow();
 
 #endif

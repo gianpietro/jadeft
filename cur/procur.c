@@ -57,7 +57,7 @@ void providerWindow()
       /* Field 1 digit allowed in range from 1 to 2 */
       set_field_type(providerField[0],TYPE_INTEGER,1,1,2);
       /* Field allowed values of A-Z a-z and hyphen */
-      set_field_type(providerField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(providerField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");   
  
       providerForm = new_form(providerField);
       scale_form(providerForm, &rows, &cols);
@@ -81,6 +81,7 @@ void providerWindow()
 	}
 
       waddstr(proWin,"Provider Entry Form");
+      mvwprintw(proWin,rows-12, cols-50,"row %d col %d", rows, cols); // DEBUG CODE
       post_form(providerForm); 
       wrefresh(proWin);
 
@@ -166,3 +167,137 @@ void providerWindow()
   endwin();
   
 }
+
+/* Function to display Provider Type form for data entry */
+void providerTypeWindow()
+{
+  FIELD *proTypeField[2];
+  FORM *proTypeForm;
+  WINDOW *proTypeWin;
+  int ch;
+  char newRec = 'y';
+  int rows, cols;
+  int y = 2;   /* UL corner form subwindow */
+  int x = 2;   /* UL corner form subwindow */
+  char pdesc[30];
+  int cf;
+
+  initscr();
+  cbreak();
+  noecho();
+  keypad(stdscr,TRUE);
+
+  while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
+    {
+      proTypeField[0] = new_field(1,30,2,18,0,0);
+      proTypeField[1] = NULL;
+      set_field_type(proTypeField[0],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+
+      proTypeForm = new_form(proTypeField);
+      scale_form(proTypeForm, &rows, &cols);
+      proTypeWin = newwin(rows+15,cols+5,1,1);  
+      keypad(proTypeWin, TRUE);
+
+      set_form_win(proTypeForm, proTypeWin);	
+      set_form_sub(proTypeForm, derwin(proTypeWin,rows,cols,y,x));
+      getmaxyx(proTypeWin,rows,cols);
+      
+      box(proTypeWin, 0,0);
+          
+      if (proTypeWin == NULL)
+	{
+	  addstr("Unable to create window");
+	  refresh();
+	  getch();	  
+	}
+
+      waddstr(proTypeWin,"Provider Type Form");
+      //mvwprintw(proTypeWin,rows-12, cols-50,"row %d col %d", rows, cols);
+      post_form(proTypeForm); 
+      wrefresh(proTypeWin);
+
+      mvwprintw(proTypeWin,rows-14,cols-46, "Description:");
+      //mvwprintw(proTypeWin,y+2,x+5, "Description:");
+      mvwprintw(proTypeWin,rows-2,cols-46,"Press F1 when form complete");
+      wmove(proTypeWin,rows-14,cols-33);     /* move cursor */
+      
+      while((ch = wgetch(proTypeWin)) != KEY_F(1))
+	{
+	  switch(ch)
+	    {
+	    case KEY_DOWN:
+	      form_driver(proTypeForm, REQ_NEXT_FIELD);
+	      form_driver(proTypeForm, REQ_END_LINE);
+	      break;
+	    case KEY_UP:
+	      form_driver(proTypeForm, REQ_PREV_FIELD);
+	      form_driver(proTypeForm, REQ_END_LINE);
+	      break;
+	    case KEY_BACKSPACE:
+	      form_driver(proTypeForm, REQ_CLR_FIELD);
+	    case 10:                                           /* ASCII value for new line feed(Enter Key) */
+	      form_driver(proTypeForm, REQ_VALIDATION);
+	      form_driver(proTypeForm, REQ_NEXT_FIELD);
+	      break;
+	    default:
+	      form_driver(proTypeForm, ch);
+	      break;
+	    }
+	}      
+
+      strcpy(pdesc,field_buffer(proTypeField[0],0));
+
+      if ((form_driver(proTypeForm,REQ_VALIDATION) == E_OK) && (!isspace(*pdesc)))
+	{
+	  strcpy(pdesc, trimWS(pdesc));
+	  mvwprintw(proTypeWin,rows-4,cols-46,"input val:%s",pdesc);	    
+	  echo;
+	  mvwprintw(proTypeWin,rows-12,cols-46, "Save y/n: ");
+	  wmove(proTypeWin,rows-12,cols-27);
+	  while((cf = wgetch(proTypeWin)) != 'y')
+	    {
+	      wmove(proTypeWin,rows-12,cols-27);
+	      if (cf =- 'n')
+		{
+		  mvwprintw(proTypeWin,rows-10,cols-46, "Data not saved");
+		  break;
+		}
+	    }
+	  if(cf == 'y')
+	    {
+	      proTypeInsert(pdesc);
+	      mvwprintw(proTypeWin,rows-10,cols-46, "Data saved");
+	    }
+	}
+	  else
+	    {
+	      mvwprintw(proTypeWin,rows-10,cols-46, "Data invalid");
+	    }
+	  noecho();
+	
+
+      unpost_form(proTypeForm);
+      free_form(proTypeForm);
+      free_field(proTypeField[0]);
+      free_field(proTypeField[1]);
+
+      mvwprintw(proTypeWin,rows-6,cols-46,"Provide Type Entry Form");
+      mvwprintw(proTypeWin,rows-5,cols-46,"Do you want to add a new record y/n: ");
+      echo();
+      while((newRec = wgetch(proTypeWin)) != 'y')
+	{
+	  wmove(proTypeWin,rows-5,cols-46);
+	  if(newRec == 'n')
+	    break;
+	}
+      noecho();
+
+      endwin();
+    }
+
+}
+
+
+
+
+  
