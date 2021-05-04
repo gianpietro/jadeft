@@ -1,7 +1,0 @@
-ifndef _CONNECT_H
-#defind _CONNECT_H
-
-void print_sqlca();
-void connectToDB();
-
-#endif
