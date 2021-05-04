@@ -15,7 +15,7 @@ OBJ =  fdbcon.so prolib.so procur.so
 program : $(OBJ)
 	gcc $(CFLAGS) $(SRCDIR)/jadeft.c $(OBJDIR)/fdbcon.so $(OBJDIR)/prolib.so \
 	$(OBJDIR)/procur.so \
-	-o $(BINDIR)/jadeft -I/usr/include -lecpg -lform -lcurses
+	-o $(BINDIR)/jadeft -I/usr/include -lpq -lecpg -lform -lcurses -I/include -lpq
 
 fdbcon.so : fdbcon.c fdbcon.h
 	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@

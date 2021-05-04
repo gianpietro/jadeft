@@ -2,9 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <libpq-fe.h>
 #include "../inc/procur.h"
 #include "../inc/prolib.h"
 
+/* API database connection method */
+PGconn * fdbcon()
+{  
+  PGconn *connection = PQconnectdb("user=gianpietro dbname=jadedev");
+  return connection;
+}
 
 /* Trim trailing whitespace from the string entered in form field */
 char * trimWS(char *s)
@@ -98,6 +105,8 @@ void providerWindow()
       mvwprintw(proWin,rows-14,cols-65, "Provider Name:");
       mvwprintw(proWin,rows-2,cols-65,"Press F1 when form complete");
       wmove(proWin, rows-16,cols-48);     /* move cursor */
+
+      //keyNavigation(proWin, providerForm, ch);
       
       while((ch = wgetch(proWin)) != KEY_F(1))
 	{
@@ -113,7 +122,7 @@ void providerWindow()
 	      break;
 	    case KEY_BACKSPACE:
 	      form_driver(providerForm, REQ_CLR_FIELD);
-	    case 10:                                           /* ASCII value for new line feed(Enter Key) */
+	    case 10:                                           // ASCII value for new line feed(Enter Key) 
 	      form_driver(providerForm, REQ_VALIDATION);
 	      form_driver(providerForm, REQ_NEXT_FIELD);
 	      break;
@@ -122,6 +131,7 @@ void providerWindow()
 	      break;
 	    }
 	}
+      
 
       /* Assign data entered in field */
       actInd = atoi(field_buffer(providerField[0],0));
@@ -145,12 +155,12 @@ void providerWindow()
 	  if (cf == 'y')
 	    {
 	      providerInsert(actInd,pname);   /* Save data to database */
-	      mvwprintw(proWin,rows-4,cols-65, "Data saved");
+	      mvwprintw(proWin,rows-6,cols-65, "Data saved");
 	    }
 	}
       else
 	{
-	  mvwprintw(proWin,rows-8,cols-65, "Data invalid");
+	  mvwprintw(proWin,rows-6,cols-65, "Data invalid");
 	}
           noecho();
 
@@ -302,10 +312,116 @@ void providerTypeWindow()
 
       endwin();
     }
-
 }
 
 
+/* Function to display Provider data from database */
+int proSelect()
+{
+  int i = 0, j = 0;
+  int range = 5;
+  char p;
+  WINDOW * proListWin;
+  int nrow, ncol;
+  int list = 2;
 
+  initscr();
+  cbreak();
+  noecho();
+  keypad(stdscr,TRUE);
+
+  proListWin = newwin(25,50,1,120);  
+  if(proListWin == NULL)
+    {
+        endwin();
+        puts("Unable to create window");
+        return(1);
+    }
+  getmaxyx(proListWin, nrow, ncol);
+  box(proListWin,0,0);
+  waddstr(proListWin, "Provider data");
+  wrefresh(proListWin);
+  
+  PGconn *conn =  fdbcon();
+  
+  if(PQstatus(conn) == CONNECTION_BAD)
+    {
+      PQfinish(conn);
+      exit(1);
+    }
+
+  PGresult *res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");
+
+  int rows = PQntuples(res);
+
+  while((p = wgetch(proListWin)) == '\n')
+    {      
+      if ( j + range < rows)
+	j = j + range;	
+      else
+        j = j + (rows - j);
+      for (i; i < j; i++)
+	{	 
+	  mvwprintw(proListWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+	  list++;	 
+	}
+      list = 2;
+      wclrtoeol(proListWin);  //clear current line to right of cursor
+      if  (i == rows)
+	{
+	  wclrtobot(proListWin);  // clear current line right of cursor and all lines below
+	  mvwprintw(proListWin,10,1,"End of list");
+	  box(proListWin,0,0);
+	  mvwprintw(proListWin,0,0, "Provider data");
+	  wmove(proListWin,10,1);
+  	      mvwprintw(proListWin,11,1,"Select Provider: ");
+	  wrefresh(proListWin);
+	  //break;
+	}
+    }  
+  //  mvwprintw(proListWin,11,1,"Select Provider: ");
+  //wrefresh(proListWin);
+  getch();
+  
+  PQclear(res);
+  PQfinish(conn);
+
+  endwin();
+
+  return 0;
+}
+
+/*
+int proListWindow()
+{
+  WINDOW * proListWin;
+  int rows, cols;
+  initscr();
+  cbreak();
+  noecho();
+  keypad(stdscr,TRUE);
+
+  proListWin = newwin(25,50,1,120);  
+  if(proListWin == NULL)
+    {
+        endwin();
+        puts("Unable to create window");
+        return(1);
+    }
+  getmaxyx(proListWin, rows, cols);
+  box(proListWin,0,0);
+  waddstr(proListWin, "Provider data");
+  wrefresh(proListWin);
+  
+  proSelect(proListWin, 1,1);
+  
+
+  endwin();
+
+  return 0;
+
+  
+}
+*/
 
   
