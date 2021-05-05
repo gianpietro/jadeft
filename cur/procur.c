@@ -330,7 +330,8 @@ int proSelect()
   noecho();
   keypad(stdscr,TRUE);
 
-  proListWin = newwin(25,50,1,120);  
+  proListWin = newwin(25,50,1,120);
+  keypad(proListWin, TRUE);
   if(proListWin == NULL)
     {
         endwin();
@@ -355,7 +356,7 @@ int proSelect()
   int rows = PQntuples(res);
 
   while((p = wgetch(proListWin)) == '\n')
-    {      
+    {
       if ( j + range < rows)
 	j = j + range;	
       else
@@ -365,7 +366,7 @@ int proSelect()
 	  mvwprintw(proListWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
 	  list++;	 
 	}
-      list = 2;
+      list = 2;      
       wclrtoeol(proListWin);  //clear current line to right of cursor
       if  (i == rows)
 	{
@@ -374,14 +375,20 @@ int proSelect()
 	  box(proListWin,0,0);
 	  mvwprintw(proListWin,0,0, "Provider data");
 	  wmove(proListWin,10,1);
-  	      mvwprintw(proListWin,11,1,"Select Provider: ");
-	  wrefresh(proListWin);
+	  // mvwprintw(proListWin,11,1,"Select Provider: ");
+	  // wrefresh(proListWin); DEBUG
 	  //break;
 	}
-    }  
-  //  mvwprintw(proListWin,11,1,"Select Provider: ");
-  //wrefresh(proListWin);
-  getch();
+    }
+  
+   mvwprintw(proListWin,11,1,"Select Provider: ");
+   wgetch(proListWin);
+
+   // touchwin(stdscr);
+   //printw("Testing");
+   //refresh();
+   // touchwin(proListWin);
+   // wrefresh(proListWin); 
   
   PQclear(res);
   PQfinish(conn);
