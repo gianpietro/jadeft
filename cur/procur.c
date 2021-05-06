@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include <form.h>
 #include <libpq-fe.h>
+#include <libpq/libpq-fs.h>   
+#include <arpa/inet.h>
 #include "../inc/procur.h"
 #include "../inc/prolib.h"
 
@@ -330,7 +332,10 @@ int proSelect()
   int parow, pacol;
   int list = 2;
   int proID;
+  char proIDstr[5];  // store provide_id as str
 
+  PGconn *conn =  fdbcon();
+  
   initscr();
   cbreak();
   noecho();
@@ -357,7 +362,6 @@ int proSelect()
   box(proAcctWin,0,0);
   box(proListWin,0,0);
   waddstr(proAcctWin, "Provider Account Form");
-  //mvwprintw(proAcctWin,1,1,"rows %d cols %d", parow, pacol);
   
   waddstr(proListWin, "Provider List");
 
@@ -400,71 +404,85 @@ int proSelect()
 	}
       if(ch == 's')
 	{
-	wrefresh(proListWin);
-       
-      
-      //    }  //DEBUG -original while loop end
+	  wrefresh(proListWin);
     
-  PGconn *conn =  fdbcon();
+	  //PGconn *conn =  fdbcon();
   
-  if(PQstatus(conn) == CONNECTION_BAD)
-    {
-      PQfinish(conn);
-      exit(1);
-    }
+	  if(PQstatus(conn) == CONNECTION_BAD)
+	    {
+	      PQfinish(conn);
+	      exit(1);
+	    }
 
-  PGresult *res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");
+	  PGresult *res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");
 
-  int rows = PQntuples(res);
+	  int rows = PQntuples(res);
 
-  wrefresh(proListWin);
-  while((p = wgetch(proListWin)) == '\n')
-    {
-      if ( j + range < rows)
-	j = j + range;	
-      else
-        j = j + (rows - j);
-      for (i; i < j; i++)
-	{	 
-	  mvwprintw(proListWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
-	  list++;	 
-	}
-      list = 2;      
-      wclrtoeol(proListWin);  //clear current line to right of cursor
-      if  (i == rows)
-	{
-	  wclrtobot(proListWin);  // clear current line right of cursor and all lines below
-	  mvwprintw(proListWin,10,1,"End of list");
-	  box(proListWin,0,0);
-	  mvwprintw(proListWin,0,0, "Provider List");
-	  wmove(proListWin,10,1);
-	}
-    }
+	  wrefresh(proListWin);
+	  
+	  while((p = wgetch(proListWin)) == '\n')
+	    {
+	      if ( j + range < rows)
+		j = j + range;	
+	      else
+		j = j + (rows - j);
+	      for (i; i < j; i++)
+		{	 
+		  mvwprintw(proListWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		  list++;	 
+		}
+	      list = 2;      
+	      wclrtoeol(proListWin);  //clear current line to right of cursor
+	      if  (i == rows)
+		{
+		  wclrtobot(proListWin);  // clear current line right of cursor and all lines below
+		  mvwprintw(proListWin,10,1,"End of list");
+		  box(proListWin,0,0);
+		  mvwprintw(proListWin,0,0, "Provider List");
+		  wmove(proListWin,10,1);
+		  break;
+		}
+	    }
+	  echo();  
+	  mvwprintw(proListWin,11,1,"Select Provider: ");
+	  mvwscanw(proListWin,11,25, "%s", &proIDstr);
+	  set_field_buffer(proAcctField[1],0, proIDstr);
 
-  echo();  //debug
-  mvwprintw(proListWin,11,1,"Select Provider: ");
-  char proIDstr[5];
-  mvwscanw(proListWin,11,25, "%s", &proIDstr);
-  //proID = wgetch(proListWin);
-  mvwprintw(proListWin,12,1,"id val %s ", proIDstr);  //DEBUG  
-  
-  set_field_buffer(proAcctField[1],0, proIDstr);
-  // wgetch(proListWin);
-  proID = atoi(field_buffer(proAcctField[1],0));
-  mvwprintw(proListWin,13,1,"id val %d ", proID);  //DEBUG
-  wgetch(proListWin);
-    
-  
-  PQclear(res);  //DEBUG
-  PQfinish(conn);  //DEBUG
-	} // DEBUG END OF IF
-    } //DEBUG END OF WHILE
 
-  wrefresh(proAcctWin);
-  wgetch(proAcctWin);
-  
-  //  PQclear(res);
-  // PQfinish(conn);
+	  // res = PQexec(conn,"SELECT * FROM provider WHERE provider_id = 1");
+	  //mvwprintw(proListWin,12,1,"%s", PQgetvalue(res,i,0));
+	  proID = atoi(field_buffer(proAcctField[1],0));
+          PQclear(res);
+	  
+	  int val;
+	  val = htonl((uint32_t)proID);
+	  //val = proID;
+	  int *params[1];
+	  params[0] = (int *)&val;
+	  int length[1];
+	  length[0] = sizeof(val);
+	  int formats[1];
+	  formats[0] = 1;
+
+	  res = PQexecParams(conn, "SELECT * FROM provider WHERE provider_id = $1;"
+			     ,1
+			     ,NULL
+			     ,(const char *const *)params
+			     ,length
+			     ,formats
+			     ,0);
+	  
+	  int v = PQntuples(res);
+	  for (int z=0; z<v; z++)
+	    {
+	      mvwprintw(proListWin,12,1,"Value selected %s", PQgetvalue(res,z,0));
+	    }
+	  wrefresh(proListWin);	      
+	  
+          noecho();
+	  PQclear(res);  
+	} 
+    } 
 
   unpost_form(proAcctForm);
   free_form(proAcctForm);
@@ -472,6 +490,7 @@ int proSelect()
   free_field(proAcctField[1]);
   free_field(proAcctField[2]);
 
+  PQfinish(conn); 
   endwin();
 
   return 0;
