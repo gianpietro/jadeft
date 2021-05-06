@@ -336,7 +336,7 @@ int proSelect()
   noecho();
   keypad(stdscr,TRUE);
 
-  proAcctField[0] = new_field(1,1,2,25,0,0);  // active_ind
+  proAcctField[0] = new_field(1,1,2,25,0,0);  // active_ind.
   proAcctField[1] = new_field(1,5,4,25,0,0);  // provider_id fk
   proAcctField[2] = NULL;
 
