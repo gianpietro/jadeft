@@ -321,7 +321,7 @@ int proSelect()
 {
   WINDOW * proListWin, * proAcctWin;
   FORM * proAcctForm;
-  FIELD * proAcctField[2];
+  FIELD * proAcctField[3];
   int i = 0, j = 0;
   int range = 5;
   char p;
@@ -329,6 +329,7 @@ int proSelect()
   int nrow, ncol;
   int parow, pacol;
   int list = 2;
+  int proID;
 
   initscr();
   cbreak();
@@ -439,10 +440,21 @@ int proSelect()
 	  wmove(proListWin,10,1);
 	}
     }
-    
-  mvwprintw(proListWin,11,1,"Select Provider: ");
-  wgetch(proListWin);
 
+  echo();  //debug
+  mvwprintw(proListWin,11,1,"Select Provider: ");
+  char proIDstr[5];
+  mvwscanw(proListWin,11,25, "%s", &proIDstr);
+  //proID = wgetch(proListWin);
+  mvwprintw(proListWin,12,1,"id val %s ", proIDstr);  //DEBUG  
+  
+  set_field_buffer(proAcctField[1],0, proIDstr);
+  // wgetch(proListWin);
+  proID = atoi(field_buffer(proAcctField[1],0));
+  mvwprintw(proListWin,13,1,"id val %d ", proID);  //DEBUG
+  wgetch(proListWin);
+    
+  
   PQclear(res);  //DEBUG
   PQfinish(conn);  //DEBUG
 	} // DEBUG END OF IF
