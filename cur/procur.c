@@ -1,7 +1,7 @@
-#include <form.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <form.h>
 #include <libpq-fe.h>
 #include "../inc/procur.h"
 #include "../inc/prolib.h"
@@ -12,6 +12,7 @@ PGconn * fdbcon()
   PGconn *connection = PQconnectdb("user=gianpietro dbname=jadedev");
   return connection;
 }
+
 
 /* Trim trailing whitespace from the string entered in form field */
 char * trimWS(char *s)
@@ -106,8 +107,6 @@ void providerWindow()
       mvwprintw(proWin,rows-2,cols-65,"Press F1 when form complete");
       wmove(proWin, rows-16,cols-48);     /* move cursor */
 
-      //keyNavigation(proWin, providerForm, ch);
-      
       while((ch = wgetch(proWin)) != KEY_F(1))
 	{
 	  switch(ch)
@@ -131,6 +130,7 @@ void providerWindow()
 	      break;
 	    }
 	}
+      
       
 
       /* Assign data entered in field */
@@ -315,14 +315,19 @@ void providerTypeWindow()
 }
 
 
-/* Function to display Provider data from database */
+/* Function to display Provider Account Form and retrieve DB records
+   for provider and provider type to select for provoder account */
 int proSelect()
 {
+  WINDOW * proListWin, * proAcctWin;
+  FORM * proAcctForm;
+  FIELD * proAcctField[2];
   int i = 0, j = 0;
   int range = 5;
   char p;
-  WINDOW * proListWin;
+  int ch;
   int nrow, ncol;
+  int parow, pacol;
   int list = 2;
 
   initscr();
@@ -330,19 +335,75 @@ int proSelect()
   noecho();
   keypad(stdscr,TRUE);
 
+  proAcctField[0] = new_field(1,1,2,25,0,0);  // active_ind
+  proAcctField[1] = new_field(1,5,4,25,0,0);  // provider_id fk
+  proAcctField[2] = NULL;
+
+  set_field_type(proAcctField[0],TYPE_INTEGER,1,1,2);
+
+  proAcctForm = new_form(proAcctField);
+  scale_form(proAcctForm, &parow, &pacol);   
+
+  proAcctWin = newwin(parow+30,pacol+40,1,1);
   proListWin = newwin(25,50,1,120);
+  keypad(proAcctWin, TRUE);
   keypad(proListWin, TRUE);
-  if(proListWin == NULL)
+
+  set_form_win(proAcctForm,proAcctWin);
+  set_form_sub(proAcctForm, derwin(proAcctWin,parow,pacol,1,1));
+  getmaxyx(proAcctWin, parow, pacol);
+  getmaxyx(proListWin, nrow, ncol);
+  box(proAcctWin,0,0);
+  box(proListWin,0,0);
+  waddstr(proAcctWin, "Provider Account Form");
+  //mvwprintw(proAcctWin,1,1,"rows %d cols %d", parow, pacol);
+  
+  waddstr(proListWin, "Provider List");
+
+  if(proListWin == NULL || proAcctWin == NULL)
     {
         endwin();
         puts("Unable to create window");
         return(1);
     }
-  getmaxyx(proListWin, nrow, ncol);
-  box(proListWin,0,0);
-  waddstr(proListWin, "Provider data");
-  wrefresh(proListWin);
   
+  post_form(proAcctForm);  
+  wrefresh(proAcctWin);
+
+  mvwprintw(proAcctWin, parow-32,pacol-68, "Active Ind:");
+  mvwprintw(proAcctWin, parow-30,pacol-68, "Provider ID:");
+  wmove(proAcctWin,parow-32,pacol-45);
+  
+  while((ch = wgetch(proAcctWin)) != KEY_F(1))
+    {
+      switch(ch)
+	{
+	case KEY_DOWN:
+	  form_driver(proAcctForm, REQ_NEXT_FIELD);
+	  form_driver(proAcctForm, REQ_END_LINE);
+	  break;
+	case KEY_UP:
+	  form_driver(proAcctForm, REQ_PREV_FIELD);
+	  form_driver(proAcctForm, REQ_END_LINE);
+	  break;
+	case KEY_BACKSPACE:
+	  form_driver(proAcctForm, REQ_CLR_FIELD);	  
+	  break;
+	case 10:
+	  form_driver(proAcctForm, REQ_VALIDATION);
+	  form_driver(proAcctForm, REQ_NEXT_FIELD);
+	  break;
+	default:
+	  form_driver(proAcctForm, ch);
+	  break;
+	}
+      if(ch == 's')
+	{
+	wrefresh(proListWin);
+       
+      
+      //    }  //DEBUG -original while loop end
+    
   PGconn *conn =  fdbcon();
   
   if(PQstatus(conn) == CONNECTION_BAD)
@@ -355,6 +416,7 @@ int proSelect()
 
   int rows = PQntuples(res);
 
+  wrefresh(proListWin);
   while((p = wgetch(proListWin)) == '\n')
     {
       if ( j + range < rows)
@@ -373,62 +435,36 @@ int proSelect()
 	  wclrtobot(proListWin);  // clear current line right of cursor and all lines below
 	  mvwprintw(proListWin,10,1,"End of list");
 	  box(proListWin,0,0);
-	  mvwprintw(proListWin,0,0, "Provider data");
+	  mvwprintw(proListWin,0,0, "Provider List");
 	  wmove(proListWin,10,1);
-	  // mvwprintw(proListWin,11,1,"Select Provider: ");
-	  // wrefresh(proListWin); DEBUG
-	  //break;
 	}
     }
-  
-   mvwprintw(proListWin,11,1,"Select Provider: ");
-   wgetch(proListWin);
+    
+  mvwprintw(proListWin,11,1,"Select Provider: ");
+  wgetch(proListWin);
 
-   // touchwin(stdscr);
-   //printw("Testing");
-   //refresh();
-   // touchwin(proListWin);
-   // wrefresh(proListWin); 
+  PQclear(res);  //DEBUG
+  PQfinish(conn);  //DEBUG
+	} // DEBUG END OF IF
+    } //DEBUG END OF WHILE
+
+  wrefresh(proAcctWin);
+  wgetch(proAcctWin);
   
-  PQclear(res);
-  PQfinish(conn);
+  //  PQclear(res);
+  // PQfinish(conn);
+
+  unpost_form(proAcctForm);
+  free_form(proAcctForm);
+  free_field(proAcctField[0]);
+  free_field(proAcctField[1]);
+  free_field(proAcctField[2]);
 
   endwin();
 
   return 0;
 }
 
-/*
-int proListWindow()
-{
-  WINDOW * proListWin;
-  int rows, cols;
-  initscr();
-  cbreak();
-  noecho();
-  keypad(stdscr,TRUE);
 
-  proListWin = newwin(25,50,1,120);  
-  if(proListWin == NULL)
-    {
-        endwin();
-        puts("Unable to create window");
-        return(1);
-    }
-  getmaxyx(proListWin, rows, cols);
-  box(proListWin,0,0);
-  waddstr(proListWin, "Provider data");
-  wrefresh(proListWin);
-  
-  proSelect(proListWin, 1,1);
-  
-
-  endwin();
-
-  return 0;
-
-  
-}
-*/
 
   
