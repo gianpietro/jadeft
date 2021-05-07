@@ -15,10 +15,10 @@ int main (void) {
   printf("Enter 1 to continue: ");
   scanf("%d",&x);
 
-  providerTypeWindow();
-  providerWindow();
+  //providerTypeWindow();
+  //providerWindow();
   
-  //proSelect();
+  proSelect();
   
   // system("clear");
    printf("Completed Enter 1 to exit: ");

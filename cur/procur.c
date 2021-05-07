@@ -12,41 +12,39 @@
 PGconn * fdbcon()
 {  
   PGconn *connection = PQconnectdb("user=gianpietro dbname=jadedev");
+  if(PQstatus(connection) == CONNECTION_BAD)
+    {
+      PQfinish(connection);
+      exit(1);
+    }  
   return connection;
 }
 
-//int keyNavigate(int ch, FORM * f, WINDOW * w)
+/* Form navigation keys */
 void keyNavigate(int ch, FORM * f)
 { 
-  // while((ch = wgetch(w)) != KEY_F(1))
-  // {
-      switch(ch)
-	{
-	case KEY_DOWN:
-	  form_driver(f, REQ_NEXT_FIELD);
-	  form_driver(f, REQ_END_LINE);
-	  break;
-	case KEY_UP:
-	  form_driver(f, REQ_PREV_FIELD);
-	  form_driver(f, REQ_END_LINE);
-	  break;
-	case KEY_BACKSPACE:
-	  form_driver(f, REQ_CLR_FIELD);	  
-	  break;
-	case 10:
-	  form_driver(f, REQ_VALIDATION);
-	  form_driver(f, REQ_NEXT_FIELD);
-	  break;
-	default:
-	  form_driver(f, ch);
-	  break;
-	}
-      
-      //  return ch;
-      // }
+  switch(ch)
+    {
+    case KEY_DOWN:
+      form_driver(f, REQ_NEXT_FIELD);
+      form_driver(f, REQ_END_LINE);
+      break;
+    case KEY_UP:
+      form_driver(f, REQ_PREV_FIELD);
+      form_driver(f, REQ_END_LINE);
+      break;
+    case KEY_BACKSPACE:
+      form_driver(f, REQ_CLR_FIELD);	  
+      break;
+    case 10:
+      form_driver(f, REQ_VALIDATION);
+      form_driver(f, REQ_NEXT_FIELD);
+      break;
+    default:
+      form_driver(f, ch);
+      break;
+    }
 }
-
-
 
 /* Trim trailing whitespace from the string entered in form field */
 char * trimWS(char *s)
@@ -80,8 +78,6 @@ void providerWindow()
   int index , i;
   int newRec= 'y';   /* Add another new record */
   int rows, cols;
-  //int y = 2;         /* sub_form window row */
-  //int x = 2;         /* fsub_orm window col */
     
   initscr();
   cbreak();
@@ -123,15 +119,7 @@ void providerWindow()
 	}
 
       waddstr(proWin,"Provider Entry Form");
-      
-      /* 
-      int r, c;
-      for (r=0; r < rows; r++)
-	 mvwprintw(proWin,r, 1,"%d", r); // DEBUG CODE      
-      for(c=0; c < cols; c++)
-            mvwprintw(proWin,1, c,"%d", c); // DEBUG CODE
-      */
-      
+
       post_form(providerForm); 
       wrefresh(proWin);
 
@@ -143,35 +131,7 @@ void providerWindow()
 
       while((ch = wgetch(proWin)) != KEY_F(1))
 	 keyNavigate(ch, providerForm);
-      
-      /*
-      while((ch = wgetch(proWin)) != KEY_F(1))
-	{
-	  switch(ch)
-	    {
-	    case KEY_DOWN:
-	      form_driver(providerForm, REQ_NEXT_FIELD);
-	      form_driver(providerForm, REQ_END_LINE);
-	      break;
-	    case KEY_UP:
-	      form_driver(providerForm, REQ_PREV_FIELD);
-	      form_driver(providerForm, REQ_END_LINE);
-	      break;
-	    case KEY_BACKSPACE:
-	      form_driver(providerForm, REQ_CLR_FIELD);
-	    case 10:                                           // ASCII value for new line feed(Enter Key) 
-	      form_driver(providerForm, REQ_VALIDATION);
-	      form_driver(providerForm, REQ_NEXT_FIELD);
-	      break;
-	    default:
-	      form_driver(providerForm, ch);
-	      break;
-	    }
-	}
-      */
-      
-      
-
+    
       /* Assign data entered in field */
       actInd = atoi(field_buffer(providerField[0],0));
       strcpy(pname, field_buffer(providerField[1],0));
@@ -181,7 +141,7 @@ void providerWindow()
 	  strcpy(pname, trimWS(pname));  
 	  echo();
 	  mvwprintw(proWin,rows-8,cols-65,"Save: y/n: ");     
-	  //wmove(proWin,rows-8,cols-54);
+
 	  while((cf = wgetch(proWin)) != 'y')
 	    {
 	      wmove(proWin,rows-8,cols-54);
@@ -209,7 +169,6 @@ void providerWindow()
       free_field(providerField[1]);
       free_field(providerField[2]);
 
-      //mvwprintw(proWin,rows-4,cols-65,"Provider Entry Form");
       mvwprintw(proWin,rows-4,cols-65,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(proWin)) != 'y')
@@ -219,10 +178,8 @@ void providerWindow()
 	    break;
 	}
       noecho();
-    }    
-  
+    } 
   endwin();
-  
 }
 
 /* Function to display Provider Type form for data entry */
@@ -234,8 +191,6 @@ void providerTypeWindow()
   int ch;
   char newRec = 'y';
   int rows, cols;
-  //int y = 2;   /* UL corner form subwindow */
-  //int x = 2;   /* UL corner form subwindow */
   char pdesc[30];
   int cf;
 
@@ -269,41 +224,15 @@ void providerTypeWindow()
 	}
 
       waddstr(proTypeWin,"Provider Type Form");
-      //mvwprintw(proTypeWin,rows-12, cols-50,"row %d col %d", rows, cols);
       post_form(proTypeForm); 
       wrefresh(proTypeWin);
 
       mvwprintw(proTypeWin,rows-14,cols-46, "Description:");
-      //mvwprintw(proTypeWin,y+2,x+5, "Description:");
       mvwprintw(proTypeWin,rows-2,cols-46,"Press F1 when form complete");
       wmove(proTypeWin,rows-14,cols-33);     /* move cursor */
 
       while((ch = wgetch(proTypeWin)) != KEY_F(1))
 	keyNavigate(ch, proTypeForm);
-      /*
-      while((ch = wgetch(proTypeWin)) != KEY_F(1))
-	{
-	  switch(ch)
-	    {
-	    case KEY_DOWN:
-	      form_driver(proTypeForm, REQ_NEXT_FIELD);
-	      form_driver(proTypeForm, REQ_END_LINE);
-	      break;
-	    case KEY_UP:
-	      form_driver(proTypeForm, REQ_PREV_FIELD);
-	      form_driver(proTypeForm, REQ_END_LINE);
-	      break;
-	    case KEY_BACKSPACE:
-	      form_driver(proTypeForm, REQ_CLR_FIELD);
-	    case 10:                                           // ASCII value for new line feed(Enter Key)      
-	      form_driver(proTypeForm, REQ_VALIDATION);
-	      form_driver(proTypeForm, REQ_NEXT_FIELD);
-	      break;
-	    default:
-	      form_driver(proTypeForm, ch);
-	      break;
-	    }
-	} */
 
       strcpy(pdesc,field_buffer(proTypeField[0],0));
      
@@ -311,9 +240,7 @@ void providerTypeWindow()
 	{
 	  strcpy(pdesc, trimWS(pdesc));
 	  echo();
-	  //mvwprintw(proTypeWin,rows-4,cols-46,"input val:%s",pdesc);	    
 	  mvwprintw(proTypeWin,rows-8,cols-46, "Save y/n: ");
-	  //wmove(proTypeWin,rows-8,cols-34);
 	  while((cf = wgetch(proTypeWin)) != 'y')
 	    {
 	      wmove(proTypeWin,rows-8,cols-36);
@@ -334,14 +261,12 @@ void providerTypeWindow()
 	      mvwprintw(proTypeWin,rows-6,cols-46, "Data invalid");
 	    }
 	  noecho();
-	
 
       unpost_form(proTypeForm);
       free_form(proTypeForm);
       free_field(proTypeField[0]);
       free_field(proTypeField[1]);
 
-      //mvwprintw(proTypeWin,rows-6,cols-46,"Provide Type Entry Form");
       mvwprintw(proTypeWin,rows-4,cols-46,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(proTypeWin)) != 'y')
@@ -367,15 +292,15 @@ int proSelect()
   int i = 0, j = 0;
   int range = 5;
   char p;
-  int ch;
-  int nrow, ncol;
-  int parow, pacol;
+  int ch, nrow, ncol, parow, pacol;
   int list = 2;
   int proID;
   char proIDstr[5];  // store provide_id as str
-
   PGconn *conn =  fdbcon();
-  
+  PGresult *res;
+  int rows; // number of tuples returned from sql query
+  int val, *params[1], length[1], formats[1];   //PQexecParams
+
   initscr();
   cbreak();
   noecho();
@@ -421,6 +346,8 @@ int proSelect()
   
   while((ch = wgetch(proAcctWin)) != KEY_F(1))
     {
+      keyNavigate(ch, proAcctForm);
+      /*
       switch(ch)
 	{
 	case KEY_DOWN:
@@ -440,23 +367,21 @@ int proSelect()
 	  break;
 	default:
 	  form_driver(proAcctForm, ch);
-	  break;
-	}
+	  break;*/	
       if(ch == 's')
 	{
 	  wrefresh(proListWin);
     
-	  //PGconn *conn =  fdbcon();
-  
-	  if(PQstatus(conn) == CONNECTION_BAD)
+	  /*  if(PQstatus(conn) == CONNECTION_BAD)
 	    {
 	      PQfinish(conn);
 	      exit(1);
 	    }
+	  */
 
-	  PGresult *res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");
-
-	  int rows = PQntuples(res);
+	  //PGresult *res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");
+          res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");	  
+	  rows = PQntuples(res);
 
 	  wrefresh(proListWin);
 	  
@@ -491,14 +416,9 @@ int proSelect()
 	  proID = atoi(field_buffer(proAcctField[1],0));
           PQclear(res);
 	  
-	  int val;
 	  val = htonl((uint32_t)proID);
-	  //val = proID;
-	  int *params[1];
 	  params[0] = (int *)&val;
-	  int length[1];
 	  length[0] = sizeof(val);
-	  int formats[1];
 	  formats[0] = 1;
 
 	  res = PQexecParams(conn, "SELECT * FROM provider WHERE provider_id = $1;"
@@ -510,8 +430,7 @@ int proSelect()
 			     ,0);
 	  
 	  int v = PQntuples(res);
-	  // for (int z=0; z<v; z++)
-	  //{
+	  mvwprintw(proListWin,13,1, "no or rows %d ",v);
 	  mvwprintw(proListWin,12,1,"Value selected %s", PQgetvalue(res,0,0));
 	  /*
 	  if (PQresultStatus(res) != PGRES_COMMAND_OK)
