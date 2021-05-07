@@ -89,7 +89,7 @@ void providerWindow()
       /* Add the fields required in the form */
       /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
       providerField[0] = new_field(1, 1, 2, 22, 0, 0);      
-      providerField[1] = new_field(1, 30, 4, 22, 0, 0);   //DEBUG CODE needs to be 30
+      providerField[1] = new_field(1, 30, 4, 22, 0, 0);      
       providerField[2] = NULL;
 
       /* Field 1 digit allowed in range from 1 to 2 */
@@ -286,16 +286,17 @@ void providerTypeWindow()
    for provider and provider type to select for provoder account */
 int proSelect()
 {
-  WINDOW * proListWin, * proAcctWin;
+  WINDOW * proListWin, * proAcctWin, *proTypeWin;
   FORM * proAcctForm;
-  FIELD * proAcctField[3];
+  FIELD * proAcctField[7];
   int i = 0, j = 0;
   int range = 5;
   char p;
-  int ch, nrow, ncol, parow, pacol;
+  int ch, nrow, ncol, parow, pacol, ptrow, ptcol;
   int list = 2;
-  int proID;
+  int proID, proTypeID;
   char proIDstr[5];  // store provide_id as str
+  char proTypestr[5];
   PGconn *conn =  fdbcon();
   PGresult *res;
   int rows; // number of tuples returned from sql query
@@ -306,30 +307,39 @@ int proSelect()
   noecho();
   keypad(stdscr,TRUE);
 
-  proAcctField[0] = new_field(1,1,2,25,0,0);  // active_ind.
-  proAcctField[1] = new_field(1,5,4,25,0,0);  // provider_id fk
-  proAcctField[2] = NULL;
+  proAcctField[0] = new_field(1,1,1,35,0,0);    /* active_ind */
+  proAcctField[1] = new_field(1,5,3,35,0,0);    /* provider_id (fk) */
+  proAcctField[2] = new_field(1,30,5,35,0,0);   /* provider_account_no */
+  proAcctField[3] = new_field(1,12,7,35,0,0);   /* sort_code */
+  proAcctField[4] = new_field(1,30,9,35,0,0);   /* reference */
+  proAcctField[5] = new_field(1,5,11,35,0,0);   /* provider_type_id */
+  proAcctField[6] = NULL;
 
   set_field_type(proAcctField[0],TYPE_INTEGER,1,1,2);
 
   proAcctForm = new_form(proAcctField);
   scale_form(proAcctForm, &parow, &pacol);   
 
-  proAcctWin = newwin(parow+30,pacol+40,1,1);
-  proListWin = newwin(25,50,1,120);
+  proAcctWin = newwin(parow+20,pacol+10,1,1);
+  proListWin = newwin(20,50,1,120);
+  proTypeWin = newwin(20,50,23,120);  
   keypad(proAcctWin, TRUE);
   keypad(proListWin, TRUE);
+  keypad(proTypeWin, TRUE);
 
   set_form_win(proAcctForm,proAcctWin);
   set_form_sub(proAcctForm, derwin(proAcctWin,parow,pacol,1,1));
   getmaxyx(proAcctWin, parow, pacol);
   getmaxyx(proListWin, nrow, ncol);
+  getmaxyx(proTypeWin, ptrow, ptcol);
   box(proAcctWin,0,0);
   box(proListWin,0,0);
+  box(proTypeWin,0,0);
   waddstr(proAcctWin, "Provider Account Form");
   waddstr(proListWin, "Provider List");
+  waddstr(proTypeWin, "Provider Type");
 
-  if(proListWin == NULL || proAcctWin == NULL)
+  if(proListWin == NULL || proAcctWin == NULL || proTypeWin == NULL)
     {
         endwin();
         puts("Unable to create window");
@@ -339,19 +349,23 @@ int proSelect()
   post_form(proAcctForm);  
   wrefresh(proAcctWin);
 
-  mvwprintw(proAcctWin, parow-32,pacol-68, "Active Ind:");
-  mvwprintw(proAcctWin, parow-30,pacol-68, "Provider ID:");
-  wmove(proAcctWin,parow-32,pacol-45);
+  // mvwprintw(proAcctWin, parow-3,pacol-3, "rows %d cols %d",parow,pacol);
+  mvwprintw(proAcctWin, parow-30,pacol-64, "Active Ind:");
+  mvwprintw(proAcctWin, parow-28,pacol-64, "Provider ID:");
+  mvwprintw(proAcctWin, parow-26,pacol-64, "Account Number:");
+  mvwprintw(proAcctWin, parow-24,pacol-64, "Sort Code:");
+  mvwprintw(proAcctWin, parow-22,pacol-64, "Reference:");
+  mvwprintw(proAcctWin, parow-20,pacol-64, "Provider Type ID:");
+  wmove(proAcctWin,parow-30,pacol-39);
+  wrefresh(proAcctWin);
   
   while((ch = wgetch(proAcctWin)) != KEY_F(1))
     {
       keyNavigate(ch, proAcctForm);
-      if(ch == 's')
+      if(ch == KEY_F(2))
 	{
 	  i = j = rows = 0;
 	  list = 2;
-	  //wmove(proListWin,1,1);
-	  // wclrtobot(proListWin);
 	  wclear(proListWin);
           box(proListWin,0,0);
 	  waddstr(proListWin, "Provider List");
@@ -420,20 +434,84 @@ int proSelect()
 	      wrefresh(proListWin);		
 	      wrefresh(proAcctWin);
 	    }
-	  //wrefresh(proListWin);	      
-	  
           noecho();
 	  PQclear(res);
 	}
-      // if(ch == 'z')
-      /* {
-          The  code for the provider type box
-          will go here. This should follow the same 
-          as the above -  if (ch == 's') - for a proTypeWin
-          which will list the records in the provider_type
-          table so the description of the provider can be added
-          to the provider account form  
-	  } */
+      if(ch == KEY_F(3))
+	{
+	  i = j = rows = 0;
+	  list = 2;
+	  wclear(proTypeWin);
+          box(proTypeWin,0,0);
+	  waddstr(proTypeWin, "Provider Type");
+	  wmove(proTypeWin,1,1);
+	  wrefresh(proTypeWin);
+
+	  res = PQexec(conn,"SELECT * FROM provider_type");
+	  rows = PQntuples(res);
+
+	  wrefresh(proTypeWin);
+
+	  while((p = wgetch(proTypeWin)) == '\n')
+	    {
+	      if ( j + range < rows)
+		j = j + range;	
+	      else
+		j = j + (rows - j);
+	      for (i; i < j; i++)
+		{	 
+		  mvwprintw(proTypeWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		  list++;	 
+		}
+	      list = 2;      
+	      wclrtoeol(proTypeWin);  //clear current line to right of cursor
+	      if  (i == rows)
+		{
+		  wclrtobot(proTypeWin);  // clear current line right of cursor and all lines below
+		  mvwprintw(proTypeWin,10,1,"End of list");
+		  box(proTypeWin,0,0);
+		  mvwprintw(proTypeWin,0,0, "Provider Type");
+		  wmove(proTypeWin,10,1);
+		  break;
+		}
+	    }
+	  echo();  
+	  mvwprintw(proTypeWin,11,1,"Select Provider: ");
+	  mvwscanw(proTypeWin,11,25, "%5s", &proTypestr);
+	  set_field_buffer(proAcctField[5],0, proTypestr);
+
+	  proTypeID = atoi(field_buffer(proAcctField[5],0));
+          PQclear(res);
+
+	  val = htonl((uint32_t)proTypeID);
+	  params[0] = (int *)&val;
+	  length[0] = sizeof(val);
+	  formats[0] = 1;
+
+	  res = PQexecParams(conn, "SELECT * FROM provider_type WHERE provider_type_id = $1;"
+			     ,1
+			     ,NULL
+			     ,(const char *const *)params
+			     ,length
+			     ,formats
+			     ,0);
+	  
+	  rows = PQntuples(res);
+	  if (rows == 1)
+	    {
+	      mvwprintw(proTypeWin,13,1, "no or rows %d ",rows);
+	      mvwprintw(proTypeWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+	      wrefresh(proTypeWin);
+	    }
+	  else
+	    {
+	      mvwprintw(proTypeWin,12,1,"Number invalied");
+	      wrefresh(proTypeWin);		
+	      wrefresh(proAcctWin);
+	    }
+          noecho();
+	  PQclear(res);
+	}  // if (ch == f3)
     } 
 
   unpost_form(proAcctForm);
@@ -441,6 +519,10 @@ int proSelect()
   free_field(proAcctField[0]);
   free_field(proAcctField[1]);
   free_field(proAcctField[2]);
+  free_field(proAcctField[3]);
+  free_field(proAcctField[4]);
+  free_field(proAcctField[5]);
+  free_field(proAcctField[6]);
 
   PQfinish(conn); 
   endwin();
