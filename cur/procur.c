@@ -448,9 +448,6 @@ int proSelect()
 	  mvwscanw(proListWin,11,25, "%s", &proIDstr);
 	  set_field_buffer(proAcctField[1],0, proIDstr);
 
-
-	  // res = PQexec(conn,"SELECT * FROM provider WHERE provider_id = 1");
-	  //mvwprintw(proListWin,12,1,"%s", PQgetvalue(res,i,0));
 	  proID = atoi(field_buffer(proAcctField[1],0));
           PQclear(res);
 	  
@@ -473,10 +470,24 @@ int proSelect()
 			     ,0);
 	  
 	  int v = PQntuples(res);
-	  for (int z=0; z<v; z++)
-	    {
-	      mvwprintw(proListWin,12,1,"Value selected %s", PQgetvalue(res,z,0));
-	    }
+	  // for (int z=0; z<v; z++)
+	  //{
+	  mvwprintw(proListWin,12,1,"Value selected %s", PQgetvalue(res,0,0));
+	  /*
+	  if (PQresultStatus(res) != PGRES_COMMAND_OK)
+	  {
+	  mvwprintw(proListWin,12,1,"Value selected %s", PQgetvalue(res,0,0));
+	      }
+	     else
+	     {
+	     mvwprintw(proListWin,12,1,"Invalid entry");
+	     wmove(proListWin,11,5);
+	     }
+	  */
+	      
+	  //  else
+		
+	      // }
 	  wrefresh(proListWin);	      
 	  
           noecho();
