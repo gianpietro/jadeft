@@ -15,6 +15,38 @@ PGconn * fdbcon()
   return connection;
 }
 
+//int keyNavigate(int ch, FORM * f, WINDOW * w)
+void keyNavigate(int ch, FORM * f)
+{ 
+  // while((ch = wgetch(w)) != KEY_F(1))
+  // {
+      switch(ch)
+	{
+	case KEY_DOWN:
+	  form_driver(f, REQ_NEXT_FIELD);
+	  form_driver(f, REQ_END_LINE);
+	  break;
+	case KEY_UP:
+	  form_driver(f, REQ_PREV_FIELD);
+	  form_driver(f, REQ_END_LINE);
+	  break;
+	case KEY_BACKSPACE:
+	  form_driver(f, REQ_CLR_FIELD);	  
+	  break;
+	case 10:
+	  form_driver(f, REQ_VALIDATION);
+	  form_driver(f, REQ_NEXT_FIELD);
+	  break;
+	default:
+	  form_driver(f, ch);
+	  break;
+	}
+      
+      //  return ch;
+      // }
+}
+
+
 
 /* Trim trailing whitespace from the string entered in form field */
 char * trimWS(char *s)
@@ -110,6 +142,10 @@ void providerWindow()
       wmove(proWin, rows-16,cols-48);     /* move cursor */
 
       while((ch = wgetch(proWin)) != KEY_F(1))
+	 keyNavigate(ch, providerForm);
+      
+      /*
+      while((ch = wgetch(proWin)) != KEY_F(1))
 	{
 	  switch(ch)
 	    {
@@ -132,6 +168,7 @@ void providerWindow()
 	      break;
 	    }
 	}
+      */
       
       
 
@@ -240,7 +277,10 @@ void providerTypeWindow()
       //mvwprintw(proTypeWin,y+2,x+5, "Description:");
       mvwprintw(proTypeWin,rows-2,cols-46,"Press F1 when form complete");
       wmove(proTypeWin,rows-14,cols-33);     /* move cursor */
-      
+
+      while((ch = wgetch(proTypeWin)) != KEY_F(1))
+	keyNavigate(ch, proTypeForm);
+      /*
       while((ch = wgetch(proTypeWin)) != KEY_F(1))
 	{
 	  switch(ch)
@@ -255,7 +295,7 @@ void providerTypeWindow()
 	      break;
 	    case KEY_BACKSPACE:
 	      form_driver(proTypeForm, REQ_CLR_FIELD);
-	    case 10:                                           /* ASCII value for new line feed(Enter Key) */
+	    case 10:                                           // ASCII value for new line feed(Enter Key)      
 	      form_driver(proTypeForm, REQ_VALIDATION);
 	      form_driver(proTypeForm, REQ_NEXT_FIELD);
 	      break;
@@ -263,7 +303,7 @@ void providerTypeWindow()
 	      form_driver(proTypeForm, ch);
 	      break;
 	    }
-	}      
+	} */
 
       strcpy(pdesc,field_buffer(proTypeField[0],0));
      
