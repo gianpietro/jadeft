@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <form.h>
 #include <libpq-fe.h>
-#include <libpq/libpq-fs.h>   
+//#include <libpq/libpq-fs.h>   
 #include <arpa/inet.h>
 #include "../inc/procur.h"
 #include "../inc/prolib.h"
@@ -327,7 +327,6 @@ int proSelect()
   box(proAcctWin,0,0);
   box(proListWin,0,0);
   waddstr(proAcctWin, "Provider Account Form");
-  
   waddstr(proListWin, "Provider List");
 
   if(proListWin == NULL || proAcctWin == NULL)
@@ -347,39 +346,18 @@ int proSelect()
   while((ch = wgetch(proAcctWin)) != KEY_F(1))
     {
       keyNavigate(ch, proAcctForm);
-      /*
-      switch(ch)
-	{
-	case KEY_DOWN:
-	  form_driver(proAcctForm, REQ_NEXT_FIELD);
-	  form_driver(proAcctForm, REQ_END_LINE);
-	  break;
-	case KEY_UP:
-	  form_driver(proAcctForm, REQ_PREV_FIELD);
-	  form_driver(proAcctForm, REQ_END_LINE);
-	  break;
-	case KEY_BACKSPACE:
-	  form_driver(proAcctForm, REQ_CLR_FIELD);	  
-	  break;
-	case 10:
-	  form_driver(proAcctForm, REQ_VALIDATION);
-	  form_driver(proAcctForm, REQ_NEXT_FIELD);
-	  break;
-	default:
-	  form_driver(proAcctForm, ch);
-	  break;*/	
       if(ch == 's')
 	{
+	  i = j = rows = 0;
+	  list = 2;
+	  //wmove(proListWin,1,1);
+	  // wclrtobot(proListWin);
+	  wclear(proListWin);
+          box(proListWin,0,0);
+	  waddstr(proListWin, "Provider List");
+	  wmove(proListWin,1,1);
 	  wrefresh(proListWin);
-    
-	  /*  if(PQstatus(conn) == CONNECTION_BAD)
-	    {
-	      PQfinish(conn);
-	      exit(1);
-	    }
-	  */
-
-	  //PGresult *res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");
+	  
           res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");	  
 	  rows = PQntuples(res);
 
@@ -407,10 +385,10 @@ int proSelect()
 		  wmove(proListWin,10,1);
 		  break;
 		}
-	    }
+	    }	  
 	  echo();  
 	  mvwprintw(proListWin,11,1,"Select Provider: ");
-	  mvwscanw(proListWin,11,25, "%s", &proIDstr);
+	  mvwscanw(proListWin,11,25, "%5s", &proIDstr);
 	  set_field_buffer(proAcctField[1],0, proIDstr);
 
 	  proID = atoi(field_buffer(proAcctField[1],0));
@@ -429,29 +407,33 @@ int proSelect()
 			     ,formats
 			     ,0);
 	  
-	  int v = PQntuples(res);
-	  mvwprintw(proListWin,13,1, "no or rows %d ",v);
-	  mvwprintw(proListWin,12,1,"Value selected %s", PQgetvalue(res,0,0));
-	  /*
-	  if (PQresultStatus(res) != PGRES_COMMAND_OK)
-	  {
-	  mvwprintw(proListWin,12,1,"Value selected %s", PQgetvalue(res,0,0));
-	      }
-	     else
-	     {
-	     mvwprintw(proListWin,12,1,"Invalid entry");
-	     wmove(proListWin,11,5);
-	     }
-	  */
-	      
-	  //  else
-		
-	      // }
-	  wrefresh(proListWin);	      
+	  rows = PQntuples(res);
+	  if (rows == 1)
+	    {
+	      mvwprintw(proListWin,13,1, "no or rows %d ",rows);
+	      mvwprintw(proListWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+	      wrefresh(proListWin);
+	    }
+	  else
+	    {
+	      mvwprintw(proListWin,12,1,"Number invalied");
+	      wrefresh(proListWin);		
+	      wrefresh(proAcctWin);
+	    }
+	  //wrefresh(proListWin);	      
 	  
           noecho();
-	  PQclear(res);  
-	} 
+	  PQclear(res);
+	}
+      // if(ch == 'z')
+      /* {
+          The  code for the provider type box
+          will go here. This should follow the same 
+          as the above -  if (ch == 's') - for a proTypeWin
+          which will list the records in the provider_type
+          table so the description of the provider can be added
+          to the provider account form  
+	  } */
     } 
 
   unpost_form(proAcctForm);
