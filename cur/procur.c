@@ -9,7 +9,7 @@
 #include "../inc/prolib.h"
 
 /* API database connection method */
-PGconn * fdbcon()
+static PGconn * fdbcon()
 {  
   PGconn *connection = PQconnectdb("user=gianpietro dbname=jadedev");
   if(PQstatus(connection) == CONNECTION_BAD)
@@ -21,7 +21,7 @@ PGconn * fdbcon()
 }
 
 /* Form navigation keys */
-void keyNavigate(int ch, FORM * f)
+static void keyNavigate(int ch, FORM * f)
 { 
   switch(ch)
     {
@@ -47,7 +47,7 @@ void keyNavigate(int ch, FORM * f)
 }
 
 /* Trim trailing whitespace from the string entered in form field */
-char * trimWS(char *s)
+static char * trimWS(char *s)
 {
   int i = 0;
   int index = -1;
@@ -66,7 +66,7 @@ char * trimWS(char *s)
 }       
 
 /* Function to display Provider form for data entry */
-void providerWindow()
+void provInsert()
 {
   FIELD *providerField[3];
   FORM *providerForm;
@@ -183,7 +183,7 @@ void providerWindow()
 }
 
 /* Function to display Provider Type form for data entry */
-void providerTypeWindow()
+void provTypeInsert()
 {
   FIELD *proTypeField[2];
   FORM *proTypeForm;
@@ -284,7 +284,7 @@ void providerTypeWindow()
 
 /* Function to display Provider Account Form and retrieve DB records
    for provider and provider type to select for provoder account */
-int proSelect()
+int provAccountInsert()
 {
   WINDOW * proListWin, * proAcctWin, *proTypeWin;
   FORM * proAcctForm;
@@ -301,6 +301,9 @@ int proSelect()
   PGresult *res;
   int rows; // number of tuples returned from sql query
   int val, *params[1], length[1], formats[1];   //PQexecParams
+  int pafActiveID, pafID, pafSortCode, pafTypeID;  // field values
+  char pafAccountNo[30], pafRef[30];
+  int cf; // confirm save to DB
 
   initscr();
   cbreak();
@@ -310,12 +313,17 @@ int proSelect()
   proAcctField[0] = new_field(1,1,1,35,0,0);    /* active_ind */
   proAcctField[1] = new_field(1,5,3,35,0,0);    /* provider_id (fk) */
   proAcctField[2] = new_field(1,30,5,35,0,0);   /* provider_account_no */
-  proAcctField[3] = new_field(1,12,7,35,0,0);   /* sort_code */
+  proAcctField[3] = new_field(1,9,7,35,0,0);   /* sort_code */
   proAcctField[4] = new_field(1,30,9,35,0,0);   /* reference */
   proAcctField[5] = new_field(1,5,11,35,0,0);   /* provider_type_id */
   proAcctField[6] = NULL;
 
   set_field_type(proAcctField[0],TYPE_INTEGER,1,1,2);
+  set_field_type(proAcctField[1],TYPE_INTEGER,0,1,99999);
+  set_field_type(proAcctField[2],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+  set_field_type(proAcctField[3],TYPE_INTEGER,0,1,999999999);
+  set_field_type(proAcctField[4],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+  set_field_type(proAcctField[5],TYPE_INTEGER,0,1,99999);
 
   proAcctForm = new_form(proAcctField);
   scale_form(proAcctForm, &parow, &pacol);   
@@ -512,8 +520,47 @@ int proSelect()
           noecho();
 	  PQclear(res);
 	}  // if (ch == f3)
-    } 
+    }
 
+  /* code goes here for assign buffer value and validate prior to insert */
+
+  pafActiveID = atoi(field_buffer(proAcctField[0],0));
+  pafID = atoi(field_buffer(proAcctField[1],0));
+  strcpy(pafAccountNo,trimWS(field_buffer(proAcctField[2],0)));
+  pafSortCode = atoi(field_buffer(proAcctField[3],0));
+  strcpy(pafRef, trimWS(field_buffer(proAcctField[4],0)));
+  pafTypeID = atoi(field_buffer(proAcctField[5],0));
+
+  if ((form_driver(proAcctForm,REQ_VALIDATION) == E_OK) && (pafActiveID >= 1))
+    {
+      echo();
+      mvwprintw(proAcctWin,parow-10,pacol-64,"Save: y/n: ");     
+
+      while((cf = wgetch(proAcctWin)) != 'y')
+	{
+	  wmove(proAcctWin,parow-10,pacol-53);
+	  if (cf == 'n')
+	    {
+	      mvwprintw(proAcctWin,parow-8,pacol-64, "Data not saved");
+	      break;
+	    }
+	}	  
+      if (cf == 'y')
+	{
+	  // insert sql code proAccountInsert(pafActiveID,pafID,pafAccountNo,pafSortCode,pafRef,pafTypeID);   /* Save data to database */
+	  mvwprintw(proAcctWin,parow-8, pacol-64, "Data saved");
+	}
+    }
+  
+  else
+    {
+      mvwprintw(proAcctWin,parow-8,pacol-64, "Data invalid");	
+    }
+  noecho();
+
+  mvwprintw(proAcctWin,parow-6,pacol-64,"Exit ");
+  wgetch(proAcctWin);  
+  
   unpost_form(proAcctForm);
   free_form(proAcctForm);
   free_field(proAcctField[0]);
