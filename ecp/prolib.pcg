@@ -43,4 +43,33 @@ void proTypeInsert(char proTypeDesc[])
 
    EXEC SQL DISCONNECT;
 }
- 
+
+void proAccountInsert(int pafActiveID, int pafID, char pafAccountNo[], int pafSortCode, char pafRef[], int pafTypeID)
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+    int v_pafActiveID;
+    int v_pafID;
+    char v_pafAccountNo[30];
+    int v_pafSortCode;
+    char v_pafRef[30];
+    int v_pafTypeID;
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_pafActiveID = pafActiveID;
+  v_pafID = pafID;
+  strcpy(v_pafAccountNo, pafAccountNo);
+  v_pafSortCode = pafSortCode;
+  strcpy(v_pafRef, pafRef);
+  v_pafTypeID = pafTypeID;
+
+ EXEC SQL
+   INSERT INTO provider_account(active_ind, provider_id, provider_acct_no, sort_code, preference, provider_type_id) VALUES (:v_pafActiveID, :v_pafID, :v_pafAccountNo,
+   :v_pafSortCode, :v_pafRef, :v_pafTypeID);
+ EXEC SQL COMMIT;
+
+ EXEC SQL DISCONNECT;
+}
+
+ 	       

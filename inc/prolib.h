@@ -3,5 +3,7 @@
 
 void providerInsert(int, char *);
 void proTypeInsert(char *);
+void proAccountInsert(int, int, char *, int, char *, int);
+
 
 #endif

@@ -297,13 +297,14 @@ int provAccountInsert()
   int proID, proTypeID;
   char proIDstr[5];  // store provide_id as str
   char proTypestr[5];
-  PGconn *conn =  fdbcon();
-  PGresult *res;
   int rows; // number of tuples returned from sql query
   int val, *params[1], length[1], formats[1];   //PQexecParams
   int pafActiveID, pafID, pafSortCode, pafTypeID;  // field values
   char pafAccountNo[30], pafRef[30];
   int cf; // confirm save to DB
+
+  PGconn *conn =  fdbcon();
+  PGresult *res;
 
   initscr();
   cbreak();
@@ -547,7 +548,7 @@ int provAccountInsert()
 	}	  
       if (cf == 'y')
 	{
-	  // insert sql code proAccountInsert(pafActiveID,pafID,pafAccountNo,pafSortCode,pafRef,pafTypeID);   /* Save data to database */
+	  proAccountInsert(pafActiveID, pafID, pafAccountNo, pafSortCode, pafRef, pafTypeID);
 	  mvwprintw(proAcctWin,parow-8, pacol-64, "Data saved");
 	}
     }
