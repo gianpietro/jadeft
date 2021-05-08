@@ -13,8 +13,6 @@
 #include "../inc/prolib.h"
 #include "../inc/fdbcon.h"
 
-//EXEC SQL INCLUDE sqlca;
-
 
 void providerInsert(int activeInd, char proName[])
 {
@@ -22,13 +20,13 @@ void providerInsert(int activeInd, char proName[])
        
        
    
-#line 14 "prolib.pcg"
+#line 12 "prolib.pcg"
  int v_activeInd ;
  
-#line 15 "prolib.pcg"
+#line 13 "prolib.pcg"
  char v_proName [ 30 ] ;
 /* exec sql end declare section */
-#line 16 "prolib.pcg"
+#line 14 "prolib.pcg"
 
    
    connectToDB();
@@ -41,14 +39,14 @@ void providerInsert(int activeInd, char proName[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_proName),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 24 "prolib.pcg"
+#line 22 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 25 "prolib.pcg"
+#line 23 "prolib.pcg"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 27 "prolib.pcg"
+#line 25 "prolib.pcg"
 
 }
 
@@ -57,10 +55,10 @@ void proTypeInsert(char proTypeDesc[])
    /* exec sql begin declare section */
       
    
-#line 33 "prolib.pcg"
+#line 31 "prolib.pcg"
  char v_proTypeDesc [ 30 ] ;
 /* exec sql end declare section */
-#line 34 "prolib.pcg"
+#line 32 "prolib.pcg"
 
   
    connectToDB();
@@ -70,14 +68,14 @@ void proTypeInsert(char proTypeDesc[])
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into provider_type ( description ) values ( $1  )", 
 	ECPGt_char,(v_proTypeDesc),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 41 "prolib.pcg"
+#line 39 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 42 "prolib.pcg"
+#line 40 "prolib.pcg"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 44 "prolib.pcg"
+#line 42 "prolib.pcg"
 
 }
 
@@ -91,25 +89,25 @@ void proAccountInsert(int pafActiveID, int pafID, char pafAccountNo[], int pafSo
      
      
   
-#line 50 "prolib.pcg"
+#line 48 "prolib.pcg"
  int v_pafActiveID ;
  
-#line 51 "prolib.pcg"
+#line 49 "prolib.pcg"
  int v_pafID ;
  
-#line 52 "prolib.pcg"
+#line 50 "prolib.pcg"
  char v_pafAccountNo [ 30 ] ;
  
-#line 53 "prolib.pcg"
+#line 51 "prolib.pcg"
  int v_pafSortCode ;
  
-#line 54 "prolib.pcg"
+#line 52 "prolib.pcg"
  char v_pafRef [ 30 ] ;
  
-#line 55 "prolib.pcg"
+#line 53 "prolib.pcg"
  int v_pafTypeID ;
 /* exec sql end declare section */
-#line 56 "prolib.pcg"
+#line 54 "prolib.pcg"
 
 
   connectToDB();
@@ -134,14 +132,14 @@ void proAccountInsert(int pafActiveID, int pafID, char pafAccountNo[], int pafSo
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_pafTypeID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 69 "prolib.pcg"
+#line 67 "prolib.pcg"
 
  { ECPGtrans(__LINE__, NULL, "commit");}
-#line 70 "prolib.pcg"
+#line 68 "prolib.pcg"
 
 
  { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 72 "prolib.pcg"
+#line 70 "prolib.pcg"
 
 }
 

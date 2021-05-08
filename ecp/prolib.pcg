@@ -5,8 +5,6 @@
 #include "../inc/prolib.h"
 #include "../inc/fdbcon.h"
 
-//EXEC SQL INCLUDE sqlca;
-
 
 void providerInsert(int activeInd, char proName[])
 {
