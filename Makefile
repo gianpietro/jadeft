@@ -10,11 +10,11 @@ CURDIR = cur
 
 CFLAGS = -g
 
-OBJ =  fdbcon.so prolib.so procur.so
+OBJ =  fdbcon.so prolib.so procur.so jadlib.so
 
 program : $(OBJ)
 	gcc $(CFLAGS) $(SRCDIR)/jadeft.c $(OBJDIR)/fdbcon.so $(OBJDIR)/prolib.so \
-	$(OBJDIR)/procur.so \
+	$(OBJDIR)/procur.so $(OBJDIR)/jadlib.so \
 	-o $(BINDIR)/jadeft -I/usr/include -lpq -lecpg -lform -lcurses -I/include -lpq
 
 fdbcon.so : fdbcon.c fdbcon.h
@@ -24,6 +24,9 @@ prolib.so : prolib.c prolib.h
 	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
 
 procur.so : procur.c procur.h
+	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
+
+jadlib.so : jadlib.c jadlib.h
 	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
 
 clean:
@@ -40,5 +43,6 @@ clean:
 # $(\OBJDIR) is the target directory in this case lib where .so files will sit
 # $\@ refers to the target filename
 # clean is used to remove .so and binary files with command 'make clean'
+# when starting a new line make sure to add the back slash
 
 

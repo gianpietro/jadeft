@@ -7,8 +7,10 @@
 #include <arpa/inet.h>
 #include "../inc/procur.h"
 #include "../inc/prolib.h"
+#include "../inc/jadlib.h"
 
 /* API database connection method */
+/*
 static PGconn * fdbcon()
 {  
   PGconn *connection = PQconnectdb("user=gianpietro dbname=jadedev");
@@ -19,8 +21,9 @@ static PGconn * fdbcon()
     }  
   return connection;
 }
-
+*/
 /* Form navigation keys */
+/*
 static void keyNavigate(int ch, FORM * f)
 { 
   switch(ch)
@@ -45,8 +48,10 @@ static void keyNavigate(int ch, FORM * f)
       break;
     }
 }
+*/
 
 /* Trim trailing whitespace from the string entered in form field */
+/*
 static char * trimWS(char *s)
 {
   int i = 0;
@@ -63,7 +68,8 @@ static char * trimWS(char *s)
   s[index + 1] = '\0';
 
   return s;
-}       
+} 
+*/      
 
 /* Function to display Provider form for data entry */
 void provInsert()
