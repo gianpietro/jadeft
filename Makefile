@@ -10,11 +10,11 @@ CURDIR = cur
 
 CFLAGS = -g
 
-OBJ =  fdbcon.so prolib.so procur.so jadlib.so
+OBJ =  fdbcon.so prolib.so procur.so supcur.so jadlib.so
 
 program : $(OBJ)
 	gcc $(CFLAGS) $(SRCDIR)/jadeft.c $(OBJDIR)/fdbcon.so $(OBJDIR)/prolib.so \
-	$(OBJDIR)/procur.so $(OBJDIR)/jadlib.so \
+	$(OBJDIR)/procur.so $(OBJDIR)/supcur.so $(OBJDIR)/jadlib.so \
 	-o $(BINDIR)/jadeft -I/usr/include -lpq -lecpg -lform -lcurses -I/include -lpq
 
 fdbcon.so : fdbcon.c fdbcon.h
@@ -24,6 +24,9 @@ prolib.so : prolib.c prolib.h
 	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
 
 procur.so : procur.c procur.h
+	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
+
+supcur.so : supcur.c supcur.h
 	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
 
 jadlib.so : jadlib.c jadlib.h

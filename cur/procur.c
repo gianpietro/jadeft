@@ -81,7 +81,7 @@ void provInsert()
   int cf;            /* confirm save data */
   int actInd;        /* active_Ind */
   char pname[30];    /* provider_name */ 
-  int index , i;
+  //int index , i;
   int newRec= 'y';   /* Add another new record */
   int rows, cols;
     

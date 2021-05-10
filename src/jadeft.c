@@ -5,6 +5,7 @@
 #include "../inc/fdbcon.h"
 #include "../inc/prolib.h"
 #include "../inc/procur.h"
+#include "../inc/supcur.h"
 
 int main (void) {
   int x;
@@ -15,10 +16,13 @@ int main (void) {
   printf("Enter 1 to continue: ");
   scanf("%d",&x);
 
-  provTypeInsert();
-  provInsert();
-  
-  provAccountInsert();
+  // provTypeInsert();
+  // provInsert();  
+  // provAccountInsert();
+  // suppInsert();
+  // suppTypeInsert();
+  // paymentPeriodInsert();
+  propertyInsert();
   
   // system("clear");
    printf("Completed Enter 1 to exit: ");
