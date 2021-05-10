@@ -447,4 +447,239 @@ void propertyInsert()
   endwin();
 }
     
-//suppAccountInsert - add code
+int suppAccountInsert()
+{
+  WINDOW * supAcctWin, * supWin, * supTypeWin, * prtWin, * PayWin;
+  FORM * supAcctForm;
+  FIELD * supAcctField[13];
+  int i = 0, j = 0;
+  int range = 5;
+  char p;
+  int ch;
+  int srow, scol, strow, stcol, sarow, sacol, prrow, prcol, parow, pacol;
+  int list = 2;
+  int supID, proID, supTID, payID, proANo;
+  char supIDstr[5], proIDstr[5], supTIDstr[5], payIDstr[5], proANostr[30];
+  int rows;
+  int val, *params[1], length[1],  formats[1];
+  int safActiveID, safSupID, safPrtID, safSupTypeID, safStartDt, safEndDt, safPayID;
+  float safAmount;
+  char safSupAcctRef[30], safComment[50], safAlias[10], safPorAcctNo[30];
+  int cf;
+  int newRec = 'y';
+
+  PGconn *conn =  fdbcon();
+  PGresult *res;
+
+  initscr();
+  cbreak();
+  noecho();
+  keypad(stdscr,TRUE);
+  
+  while (newRec == 'y')
+    {
+      supAcctField[0] = new_field(1,1,1,35,0,0); /* active_ind */
+      supAcctField[1] = new_field(1,30,3,35,0,0); /* supplier_acct_ref */
+      supAcctField[2] = new_field(1,5,5,35,0,0); /* supplier_id */
+      supAcctField[3] = new_field(1,5,7,35,0,0); /* property_id */
+      supAcctField[4] = new_field(1,5,9,35,0,0); /* supplier_type_id */
+      supAcctField[5] = new_field(1,8,11,35,0,0); /* start_date */
+      supAcctField[6] = new_field(1,8,13,35,0,0); /* end_date */
+      supAcctField[7] = new_field(1,5,15,35,0,0); /* payment_period_id */
+      supAcctField[8] = new_field(1,10,17,35,0,0); /* amount */
+      supAcctField[9] = new_field(1,50,19,35,0,0); /* comment */
+      supAcctField[11] = new_field(1,30,21,35,0,0); /* provider_acct_no */
+      supAcctField[10] = new_field(1,10,23,35,0,0); /* alias */
+      supAcctField[12] = NULL;
+
+      set_field_type(supAcctField[0],TYPE_INTEGER,1,1,2);
+      set_field_type(supAcctField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(supAcctField[2],TYPE_INTEGER,0,1,99999);
+      set_field_type(supAcctField[3],TYPE_INTEGER,0,1,99999);
+      set_field_type(supAcctField[4],TYPE_INTEGER,0,1,99999);
+      set_field_type(supAcctField[5],TYPE_INTEGER,0,1,99999999);
+      set_field_type(supAcctField[6],TYPE_INTEGER,0,1,99999999);
+      set_field_type(supAcctField[7],TYPE_INTEGER,0,1,99999);
+      set_field_type(supAcctField[8],TYPE_NUMERIC,0,-100000.00,1000000.00);
+      set_field_type(supAcctField[9],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(supAcctField[10],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(supAcctField[11],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+
+      supAcctForm = new_form(supAcctField);
+      scale_form(supAcctForm, &sarow, &sacol);
+
+      supAcctWin = newwin(sarow+20, sacol+10,1,1);
+      supWin = newwin(20,50,1,120);
+
+      keypad(supAcctWin, TRUE);
+      keypad(supWin, TRUE);
+
+      set_form_win(supAcctForm,supAcctWin);
+      set_form_sub(supAcctForm, derwin(supAcctWin,sarow,sacol,1,1));
+      getmaxyx(supAcctWin,sarow,sacol);
+      getmaxyx(supWin,srow,scol);
+      box(supAcctWin,0,0);
+      box(supWin,0,0);
+      waddstr(supAcctWin, "Supplier Account Form");
+      waddstr(supWin, "Supplier List");
+
+      if(supAcctWin == NULL || supWin == NULL)
+	{
+	  endwin();
+	  puts("Unable to create window");
+	  return(1);
+	}
+
+      post_form(supAcctForm);
+      wrefresh(supAcctWin);
+
+      mvwprintw(supAcctWin, sarow-30, sacol-64, "Active Ind:");
+      mvwprintw(supAcctWin, sarow-28, sacol-64, "Supplier Account No:");
+      mvwprintw(supAcctWin, sarow-26, sacol-64, "Supplier ID:");
+      mvwprintw(supAcctWin, sarow-24, sacol-64, "Property ID:");
+      mvwprintw(supAcctWin, sarow-22, sacol-64, "Supplier Type ID:");
+      mvwprintw(supAcctWin, sarow-20, sacol-64, "Start Date:");
+      mvwprintw(supAcctWin, sarow-18, sacol-64, "End Date:");
+      mvwprintw(supAcctWin, sarow-16, sacol-64, "Payment Period:");
+      mvwprintw(supAcctWin, sarow-14, sacol-64, "Amount:");
+      mvwprintw(supAcctWin, sarow-12, sacol-64, "Comment:");
+      mvwprintw(supAcctWin, sarow-10, sacol-64, "Provider Account No:");
+      mvwprintw(supAcctWin, sarow-8, sacol-64, "Alias:");
+      wmove(supAcctWin, sarow-30, sacol-39);
+      wrefresh(supAcctWin);
+
+      while((ch = wgetch(supAcctWin)) != KEY_F(1))
+      {
+	keyNavigate(ch, supAcctForm);
+	if(ch == KEY_F(2))
+	    {
+	      i = j = rows = 0;
+	      list = 2;
+	      wclear(supWin);
+	      box(supWin,0,0);
+	      waddstr(supWin, "Supplier List");
+	      wmove(supWin,1,1);
+	      wrefresh(supWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM supplier WHERE active_ind = 1");	  
+	      rows = PQntuples(res);
+
+	      wrefresh(supWin);
+	  
+	      while((p = wgetch(supWin)) == '\n')
+		{
+		  if ( j + range < rows)
+		    j = j + range;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(supWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      list++;	 
+		    }
+		  list = 2;      
+		  wclrtoeol(supWin);  
+		  if  (i == rows)
+		    {
+		      wclrtobot(supWin);  
+		      mvwprintw(supWin,10,1,"End of list");
+		      box(supWin,0,0);
+		      mvwprintw(supWin,0,0, "Supplier List");
+		      wmove(supWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(supWin,11,1,"Select Supplier: ");
+	      mvwscanw(supWin,11,25, "%5s", &supIDstr);
+	      set_field_buffer(supAcctField[2],0, supIDstr);
+
+	      /* CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES */
+	      supID = atoi(field_buffer(supAcctField[2],0));
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)supID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM supplier WHERE supplier_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(supWin,13,1, "no or rows %d ",rows);
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(supWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  wrefresh(supWin);
+		}
+	      else
+		{
+		  mvwprintw(supWin,12,1,"Number invalied");
+		  wrefresh(supWin);		
+		  wrefresh(supAcctWin);
+		}
+	      noecho();
+	      PQclear(res);
+	    } //F2
+	
+
+
+
+	
+      } //while not F1
+
+    /* code goes here for assign buffer value and validate prior to insert */
+
+
+
+      /* free form and fields */
+      
+      unpost_form(supAcctForm);
+      free_form(supAcctForm);
+      free_field(supAcctField[0]);
+      free_field(supAcctField[1]);
+      free_field(supAcctField[2]);
+      free_field(supAcctField[3]);
+      free_field(supAcctField[4]);
+      free_field(supAcctField[5]);
+      free_field(supAcctField[6]);
+      free_field(supAcctField[7]);
+      free_field(supAcctField[8]);
+      free_field(supAcctField[9]);
+      free_field(supAcctField[10]);
+      free_field(supAcctField[11]);
+
+      mvwprintw(supAcctWin,sarow-6,sacol-64,"Do you want to add a new record y/n: ");
+      echo();
+      while((newRec = wgetch(supAcctWin)) != 'y')
+	{
+	  wmove(supAcctWin,sarow-6,sacol-64);
+	  if(newRec == 'n')
+	    break;
+	}
+      noecho();
+      
+
+
+
+
+      
+		   
+    } //while newRec = y
+
+  PQfinish(conn);
+  endwin();      
+  
+  return 0;
+}
+    
