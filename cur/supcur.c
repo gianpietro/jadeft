@@ -449,7 +449,7 @@ void propertyInsert()
     
 int suppAccountInsert()
 {
-  WINDOW * supAcctWin, * supWin, * supTypeWin, * prtWin, * PayWin;
+  WINDOW * supAcctWin, * supWin, * supTypeWin, * prtWin, * payWin;
   FORM * supAcctForm;
   FIELD * supAcctField[13];
   int i = 0, j = 0;
@@ -458,13 +458,13 @@ int suppAccountInsert()
   int ch;
   int srow, scol, strow, stcol, sarow, sacol, prrow, prcol, parow, pacol;
   int list = 2;
-  int supID, proID, supTID, payID, proANo;
-  char supIDstr[5], proIDstr[5], supTIDstr[5], payIDstr[5], proANostr[30];
+  int supID, prtID, supTID, payID, proANo;
+  char supIDstr[5], prtIDstr[5], supTIDstr[5], payIDstr[5], proANostr[30];
   int rows;
   int val, *params[1], length[1],  formats[1];
   int safActiveID, safSupID, safPrtID, safSupTypeID, safStartDt, safEndDt, safPayID;
   float safAmount;
-  char safSupAcctRef[30], safComment[50], safAlias[10], safPorAcctNo[30];
+  char safSupAcctRef[30], safComment[50], safAlias[10], safProAcctNo[30];
   int cf;
   int newRec = 'y';
 
@@ -510,20 +510,35 @@ int suppAccountInsert()
 
       supAcctWin = newwin(sarow+20, sacol+10,1,1);
       supWin = newwin(20,50,1,120);
-
+      prtWin = newwin(20,50,1,120);
+      supTypeWin = newwin(20,50,1,120);
+      payWin = newwin(20,50,1,120);
+      
       keypad(supAcctWin, TRUE);
       keypad(supWin, TRUE);
+      keypad(prtWin, TRUE);
+      keypad(supTypeWin, TRUE);
+      keypad(payWin, TRUE);
 
       set_form_win(supAcctForm,supAcctWin);
       set_form_sub(supAcctForm, derwin(supAcctWin,sarow,sacol,1,1));
       getmaxyx(supAcctWin,sarow,sacol);
       getmaxyx(supWin,srow,scol);
+      getmaxyx(prtWin,prrow,prcol);
+      getmaxyx(supTypeWin, strow, stcol);
+      getmaxyx(payWin, parow, pacol);
       box(supAcctWin,0,0);
       box(supWin,0,0);
+      box(prtWin,0,0);
+      box(supTypeWin, 0,0);
+      box(payWin, 0,0);
       waddstr(supAcctWin, "Supplier Account Form");
-      waddstr(supWin, "Supplier List");
+      waddstr(supWin, "Supplier");
+      waddstr(prtWin, "Property");
+      waddstr(supTypeWin, "Supplier Type");
+      waddstr(payWin, "Payment Period");
 
-      if(supAcctWin == NULL || supWin == NULL)
+      if(supAcctWin == NULL || supWin == NULL || prtWin == NULL ||supTypeWin == NULL || payWin == NULL)
 	{
 	  endwin();
 	  puts("Unable to create window");
@@ -535,15 +550,15 @@ int suppAccountInsert()
 
       mvwprintw(supAcctWin, sarow-30, sacol-64, "Active Ind:");
       mvwprintw(supAcctWin, sarow-28, sacol-64, "Supplier Account No:");
-      mvwprintw(supAcctWin, sarow-26, sacol-64, "Supplier ID:");
-      mvwprintw(supAcctWin, sarow-24, sacol-64, "Property ID:");
-      mvwprintw(supAcctWin, sarow-22, sacol-64, "Supplier Type ID:");
+      mvwprintw(supAcctWin, sarow-26, sacol-64, "Supplier ID(F2):");
+      mvwprintw(supAcctWin, sarow-24, sacol-64, "Property ID(F3):");
+      mvwprintw(supAcctWin, sarow-22, sacol-64, "Supplier Type ID(F4):");
       mvwprintw(supAcctWin, sarow-20, sacol-64, "Start Date:");
       mvwprintw(supAcctWin, sarow-18, sacol-64, "End Date:");
-      mvwprintw(supAcctWin, sarow-16, sacol-64, "Payment Period:");
+      mvwprintw(supAcctWin, sarow-16, sacol-64, "Payment Period(F5):");
       mvwprintw(supAcctWin, sarow-14, sacol-64, "Amount:");
       mvwprintw(supAcctWin, sarow-12, sacol-64, "Comment:");
-      mvwprintw(supAcctWin, sarow-10, sacol-64, "Provider Account No:");
+      mvwprintw(supAcctWin, sarow-10, sacol-64, "Provider Account No(F6):");
       mvwprintw(supAcctWin, sarow-8, sacol-64, "Alias:");
       wmove(supAcctWin, sarow-30, sacol-39);
       wrefresh(supAcctWin);
@@ -557,7 +572,7 @@ int suppAccountInsert()
 	      list = 2;
 	      wclear(supWin);
 	      box(supWin,0,0);
-	      waddstr(supWin, "Supplier List");
+	      waddstr(supWin, "Supplier");
 	      wmove(supWin,1,1);
 	      wrefresh(supWin);
 
@@ -586,7 +601,7 @@ int suppAccountInsert()
 		      wclrtobot(supWin);  
 		      mvwprintw(supWin,10,1,"End of list");
 		      box(supWin,0,0);
-		      mvwprintw(supWin,0,0, "Supplier List");
+		      mvwprintw(supWin,0,0, "Supplier");
 		      wmove(supWin,10,1);
 		      break;
 		    }
@@ -631,6 +646,246 @@ int suppAccountInsert()
 	      noecho();
 	      PQclear(res);
 	    } //F2
+	if(ch == KEY_F(3))
+	    {
+	      i = j = rows = 0;
+	      list = 2;
+	      wclear(prtWin);
+	      box(prtWin,0,0);
+	      waddstr(prtWin, "Property");
+	      wmove(prtWin,1,1);
+	      wrefresh(prtWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM property WHERE active_ind = 1");	  
+	      rows = PQntuples(res);
+
+	      wrefresh(prtWin);
+	  
+	      while((p = wgetch(prtWin)) == '\n')
+		{
+		  if ( j + range < rows)
+		    j = j + range;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(prtWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      list++;	 
+		    }
+		  list = 2;      
+		  wclrtoeol(prtWin);  
+		  if  (i == rows)
+		    {
+		      wclrtobot(prtWin);  
+		      mvwprintw(prtWin,10,1,"End of list");
+		      box(prtWin,0,0);
+		      mvwprintw(prtWin,0,0, "Property");
+		      wmove(prtWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(prtWin,11,1,"Select Property: ");
+	      mvwscanw(prtWin,11,25, "%5s", &prtIDstr);
+	      set_field_buffer(supAcctField[3],0, prtIDstr);
+
+	      /* CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES */
+	      prtID = atoi(field_buffer(supAcctField[3],0));
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)prtID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM property WHERE property_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(prtWin,13,1, "no or rows %d ",rows);
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(prtWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  wrefresh(prtWin);
+		}
+	      else
+		{
+		  mvwprintw(prtWin,12,1,"Number invalied");
+		  wrefresh(prtWin);		
+		  wrefresh(supAcctWin);
+		}
+	      noecho();
+	      PQclear(res);
+	    } // F3
+	if(ch == KEY_F(4))
+	    {
+	      i = j = rows = 0;
+	      list = 2;
+	      wclear(supTypeWin);
+	      box(supTypeWin,0,0);
+	      waddstr(supTypeWin, "Supplier Type");
+	      wmove(supTypeWin,1,1);
+	      wrefresh(supTypeWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM supplier_type");	  
+	      rows = PQntuples(res);
+
+	      wrefresh(supTypeWin);
+	  
+	      while((p = wgetch(supTypeWin)) == '\n')
+		{
+		  if ( j + range < rows)
+		    j = j + range;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(supTypeWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      list++;	 
+		    }
+		  list = 2;      
+		  wclrtoeol(supTypeWin);  
+		  if  (i == rows)
+		    {
+		      wclrtobot(supTypeWin);  
+		      mvwprintw(supTypeWin,10,1,"End of list");
+		      box(supTypeWin,0,0);
+		      mvwprintw(supTypeWin,0,0, "Supplier Type");
+		      wmove(supTypeWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(supTypeWin,11,1,"Select Supplier Type: ");
+	      mvwscanw(supTypeWin,11,25, "%5s", &supTIDstr);
+	      set_field_buffer(supAcctField[4],0, supTIDstr);
+
+	      /* CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES */
+	      supTID = atoi(field_buffer(supAcctField[4],0));
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)supTID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM supplier_type WHERE supplier_type_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(supTypeWin,13,1, "no or rows %d ",rows);
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(supTypeWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  wrefresh(supTypeWin);
+		}
+	      else
+		{
+		  mvwprintw(supTypeWin,12,1,"Number invalied");
+		  wrefresh(supTypeWin);		
+		  wrefresh(supAcctWin);
+		}
+	      noecho();
+	      PQclear(res);
+	    } // F4
+	if(ch == KEY_F(5))
+	    {
+	      i = j = rows = 0;
+	      list = 2;
+	      wclear(payWin);
+	      box(payWin,0,0);
+	      waddstr(payWin, "Payment Period");
+	      wmove(payWin,1,1);
+	      wrefresh(payWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM payment_period");	  
+	      rows = PQntuples(res);
+
+	      wrefresh(payWin);
+	  
+	      while((p = wgetch(payWin)) == '\n')
+		{
+		  if ( j + range < rows)
+		    j = j + range;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(payWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      list++;	 
+		    }
+		  list = 2;      
+		  wclrtoeol(payWin);  
+		  if  (i == rows)
+		    {
+		      wclrtobot(payWin);  
+		      mvwprintw(payWin,10,1,"End of list");
+		      box(payWin,0,0);
+		      mvwprintw(payWin,0,0, "Payment Period");
+		      wmove(payWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(payWin,11,1,"Select Pay Period: ");
+	      mvwscanw(payWin,11,25, "%5s", &payIDstr);
+	      set_field_buffer(supAcctField[7],0, payIDstr);
+
+	      /* CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES */
+	      payID = atoi(field_buffer(supAcctField[7],0));
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)payID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM payment_period WHERE payment_period_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(payWin,13,1, "no or rows %d ",rows);
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(payWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  wrefresh(payWin);
+		}
+	      else
+		{
+		  mvwprintw(payWin,12,1,"Number invalied");
+		  wrefresh(payWin);		
+		  wrefresh(supAcctWin);
+		}
+	      noecho();
+	      PQclear(res);
+	    } //F5
 	
 
 
