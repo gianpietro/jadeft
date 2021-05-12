@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <libpq-fe.h>
+#include "../inc/suplib.h"
+#include "../inc/fdbcon.h"
+
+
+void supplierInsert(int activeInd,char supName[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+      int v_activeInd;
+      char v_supName[30];
+   EXEC SQL END DECLARE SECTION;
+   
+   connectToDB();
+     
+   v_activeInd = activeInd;
+   strcpy(v_supName,supName);
+    
+   EXEC SQL
+    INSERT INTO supplier(active_ind,supplier_name) VALUES(:v_activeInd,:v_supName);
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void supTypeInsert(char supTypeDesc[])
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+     char v_supTypeDesc[30];
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   strcpy(v_supTypeDesc, supTypeDesc);
+
+   EXEC SQL
+     INSERT INTO supplier_type(description) VALUES(:v_supTypeDesc);
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+
+void payPeriodInsert(char payPeriod[])
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+     char v_payPeriod[30];
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   strcpy(v_payPeriod, payPeriod);
+
+   EXEC SQL
+     INSERT INTO payment_period(period) VALUES(:v_payPeriod);
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+
+void prtInsert(int actInd, char prtPostCode[], char prtAddress[], char prtCity[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     int v_actInd;
+     char v_prtPostCode[10];
+     char v_prtAddress[30];
+     char v_prtCity[30];
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   v_actInd = actInd;
+   strcpy(v_prtPostCode, prtPostCode);
+   strcpy(v_prtAddress, prtAddress);
+   strcpy(v_prtCity,prtCity);
+
+   EXEC SQL
+     INSERT INTO property(active_ind, post_code, address, city)
+                 VALUES(:v_actInd, :v_prtPostCode, :v_prtAddress, :v_prtCity);
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int safPrtID,
+                      int safSupTypeID, int safStartDt, int safEndDt, int safPayID, float safAmount,
+		      char safComment[], char safProAcctNo[],char safAlias[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     int v_safActiveID;
+     char v_safSupAcctRef[30];
+     int v_safSupID;
+     int v_safPrtID;
+     int v_safSupTypeID;
+     int v_safStartDt;
+     int v_safEndDt;
+     int v_safPayID;
+     float v_safAmount;
+     char v_safComment[30];
+     char v_safProAcctNo[30];
+     char v_safAlias[10];
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   v_safActiveID = safActiveID;
+   strcpy(v_safSupAcctRef, safSupAcctRef);
+   v_safSupID = safSupID;
+   v_safPrtID = safPrtID;
+   v_safSupTypeID = safSupTypeID;
+   v_safStartDt = safStartDt;
+   v_safEndDt = safEndDt;
+   v_safPayID = safPayID;
+   v_safAmount = safPayID;
+   strcpy(v_safComment, safComment);
+   strcpy(v_safProAcctNo, safProAcctNo);
+   strcpy(v_safAlias, safAlias);
+
+   EXEC SQL
+     INSERT INTO supplier_account(active_ind, supplier_acct_ref, supplier_id, property_id, supplier_type_id,
+                                  start_date, end_date, payment_period_id, amount, comment, provider_acct_no, alias)
+     VALUES(:v_safActiveID, :v_safSupAcctRef, :v_safSupID, :v_safPrtID, :v_safSupTypeID,
+            :v_safStartDt, :v_safEndDt, :v_safPayID, :v_safAmount, :v_safComment, :v_safProAcctNo, :v_safAlias);
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+ 
+
+

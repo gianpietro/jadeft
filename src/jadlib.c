@@ -33,7 +33,7 @@ void keyNavigate(int ch, FORM * f)
     case KEY_BACKSPACE:
       form_driver(f, REQ_CLR_FIELD);	  
       break;
-    case 10:
+    case 10:                              /* ASCII value for carriage return */
       form_driver(f, REQ_VALIDATION);
       form_driver(f, REQ_NEXT_FIELD);
       break;
@@ -48,7 +48,7 @@ char * trimWS(char *s)
 {
   int i = 0;
   int index = -1;
-
+  				
   while (s[i] != '\0')
     {
       if(s[i] != ' ' && s[i] != '\t' && s[i] != '\n')

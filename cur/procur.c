@@ -560,8 +560,7 @@ int provAccountInsert()
 	      proAccountInsert(pafActiveID, pafID, pafAccountNo, pafSortCode, pafRef, pafTypeID);
 	      mvwprintw(proAcctWin,parow-8, pacol-64, "Data saved");
 	    }
-	}
-  
+	}  
       else
 	{
 	  mvwprintw(proAcctWin,parow-8,pacol-64, "Data invalid");	
@@ -582,7 +581,7 @@ int provAccountInsert()
       echo();
       while((newRec = wgetch(proAcctWin)) != 'y')
 	{
-	  wmove(proAcctWin,parow-6,pacol-64);
+	  wmove(proAcctWin,parow-6,pacol-27);  //CHECK COL POSITION OK
 	  if(newRec == 'n')
 	    break;
 	}

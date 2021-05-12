@@ -5,6 +5,7 @@
 #include <libpq-fe.h>
 #include <arpa/inet.h>
 #include "../inc/supcur.h"
+#include "../inc/suplib.h"
 #include "../inc/jadlib.h"
 
 
@@ -43,14 +44,13 @@ void suppInsert()
       scale_form(supplierForm, &rows, &cols);
 
       /* Add window which will be associated to form */
-      supWin = newwin(rows+15, cols+20,1,1);  
+      supWin = newwin(rows+20, cols+10,1,1);  
       keypad(supWin, TRUE);
        
       /* Set main and sub windows */
       set_form_win(supplierForm, supWin);
-      set_form_sub(supplierForm, derwin(supWin,rows,cols,2,2));
+      set_form_sub(supplierForm, derwin(supWin,rows,cols,1,1));
       getmaxyx(supWin,rows,cols);
-      
       box(supWin, 0,0);
           
       if (supWin == NULL)
@@ -65,43 +65,45 @@ void suppInsert()
       post_form(supplierForm); 
       wrefresh(supWin);
 
+
       //mvwprintw(supWin,y+2,x+5,"Jade Finacial Tracker");
-      mvwprintw(supWin,rows-16,cols-65, "Active Ind:");                           
-      mvwprintw(supWin,rows-14,cols-65, "Supplier Name:");
-      mvwprintw(supWin,rows-2,cols-65,"Press F1 when form complete");
-      wmove(supWin, rows-16,cols-48);     /* move cursor */
+      mvwprintw(supWin,24, 5, "rows %d cols %d", rows, cols);
+      mvwprintw(supWin,3,5, "Active Ind:");                           
+      mvwprintw(supWin,5,5, "Supplier Name:");
+      mvwprintw(supWin,23,5,"Press F1 when form complete");
+      wmove(supWin,3,23);     /* move cursor */
 
       while((ch = wgetch(supWin)) != KEY_F(1))
 	 keyNavigate(ch, supplierForm);
     
       /* Assign data entered in field */
       actInd = atoi(field_buffer(supplierField[0],0));
-      strcpy(sname, trimWS(field_buffer(supplierField[1],0)));
+      strcpy(sname, field_buffer(supplierField[1],0));
 
       if ((form_driver(supplierForm,REQ_VALIDATION) == E_OK) && (actInd >= 1) && (!isspace(*sname)))
 	{
-	  //strcpy(sname, trimWS(sname));  
+	  strcpy(sname, trimWS(sname));  
 	  echo();
-	  mvwprintw(supWin,rows-8,cols-65,"Save: y/n: ");     
+	  mvwprintw(supWin,17,5,"Save: y/n: ");     
 
 	  while((cf = wgetch(supWin)) != 'y')
 	    {
-	      wmove(supWin,rows-8,cols-54);
+	      wmove(supWin,17,16);
 	      if (cf == 'n')
 		{
-		  mvwprintw(supWin,rows-6,cols-65, "Data not saved");
+		  mvwprintw(supWin,19,5, "Data not saved");
 		  break;
 		}
 	    }	  
 	  if (cf == 'y')
 	    {
-	      // providerInsert(actInd,sname);   /* Save data to database */
-	      mvwprintw(supWin,rows-6,cols-65, "Data saved");
+	      supplierInsert(actInd,sname);   /* Save data to database */
+	      mvwprintw(supWin,19,5, "Data saved");
 	    }
 	}
       else
 	{
-	  mvwprintw(supWin,rows-6,cols-65, "Data invalid");
+	  mvwprintw(supWin,19,5, "Data invalid");
 	}
           noecho();
 
@@ -111,11 +113,11 @@ void suppInsert()
       free_field(supplierField[1]);
       free_field(supplierField[2]);
 
-      mvwprintw(supWin,rows-4,cols-65,"Do you want to add a new record y/n: ");
+      mvwprintw(supWin,22,5,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(supWin)) != 'y')
 	{
-	  wmove(supWin,rows-4,cols-28);
+	  wmove(supWin,22,44);
 	  if(newRec == 'n')
 	    break;
 	}
@@ -194,7 +196,7 @@ void suppTypeInsert()
 	    }
 	  if(cf == 'y')
 	    {
-	      //proTypeInsert(sdesc);
+	      supTypeInsert(sdesc);
 	      mvwprintw(supTypeWin,rows-6,cols-46, "Data saved");
 	    }
 	}
@@ -292,7 +294,7 @@ void paymentPeriodInsert()
 	    }
 	  if(cf == 'y')
 	    {
-	      //proTypeInsert(sdesc);
+	      payPeriodInsert(payPer);
 	      mvwprintw(payPerWin,rows-6,cols-46, "Data saved");
 	    }
 	}
@@ -347,8 +349,8 @@ void propertyInsert()
       /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
       propertyField[0] = new_field(1, 1, 2, 22, 0, 0);      // active_ind
       propertyField[1] = new_field(1, 10, 4, 22, 0, 0);     // post_code
-      propertyField[2] = new_field(1, 30, 6, 22, 0, 0);        // address
-      propertyField[3] = new_field(1, 30, 8, 22, 0, 0);        // city
+      propertyField[2] = new_field(1, 30, 6, 22, 0, 0);     // address
+      propertyField[3] = new_field(1, 30, 8, 22, 0, 0);     // city
       propertyField[4] = NULL;
 
       set_field_type(propertyField[0],TYPE_INTEGER,1,1,2);
@@ -418,7 +420,7 @@ void propertyInsert()
 	    }	  
 	  if (cf == 'y')
 	    {
-	      //providerInsert(actInd,pname);   /* Save data to database */
+	      prtInsert(actInd, prtPostCode, prtAddress, prtCity);
 	      mvwprintw(prtWin,rows-6,cols-65, "Data saved");
 	    }
 	}
@@ -433,6 +435,7 @@ void propertyInsert()
       free_field(propertyField[0]);
       free_field(propertyField[1]);
       free_field(propertyField[2]);
+      free_field(propertyField[3]);
 
       mvwprintw(prtWin,rows-4,cols-65,"Do you want to add a new record y/n: ");
       echo();
@@ -446,7 +449,8 @@ void propertyInsert()
     } 
   endwin();
 }
-    
+
+
 int suppAccountInsert()
 {
   WINDOW * supAcctWin, * supWin, * supTypeWin, * prtWin, * payWin, * paWin;
@@ -464,7 +468,7 @@ int suppAccountInsert()
   int val, *params[1], length[1],  formats[1];
   int safActiveID, safSupID, safPrtID, safSupTypeID, safStartDt, safEndDt, safPayID;
   float safAmount;
-  char safSupAcctRef[30], safComment[50], safAlias[10], safProAcctNo[30];
+  char safSupAcctRef[30], safComment[30], safAlias[10], safProAcctNo[30];
   int cf;
   int newRec = 'y';
 
@@ -478,18 +482,18 @@ int suppAccountInsert()
   
   while (newRec == 'y')
     {
-      supAcctField[0] = new_field(1,1,1,35,0,0); /* active_ind */
-      supAcctField[1] = new_field(1,30,3,35,0,0); /* supplier_acct_ref */
-      supAcctField[2] = new_field(1,5,5,35,0,0); /* supplier_id */
-      supAcctField[3] = new_field(1,5,7,35,0,0); /* property_id */
-      supAcctField[4] = new_field(1,5,9,35,0,0); /* supplier_type_id */
-      supAcctField[5] = new_field(1,8,11,35,0,0); /* start_date */
-      supAcctField[6] = new_field(1,8,13,35,0,0); /* end_date */
-      supAcctField[7] = new_field(1,5,15,35,0,0); /* payment_period_id */
-      supAcctField[8] = new_field(1,10,17,35,0,0); /* amount */
-      supAcctField[9] = new_field(1,50,19,35,0,0); /* comment */
-      supAcctField[10] = new_field(1,30,21,35,0,0); /* provider_acct_no */
-      supAcctField[11] = new_field(1,10,23,35,0,0); /* alias */
+      supAcctField[0] = new_field(1,1,2,33,0,0);    /* active_ind */
+      supAcctField[1] = new_field(1,30,4,33,0,0);   /* supplier_acct_ref */
+      supAcctField[2] = new_field(1,5,6,33,0,0);    /* supplier_id */
+      supAcctField[3] = new_field(1,5,8,33,0,0);    /* property_id */
+      supAcctField[4] = new_field(1,5,10,33,0,0);   /* supplier_type_id */
+      supAcctField[5] = new_field(1,8,12,33,0,0);   /* start_date */
+      supAcctField[6] = new_field(1,8,14,33,0,0);   /* end_date */
+      supAcctField[7] = new_field(1,5,16,33,0,0);   /* payment_period_id */
+      supAcctField[8] = new_field(1,10,18,33,0,0);  /* amount */
+      supAcctField[9] = new_field(1,30,20,33,0,0);  /* comment */
+      supAcctField[10] = new_field(1,30,22,33,0,0); /* provider_acct_no */
+      supAcctField[11] = new_field(1,10,24,33,0,0); /* alias */
       supAcctField[12] = NULL;
 
       set_field_type(supAcctField[0],TYPE_INTEGER,1,1,2);
@@ -500,7 +504,7 @@ int suppAccountInsert()
       set_field_type(supAcctField[5],TYPE_INTEGER,0,1,99999999);
       set_field_type(supAcctField[6],TYPE_INTEGER,0,1,99999999);
       set_field_type(supAcctField[7],TYPE_INTEGER,0,1,99999);
-      set_field_type(supAcctField[8],TYPE_NUMERIC,0,-100000.00,1000000.00);
+      set_field_type(supAcctField[8],TYPE_NUMERIC,2,-100000,1000000);
       set_field_type(supAcctField[9],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       set_field_type(supAcctField[10],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       set_field_type(supAcctField[11],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
@@ -508,7 +512,7 @@ int suppAccountInsert()
       supAcctForm = new_form(supAcctField);
       scale_form(supAcctForm, &sarow, &sacol);
 
-      supAcctWin = newwin(sarow+20, sacol+10,1,1);
+      supAcctWin = newwin(sarow+15, sacol+10,1,1);
       supWin = newwin(20,50,1,120);
       prtWin = newwin(20,50,1,120);
       supTypeWin = newwin(20,50,1,120);
@@ -553,19 +557,21 @@ int suppAccountInsert()
       post_form(supAcctForm);
       wrefresh(supAcctWin);
 
-      mvwprintw(supAcctWin, sarow-30, sacol-64, "Active Ind:");
-      mvwprintw(supAcctWin, sarow-28, sacol-64, "Supplier Account No:");
-      mvwprintw(supAcctWin, sarow-26, sacol-64, "Supplier ID(F2):");
-      mvwprintw(supAcctWin, sarow-24, sacol-64, "Property ID(F3):");
-      mvwprintw(supAcctWin, sarow-22, sacol-64, "Supplier Type ID(F4):");
-      mvwprintw(supAcctWin, sarow-20, sacol-64, "Start Date:");
-      mvwprintw(supAcctWin, sarow-18, sacol-64, "End Date:");
-      mvwprintw(supAcctWin, sarow-16, sacol-64, "Payment Period(F5):");
-      mvwprintw(supAcctWin, sarow-14, sacol-64, "Amount:");
-      mvwprintw(supAcctWin, sarow-12, sacol-64, "Comment:");
-      mvwprintw(supAcctWin, sarow-10, sacol-64, "Provider Account No(F6):");
-      mvwprintw(supAcctWin, sarow-8, sacol-64, "Alias:");
-      wmove(supAcctWin, sarow-30, sacol-39);
+      //mvwprintw(supAcctWin, 37, 5,"row %d col %d", sarow, sacol);
+
+      mvwprintw(supAcctWin, 3,5, "Active Ind:");
+      mvwprintw(supAcctWin, 5,5, "Supplier Account No:");
+      mvwprintw(supAcctWin, 7,5, "Supplier ID(F2):");
+      mvwprintw(supAcctWin, 9,5, "Property ID(F3):");
+      mvwprintw(supAcctWin, 11,5, "Supplier Type ID(F4):");
+      mvwprintw(supAcctWin, 13,5, "Start Date:");
+      mvwprintw(supAcctWin, 15,5, "End Date:");
+      mvwprintw(supAcctWin, 17,5, "Payment Period(F5):");
+      mvwprintw(supAcctWin, 19,5, "Amount:");
+      mvwprintw(supAcctWin, 21,5, "Comment:");
+      mvwprintw(supAcctWin, 23,5, "Provider Account No(F6):");
+      mvwprintw(supAcctWin, 25,5, "Alias:");
+      wmove(supAcctWin,3,34);
       wrefresh(supAcctWin);
 
       while((ch = wgetch(supAcctWin)) != KEY_F(1))
@@ -971,17 +977,49 @@ int suppAccountInsert()
 	      noecho();
 	      PQclear(res);
 	    } // F6
-	
-	
-
-
-
-	
       } //while not F1
 
     /* code goes here for assign buffer value and validate prior to insert */
+     
+      safActiveID = atoi(field_buffer(supAcctField[0],0));
+      strcpy(safSupAcctRef, trimWS(field_buffer(supAcctField[1],0)));
+      safSupID = atoi(field_buffer(supAcctField[2],0));
+      safPrtID = atoi(field_buffer(supAcctField[3],0));
+      safSupTypeID = atoi(field_buffer(supAcctField[4],0));
+      safStartDt = atoi(field_buffer(supAcctField[5],0));
+      safEndDt = atoi(field_buffer(supAcctField[6],0));
+      safPayID = atoi(field_buffer(supAcctField[7],0));
+      safAmount = atof(field_buffer(supAcctField[8],0));
+      strcpy(safComment,trimWS(field_buffer(supAcctField[9],0)));
+      strcpy(safProAcctNo, trimWS(field_buffer(supAcctField[10],0)));
+      strcpy(safAlias, trimWS(field_buffer(supAcctField[11],0)));
 
+      if ((form_driver(supAcctForm,REQ_VALIDATION) == E_OK) && (safActiveID >= 1))
+	{
+	  echo();
+	  mvwprintw(supAcctWin,32,5,"Save: y/n: ");     
 
+	  while((cf = wgetch(supAcctWin)) != 'y')
+	    {
+	      wmove(supAcctWin,32,16);
+	      if (cf == 'n')
+		{
+		  mvwprintw(supAcctWin,34,5, "Data not saved");
+		  break;
+		}
+	    }	  
+	  if (cf == 'y')
+	    {
+	      supAccountInsert(safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
+			       safEndDt, safPayID, safAmount, safComment, safProAcctNo, safAlias);
+	      mvwprintw(supAcctWin,34,5, "Data saved");
+	    }
+	}
+      else
+	{
+	  mvwprintw(supAcctWin,34,5, "Data invalid");	
+	}
+      noecho();
 
       /* free form and fields */
       
@@ -1000,22 +1038,15 @@ int suppAccountInsert()
       free_field(supAcctField[10]);
       free_field(supAcctField[11]);
 
-      mvwprintw(supAcctWin,sarow-6,sacol-64,"Do you want to add a new record y/n: ");
+      mvwprintw(supAcctWin,37,5,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(supAcctWin)) != 'y')
 	{
-	  wmove(supAcctWin,sarow-6,sacol-64);
+	  wmove(supAcctWin,37,44);
 	  if(newRec == 'n')
 	    break;
 	}
       noecho();
-      
-
-
-
-
-      
-		   
     } //while newRec = y
 
   PQfinish(conn);
