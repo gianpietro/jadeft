@@ -466,9 +466,9 @@ int suppAccountInsert()
   char supIDstr[5], prtIDstr[5], supTIDstr[5], payIDstr[5], proANostr[30];
   int rows;
   int val, *params[1], length[1],  formats[1];
-  int safActiveID, safSupID, safPrtID, safSupTypeID, safStartDt, safEndDt, safPayID;
+  int safActiveID, safSupID, safPrtID, safSupTypeID, safStartDt, safEndDt, safPayID, safProAcctID;
   float safAmount;
-  char safSupAcctRef[30], safComment[30], safAlias[10], safProAcctNo[30];
+  char safSupAcctRef[30], safComment[30], safAlias[10];
   int cf;
   int newRec = 'y';
 
@@ -492,8 +492,8 @@ int suppAccountInsert()
       supAcctField[7] = new_field(1,5,16,33,0,0);   /* payment_period_id */
       supAcctField[8] = new_field(1,10,18,33,0,0);  /* amount */
       supAcctField[9] = new_field(1,30,20,33,0,0);  /* comment */
-      supAcctField[10] = new_field(1,30,22,33,0,0); /* provider_acct_no */
-      supAcctField[11] = new_field(1,10,24,33,0,0); /* alias */
+      supAcctField[10] = new_field(1,10,22,33,0,0); /* alias */
+      supAcctField[11] = new_field(1,5,24,33,0,0);  /* provider_acct_id */
       supAcctField[12] = NULL;
 
       set_field_type(supAcctField[0],TYPE_INTEGER,1,1,2);
@@ -507,7 +507,7 @@ int suppAccountInsert()
       set_field_type(supAcctField[8],TYPE_NUMERIC,2,-100000,1000000);
       set_field_type(supAcctField[9],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       set_field_type(supAcctField[10],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
-      set_field_type(supAcctField[11],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(supAcctField[11],TYPE_INTEGER,0,1,99999);
 
       supAcctForm = new_form(supAcctField);
       scale_form(supAcctForm, &sarow, &sacol);
@@ -569,8 +569,8 @@ int suppAccountInsert()
       mvwprintw(supAcctWin, 17,5, "Payment Period(F5):");
       mvwprintw(supAcctWin, 19,5, "Amount:");
       mvwprintw(supAcctWin, 21,5, "Comment:");
-      mvwprintw(supAcctWin, 23,5, "Provider Account No(F6):");
-      mvwprintw(supAcctWin, 25,5, "Alias:");
+      mvwprintw(supAcctWin, 23,5, "Alias:");
+      mvwprintw(supAcctWin, 25,5, "Provider Account ID(F6):");
       wmove(supAcctWin,3,34);
       wrefresh(supAcctWin);
 
@@ -940,10 +940,10 @@ int suppAccountInsert()
 	      echo();  
 	      mvwprintw(paWin,11,1,"Select Provider Account: ");
 	      mvwscanw(paWin,11,25, "%5s", &proANostr);
-	      set_field_buffer(supAcctField[10],0, proANostr);
+	      set_field_buffer(supAcctField[11],0, proANostr);
 
 	      /* CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES */
-	      proANo = atoi(field_buffer(supAcctField[10],0));
+	      proANo = atoi(field_buffer(supAcctField[11],0));
 	      PQclear(res);
 	  
 	      val = htonl((uint32_t)proANo);
@@ -991,8 +991,22 @@ int suppAccountInsert()
       safPayID = atoi(field_buffer(supAcctField[7],0));
       safAmount = atof(field_buffer(supAcctField[8],0));
       strcpy(safComment,trimWS(field_buffer(supAcctField[9],0)));
-      strcpy(safProAcctNo, trimWS(field_buffer(supAcctField[10],0)));
-      strcpy(safAlias, trimWS(field_buffer(supAcctField[11],0)));
+      //strcpy(safProAcctNo, trimWS(field_buffer(supAcctField[10],0)));
+      strcpy(safAlias, trimWS(field_buffer(supAcctField[10],0)));
+      safProAcctID = atoi(field_buffer(supAcctField[11],0));
+
+      mvwprintw(supAcctWin, 3,65, "%d",safActiveID);
+      mvwprintw(supAcctWin, 5,65, "%s",safSupAcctRef);
+      mvwprintw(supAcctWin, 7,65, "%d",safSupID);
+      mvwprintw(supAcctWin, 9,65, "%d",safPrtID);
+      mvwprintw(supAcctWin, 11,65, "%d",safSupTypeID);
+      mvwprintw(supAcctWin, 13,65, "%d",safStartDt);
+      mvwprintw(supAcctWin, 15,65, "%d",safEndDt);
+      mvwprintw(supAcctWin, 17,65, "%d",safPayID);
+      mvwprintw(supAcctWin, 19,60, "%3.2f",safAmount);
+      mvwprintw(supAcctWin, 21,65, "%s",safComment);
+      mvwprintw(supAcctWin, 25,65, "%s",safAlias);
+      mvwprintw(supAcctWin, 23,65, "%d",safProAcctID);
 
       if ((form_driver(supAcctForm,REQ_VALIDATION) == E_OK) && (safActiveID >= 1))
 	{
@@ -1011,7 +1025,7 @@ int suppAccountInsert()
 	  if (cf == 'y')
 	    {
 	      supAccountInsert(safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
-			       safEndDt, safPayID, safAmount, safComment, safProAcctNo, safAlias);
+			       safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID);
 	      mvwprintw(supAcctWin,34,5, "Data saved");
 	    }
 	}

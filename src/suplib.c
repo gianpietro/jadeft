@@ -161,8 +161,8 @@ void prtInsert(int actInd, char prtPostCode[], char prtAddress[], char prtCity[]
 }
 
 void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int safPrtID,
-                      int safSupTypeID, int safStartDt, int safEndDt, int safPayID, float safAmount,
-		      char safComment[], char safProAcctNo[],char safAlias[])
+                      int safSupTypeID, int safStartDt, int safEndDt, int safPayID, double safAmount,
+		      char safComment[], char safAlias[], int safProAcctID)
 {
    /* exec sql begin declare section */
       
@@ -203,16 +203,16 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
  int v_safPayID ;
  
 #line 101 "suplib.pcg"
- float v_safAmount ;
+ double v_safAmount ;
  
 #line 102 "suplib.pcg"
  char v_safComment [ 30 ] ;
  
 #line 103 "suplib.pcg"
- char v_safProAcctNo [ 30 ] ;
+ char v_safAlias [ 10 ] ;
  
 #line 104 "suplib.pcg"
- char v_safAlias [ 10 ] ;
+ int v_safProAcctID ;
 /* exec sql end declare section */
 #line 105 "suplib.pcg"
 
@@ -227,12 +227,12 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
    v_safStartDt = safStartDt;
    v_safEndDt = safEndDt;
    v_safPayID = safPayID;
-   v_safAmount = safPayID;
+   v_safAmount = safAmount;
    strcpy(v_safComment, safComment);
-   strcpy(v_safProAcctNo, safProAcctNo);
    strcpy(v_safAlias, safAlias);
+   v_safProAcctID = safProAcctID;
 
-   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into supplier_account ( active_ind , supplier_acct_ref , supplier_id , property_id , supplier_type_id , start_date , end_date , payment_period_id , amount , comment , provider_acct_no , alias ) values ( $1  , $2  , $3  , $4  , $5  , $6  , $7  , $8  , $9  , $10  , $11  , $12  )", 
+   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into supplier_account ( active_ind , supplier_acct_ref , supplier_id , property_id , supplier_type_id , start_date , end_date , payment_period_id , amount , comment , alias , provider_acct_id ) values ( $1  , $2  , $3  , $4  , $5  , $6  , $7  , $8  , $9  , $10  , $11  , $12  )", 
 	ECPGt_int,&(v_safActiveID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_safSupAcctRef),(long)30,(long)1,(30)*sizeof(char), 
@@ -249,13 +249,13 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_safPayID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
-	ECPGt_float,&(v_safAmount),(long)1,(long)1,sizeof(float), 
+	ECPGt_double,&(v_safAmount),(long)1,(long)1,sizeof(double), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_safComment),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
-	ECPGt_char,(v_safProAcctNo),(long)30,(long)1,(30)*sizeof(char), 
-	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_safAlias),(long)10,(long)1,(10)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_int,&(v_safProAcctID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
 #line 126 "suplib.pcg"
 

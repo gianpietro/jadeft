@@ -86,8 +86,8 @@ void prtInsert(int actInd, char prtPostCode[], char prtAddress[], char prtCity[]
 }
 
 void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int safPrtID,
-                      int safSupTypeID, int safStartDt, int safEndDt, int safPayID, float safAmount,
-		      char safComment[], char safProAcctNo[],char safAlias[])
+                      int safSupTypeID, int safStartDt, int safEndDt, int safPayID, double safAmount,
+		      char safComment[], char safAlias[], int safProAcctID)
 {
    EXEC SQL BEGIN DECLARE SECTION;
      int v_safActiveID;
@@ -98,10 +98,10 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
      int v_safStartDt;
      int v_safEndDt;
      int v_safPayID;
-     float v_safAmount;
+     double v_safAmount;
      char v_safComment[30];
-     char v_safProAcctNo[30];
      char v_safAlias[10];
+     int v_safProAcctID;
    EXEC SQL END DECLARE SECTION;
   
    connectToDB();
@@ -114,16 +114,16 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
    v_safStartDt = safStartDt;
    v_safEndDt = safEndDt;
    v_safPayID = safPayID;
-   v_safAmount = safPayID;
+   v_safAmount = safAmount;
    strcpy(v_safComment, safComment);
-   strcpy(v_safProAcctNo, safProAcctNo);
    strcpy(v_safAlias, safAlias);
+   v_safProAcctID = safProAcctID;
 
    EXEC SQL
      INSERT INTO supplier_account(active_ind, supplier_acct_ref, supplier_id, property_id, supplier_type_id,
-                                  start_date, end_date, payment_period_id, amount, comment, provider_acct_no, alias)
+                                  start_date, end_date, payment_period_id, amount, comment, alias, provider_acct_id)
      VALUES(:v_safActiveID, :v_safSupAcctRef, :v_safSupID, :v_safPrtID, :v_safSupTypeID,
-            :v_safStartDt, :v_safEndDt, :v_safPayID, :v_safAmount, :v_safComment, :v_safProAcctNo, :v_safAlias);
+            :v_safStartDt, :v_safEndDt, :v_safPayID, :v_safAmount, :v_safComment, :v_safAlias, :v_safProAcctID);
   EXEC SQL COMMIT;
 
   EXEC SQL DISCONNECT;
