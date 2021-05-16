@@ -19,7 +19,7 @@ int main (void) {
   // provTypeInsert();
   // provInsert();  
   // provAccountInsert();
-  // suppInsert();
+   suppInsert();
   // suppTypeInsert();
   // paymentPeriodInsert();
   // propertyInsert();
@@ -27,7 +27,7 @@ int main (void) {
   // suppTypeInsert();
   // paymentPeriodInsert();
   // propertyInsert();
-     suppAccountInsert();
+  //   suppAccountInsert();
 
   
   // system("clear");

@@ -34,7 +34,7 @@ void keyNavigate(int ch, FORM * f)
       form_driver(f, REQ_CLR_FIELD);	  
       break;
     case 10:                              /* ASCII value for carriage return */
-      form_driver(f, REQ_VALIDATION);
+      //form_driver(f, REQ_VALIDATION);
       form_driver(f, REQ_NEXT_FIELD);
       break;
     default:

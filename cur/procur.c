@@ -3,73 +3,10 @@
 #include <ctype.h>
 #include <form.h>
 #include <libpq-fe.h>
-//#include <libpq/libpq-fs.h>   
 #include <arpa/inet.h>
 #include "../inc/procur.h"
 #include "../inc/prolib.h"
 #include "../inc/jadlib.h"
-
-/* API database connection method */
-/*
-static PGconn * fdbcon()
-{  
-  PGconn *connection = PQconnectdb("user=gianpietro dbname=jadedev");
-  if(PQstatus(connection) == CONNECTION_BAD)
-    {
-      PQfinish(connection);
-      exit(1);
-    }  
-  return connection;
-}
-*/
-/* Form navigation keys */
-/*
-static void keyNavigate(int ch, FORM * f)
-{ 
-  switch(ch)
-    {
-    case KEY_DOWN:
-      form_driver(f, REQ_NEXT_FIELD);
-      form_driver(f, REQ_END_LINE);
-      break;
-    case KEY_UP:
-      form_driver(f, REQ_PREV_FIELD);
-      form_driver(f, REQ_END_LINE);
-      break;
-    case KEY_BACKSPACE:
-      form_driver(f, REQ_CLR_FIELD);	  
-      break;
-    case 10:
-      form_driver(f, REQ_VALIDATION);
-      form_driver(f, REQ_NEXT_FIELD);
-      break;
-    default:
-      form_driver(f, ch);
-      break;
-    }
-}
-*/
-
-/* Trim trailing whitespace from the string entered in form field */
-/*
-static char * trimWS(char *s)
-{
-  int i = 0;
-  int index = -1;
-
-  while (s[i] != '\0')
-    {
-      if(s[i] != ' ' && s[i] != '\t' && s[i] != '\n')
-	{
-	  index = i;
-	}
-      i++;
-    }
-  s[index + 1] = '\0';
-
-  return s;
-} 
-*/      
 
 /* Function to display Provider form for data entry */
 void provInsert()
@@ -136,7 +73,8 @@ void provInsert()
       wmove(proWin, rows-16,cols-48);     /* move cursor */
 
       while((ch = wgetch(proWin)) != KEY_F(1))
-	 keyNavigate(ch, providerForm);
+	keyNavigate(ch, providerForm);
+      form_driver(providerForm,REQ_VALIDATION);	 /* Validates data in form and buffers and assigned values in fields */	  
     
       /* Assign data entered in field */
       actInd = atoi(field_buffer(providerField[0],0));
@@ -239,6 +177,7 @@ void provTypeInsert()
 
       while((ch = wgetch(proTypeWin)) != KEY_F(1))
 	keyNavigate(ch, proTypeForm);
+      form_driver(proTypeForm,REQ_VALIDATION);
 
       strcpy(pdesc,field_buffer(proTypeField[0],0));
      
@@ -533,6 +472,7 @@ int provAccountInsert()
 	}
 
       /* code goes here for assign buffer value and validate prior to insert */
+      form_driver(proAcctForm,REQ_VALIDATION);
 
       pafActiveID = atoi(field_buffer(proAcctField[0],0));
       pafID = atoi(field_buffer(proAcctField[1],0));

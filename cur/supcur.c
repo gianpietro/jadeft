@@ -13,14 +13,20 @@ void suppInsert()
 {
   FIELD *supplierField[3];
   FORM *supplierForm;
-  WINDOW *supWin;
+  WINDOW *supWin, *supUpdateWin;
   int ch;
-  int cf;
+  int cf, cfUpdate = 0;
+  int range = 5, list = 2, i = 0, j = 0;
   int actInd;
   char sname[30];
   int newRec = 'y';
-  int rows, cols;
-
+  int rows, cols, urows, ucols;
+  //char upStr[5];
+  char p;
+  int trows, val, upID, *params[1], length[1],  formats[1];
+ 
+  PGconn *conn =  fdbcon();
+  PGresult *res;
 
   initscr();
   cbreak();
@@ -44,14 +50,18 @@ void suppInsert()
       scale_form(supplierForm, &rows, &cols);
 
       /* Add window which will be associated to form */
-      supWin = newwin(rows+20, cols+10,1,1);  
+      supWin = newwin(rows+20, cols+10,1,1);
+      supUpdateWin = newwin(20,50,1,120);
       keypad(supWin, TRUE);
+      keypad(supUpdateWin, TRUE);
        
       /* Set main and sub windows */
       set_form_win(supplierForm, supWin);
       set_form_sub(supplierForm, derwin(supWin,rows,cols,1,1));
       getmaxyx(supWin,rows,cols);
+      getmaxyx(supUpdateWin, urows, ucols);
       box(supWin, 0,0);
+      box(supUpdateWin,0,0);
           
       if (supWin == NULL)
 	{
@@ -74,7 +84,98 @@ void suppInsert()
       wmove(supWin,3,23);     /* move cursor */
 
       while((ch = wgetch(supWin)) != KEY_F(1))
-	 keyNavigate(ch, supplierForm);
+	{
+	  //conn = fdbcon();
+	  keyNavigate(ch, supplierForm);
+	  //cfUpdate = 0;
+	  if(ch == KEY_F(9))
+	    {
+	      i = j = trows = 0, cfUpdate = 0;
+	      list = 2;
+	      wclear(supUpdateWin);
+	      box(supUpdateWin,0,0);
+	      waddstr(supUpdateWin, "Supplier");
+	      wmove(supUpdateWin,1,1);
+	      wrefresh(supUpdateWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM supplier WHERE active_ind = 1");	  
+	      trows = PQntuples(res);
+
+	      wrefresh(supUpdateWin);
+	  
+	      while((p = wgetch(supUpdateWin)) == '\n')
+		{
+		  if ( j + range < trows)
+		    j = j + range;	
+		  else
+		    j = j + (trows - j);
+		  for (i; i < j; i++)
+		    {
+		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(supUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      list++;	 
+		    }
+		  list = 2;      
+		  wclrtoeol(supUpdateWin);  
+		  if  (i == trows)
+		    {
+		      wclrtobot(supUpdateWin);  
+		      mvwprintw(supUpdateWin,10,1,"End of list");
+		      box(supUpdateWin,0,0);
+		      mvwprintw(supUpdateWin,0,0, "Supplier");
+		      wmove(supUpdateWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(supUpdateWin,11,1,"Select Supplier: ");
+	      mvwscanw(supUpdateWin,11,25, "%d", &upID);
+	      //mvwscanw(supUpdateWin,11,25, "%5s", &supIDstr);
+	      //set_field_buffer(supplierField[2],0, supIDstr);
+
+	      /* CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES */
+	      //supID = atoi(field_buffer(supplierField[2],0));
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)upID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM supplier WHERE supplier_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      trows = PQntuples(res);
+	      if (trows == 1)
+		{
+		  mvwprintw(supUpdateWin,13,1, "no or rows %d ",rows);
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(supUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  wrefresh(supUpdateWin);
+		  set_field_buffer(supplierField[0],0,PQgetvalue(res,0,1));
+		  set_field_buffer(supplierField[1],0,PQgetvalue(res,0,2));
+		  cfUpdate = 1;
+		}
+	      else
+		{
+		  mvwprintw(supUpdateWin,12,1,"Number invalied");
+		  wrefresh(supUpdateWin);		
+		  wrefresh(supWin);
+		}
+	      noecho();
+	      PQclear(res);
+	      //PQfinish(conn);
+	    } //F9
+      } //while F1
+	
+      form_driver(supplierForm,REQ_VALIDATION);
     
       /* Assign data entered in field */
       actInd = atoi(field_buffer(supplierField[0],0));
@@ -97,8 +198,16 @@ void suppInsert()
 	    }	  
 	  if (cf == 'y')
 	    {
-	      supplierInsert(actInd,sname);   /* Save data to database */
-	      mvwprintw(supWin,19,5, "Data saved");
+	      if (cfUpdate == 1)
+		{
+		  supplierUpdate(upID,actInd,sname);
+		  mvwprintw(supWin,19,5, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, sname);
+		}
+	      else
+		{
+		  supplierInsert(actInd,sname);   /* Save data to database */
+	          mvwprintw(supWin,19,5, "Data saved");
+		}
 	    }
 	}
       else
@@ -113,16 +222,18 @@ void suppInsert()
       free_field(supplierField[1]);
       free_field(supplierField[2]);
 
+      cfUpdate = 0;
       mvwprintw(supWin,22,5,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(supWin)) != 'y')
 	{
-	  wmove(supWin,22,44);
+	  wmove(supWin,22,44);	  
 	  if(newRec == 'n')
 	    break;
 	}
       noecho();
-    } 
+    }
+    PQfinish(conn);  
   endwin();
 }
 
@@ -177,6 +288,7 @@ void suppTypeInsert()
 
       while((ch = wgetch(supTypeWin)) != KEY_F(1))
 	keyNavigate(ch, supTypeForm);
+      form_driver(supTypeForm,REQ_VALIDATION);
 
       strcpy(sdesc,field_buffer(supTypeField[0],0));
      
@@ -275,6 +387,7 @@ void paymentPeriodInsert()
 
       while((ch = wgetch(payPerWin)) != KEY_F(1))
 	keyNavigate(ch, payPerForm);
+      form_driver(payPerForm,REQ_VALIDATION);
 
       strcpy(payPer,field_buffer(payPerField[0],0));
      
@@ -396,6 +509,7 @@ void propertyInsert()
 
       while((ch = wgetch(prtWin)) != KEY_F(1))
 	 keyNavigate(ch, propertyForm);
+      form_driver(propertyForm,REQ_VALIDATION);
     
       /* Assign data entered in field */
       actInd = atoi(field_buffer(propertyField[0],0));
@@ -980,6 +1094,7 @@ int suppAccountInsert()
       } //while not F1
 
     /* code goes here for assign buffer value and validate prior to insert */
+      form_driver(supAcctForm,REQ_VALIDATION);
      
       safActiveID = atoi(field_buffer(supAcctField[0],0));
       strcpy(safSupAcctRef, trimWS(field_buffer(supAcctField[1],0)));
@@ -991,7 +1106,6 @@ int suppAccountInsert()
       safPayID = atoi(field_buffer(supAcctField[7],0));
       safAmount = atof(field_buffer(supAcctField[8],0));
       strcpy(safComment,trimWS(field_buffer(supAcctField[9],0)));
-      //strcpy(safProAcctNo, trimWS(field_buffer(supAcctField[10],0)));
       strcpy(safAlias, trimWS(field_buffer(supAcctField[10],0)));
       safProAcctID = atoi(field_buffer(supAcctField[11],0));
 
@@ -1005,8 +1119,8 @@ int suppAccountInsert()
       mvwprintw(supAcctWin, 17,65, "%d",safPayID);
       mvwprintw(supAcctWin, 19,60, "%3.2f",safAmount);
       mvwprintw(supAcctWin, 21,65, "%s",safComment);
-      mvwprintw(supAcctWin, 25,65, "%s",safAlias);
-      mvwprintw(supAcctWin, 23,65, "%d",safProAcctID);
+      mvwprintw(supAcctWin, 23,65, "%s",safAlias);
+      mvwprintw(supAcctWin, 25,65, "%d",safProAcctID);
 
       if ((form_driver(supAcctForm,REQ_VALIDATION) == E_OK) && (safActiveID >= 1))
 	{

@@ -267,6 +267,49 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
 #line 129 "suplib.pcg"
 
 }
+
+void supplierUpdate(int upID, int activeInd,char supName[])
+{
+   /* exec sql begin declare section */
+       
+       
+       
+   
+#line 135 "suplib.pcg"
+ int v_upID ;
+ 
+#line 136 "suplib.pcg"
+ int v_activeInd ;
+ 
+#line 137 "suplib.pcg"
+ char v_supName [ 30 ] ;
+/* exec sql end declare section */
+#line 138 "suplib.pcg"
+
+   
+   connectToDB();
+
+   v_upID = upID;
+   v_activeInd = activeInd;
+   strcpy(v_supName,supName);
+    
+   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "update supplier set active_ind = $1  , supplier_name = $2  where supplier_id = $3 ", 
+	ECPGt_int,&(v_activeInd),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_supName),(long)30,(long)1,(30)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
+#line 147 "suplib.pcg"
+  
+   { ECPGtrans(__LINE__, NULL, "commit");}
+#line 148 "suplib.pcg"
+
+
+   { ECPGdisconnect(__LINE__, "CURRENT");}
+#line 150 "suplib.pcg"
+
+}
  
 
 
