@@ -25,6 +25,44 @@ void supplierInsert(int activeInd,char supName[])
    EXEC SQL DISCONNECT;
 }
 
+void supplierUpdate(int upID, int activeInd,char supName[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+      int v_upID;
+      int v_activeInd;
+      char v_supName[30];
+   EXEC SQL END DECLARE SECTION;
+   
+   connectToDB();
+
+   v_upID = upID;
+   v_activeInd = activeInd;
+   strcpy(v_supName,supName);
+    
+   EXEC SQL
+    UPDATE supplier SET active_ind = :v_activeInd, supplier_name = :v_supName WHERE supplier_id = :v_upID;  
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void supplierDelete(int upID)
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+      int v_upID;
+   EXEC SQL END DECLARE SECTION;
+   
+   connectToDB();
+
+   v_upID = upID;
+
+   EXEC SQL
+    DELETE FROM supplier WHERE supplier_id = :v_upID;
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
 void supTypeInsert(char supTypeDesc[])
 {
   EXEC SQL BEGIN DECLARE SECTION;
@@ -37,6 +75,42 @@ void supTypeInsert(char supTypeDesc[])
 
    EXEC SQL
      INSERT INTO supplier_type(description) VALUES(:v_supTypeDesc);
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void supTypeUpdate(int upID, char supTypeDesc[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     int v_upID;
+     char v_supTypeDesc[30];
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   v_upID = upID;
+   strcpy(v_supTypeDesc, supTypeDesc);
+
+   EXEC SQL
+    UPDATE supplier_type SET description = :v_supTypeDesc WHERE supplier_type_id = :v_upID;
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void supTypeDelete(int upID)
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     int v_upID;
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   v_upID = upID;
+
+   EXEC SQL
+    DELETE FROM supplier_type WHERE supplier_type_id = :v_upID;
    EXEC SQL COMMIT;
 
    EXEC SQL DISCONNECT;
@@ -129,26 +203,7 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
   EXEC SQL DISCONNECT;
 }
 
-void supplierUpdate(int upID, int activeInd,char supName[])
-{
-   EXEC SQL BEGIN DECLARE SECTION;
-      int v_upID;
-      int v_activeInd;
-      char v_supName[30];
-   EXEC SQL END DECLARE SECTION;
-   
-   connectToDB();
 
-   v_upID = upID;
-   v_activeInd = activeInd;
-   strcpy(v_supName,supName);
-    
-   EXEC SQL
-    UPDATE supplier SET active_ind = :v_activeInd, supplier_name = :v_supName WHERE supplier_id = :v_upID;  
-   EXEC SQL COMMIT;
-
-   EXEC SQL DISCONNECT;
-}
  
 
 

@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <form.h>
 #include <libpq-fe.h>
@@ -329,7 +329,7 @@ int provAccountInsert()
 	      wmove(proListWin,1,1);
 	      wrefresh(proListWin);
 	  
-	      res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1");	  
+	      res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1 ORDER BY provider_id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(proListWin);
@@ -343,10 +343,11 @@ int provAccountInsert()
 		  for (i; i < j; i++)
 		    {	 
 		      mvwprintw(proListWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
-		      list++;	 
+		      list++;
+		      wclrtoeol(proListWin);
 		    }
 		  list = 2;      
-		  wclrtoeol(proListWin);  //clear current line to right of cursor
+		  // wclrtoeol(proListWin);  //clear current line to right of cursor
 		  if  (i == rows)
 		    {
 		      wclrtobot(proListWin);  // clear current line right of cursor and all lines below
@@ -404,7 +405,7 @@ int provAccountInsert()
 	      wmove(proTypeWin,1,1);
 	      wrefresh(proTypeWin);
 
-	      res = PQexec(conn,"SELECT * FROM provider_type");
+	      res = PQexec(conn,"SELECT * FROM provider_type ORDER BY provider_type_id");
 	      rows = PQntuples(res);
 
 	      wrefresh(proTypeWin);
@@ -418,10 +419,11 @@ int provAccountInsert()
 		  for (i; i < j; i++)
 		    {	 
 		      mvwprintw(proTypeWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
-		      list++;	 
+		      list++;
+		      wclrtoeol(proTypeWin);
 		    }
 		  list = 2;      
-		  wclrtoeol(proTypeWin);  //clear current line to right of cursor
+		  //wclrtoeol(proTypeWin);  //clear current line to right of cursor
 		  if  (i == rows)
 		    {
 		      wclrtobot(proTypeWin);  // clear current line right of cursor and all lines below

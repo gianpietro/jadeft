@@ -21,7 +21,6 @@ void suppInsert()
   char sname[30];
   int newRec = 'y';
   int rows, cols, urows, ucols;
-  //char upStr[5];
   char p;
   int trows, val, upID, *params[1], length[1],  formats[1];
  
@@ -85,9 +84,7 @@ void suppInsert()
 
       while((ch = wgetch(supWin)) != KEY_F(1))
 	{
-	  //conn = fdbcon();
 	  keyNavigate(ch, supplierForm);
-	  //cfUpdate = 0;
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = trows = 0, cfUpdate = 0;
@@ -99,7 +96,7 @@ void suppInsert()
 	      wrefresh(supUpdateWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexec(conn,"SELECT * FROM supplier WHERE active_ind = 1");	  
+	      res = PQexec(conn,"SELECT * FROM supplier WHERE active_ind = 1 ORDER BY supplier_id");	  
 	      trows = PQntuples(res);
 
 	      wrefresh(supUpdateWin);
@@ -114,10 +111,12 @@ void suppInsert()
 		    {
 		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
 		      mvwprintw(supUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
-		      list++;	 
+		      list++;
+		      wclrtoeol(supUpdateWin);
+		      // box(supUpdateWin,0,0);		     
 		    }
 		  list = 2;      
-		  wclrtoeol(supUpdateWin);  
+		  //wclrtoeol(supUpdateWin);  
 		  if  (i == trows)
 		    {
 		      wclrtobot(supUpdateWin);  
@@ -171,7 +170,6 @@ void suppInsert()
 		}
 	      noecho();
 	      PQclear(res);
-	      //PQfinish(conn);
 	    } //F9
       } //while F1
 	
@@ -186,16 +184,25 @@ void suppInsert()
 	  strcpy(sname, trimWS(sname));  
 	  echo();
 	  mvwprintw(supWin,17,5,"Save: y/n: ");     
-
+          mvwprintw(supWin,18,5,"(d = delete record)");
+          wmove(supWin,17,16);
 	  while((cf = wgetch(supWin)) != 'y')
 	    {
 	      wmove(supWin,17,16);
 	      if (cf == 'n')
 		{
-		  mvwprintw(supWin,19,5, "Data not saved");
+	 	  mvwprintw(supWin,19,5, "Data not saved");
 		  break;
 		}
-	    }	  
+	      /* NEW CODE FOR DELETE */
+	      if (cf == 'd')
+		{  
+		      //supplierDelete(upID);
+		      mvwprintw(supWin,19,5, "Record deleted");                
+		      break;
+		 }		 
+	      /* END OF NEW CODE FOR DELETE */
+           }	  
 	  if (cf == 'y')
 	    {
 	      if (cfUpdate == 1)
@@ -242,12 +249,19 @@ void suppTypeInsert()
 {
   FIELD *supTypeField[2];
   FORM *supTypeForm;
-  WINDOW *supTypeWin;
+  WINDOW *supTypeWin, *supTypeUpdateWin;
   int ch;
   char newRec = 'y';
   int rows, cols;
   char sdesc[30];
   int cf;
+  int cfUpdate = 0;
+  int range = 5, list = 2, i = 0, j = 0;
+  char p;
+  int urows, ucols;
+  int trows, val, upID, *params[1], length[1],  formats[1];
+  PGconn *conn =  fdbcon();
+  PGresult *res;
 
   initscr();
   cbreak();
@@ -262,14 +276,17 @@ void suppTypeInsert()
 
       supTypeForm = new_form(supTypeField);
       scale_form(supTypeForm, &rows, &cols);
-      supTypeWin = newwin(rows+15,cols+5,1,120);  
+      supTypeWin = newwin(rows+15,cols+5,1,120);
+      supTypeUpdateWin = newwin(20,50,30,120);
       keypad(supTypeWin, TRUE);
-
+      keypad(supTypeUpdateWin, TRUE);
+      
       set_form_win(supTypeForm, supTypeWin);	
       set_form_sub(supTypeForm, derwin(supTypeWin,rows,cols,2,2));
       getmaxyx(supTypeWin,rows,cols);
-      
-      box(supTypeWin, 0,0);
+      getmaxyx(supTypeUpdateWin, urows, ucols);
+      box(supTypeWin,0,0);
+      box(supTypeUpdateWin,0,0);
           
       if (supTypeWin == NULL)
 	{
@@ -287,7 +304,89 @@ void suppTypeInsert()
       wmove(supTypeWin,rows-14,cols-33);     /* move cursor */
 
       while((ch = wgetch(supTypeWin)) != KEY_F(1))
-	keyNavigate(ch, supTypeForm);
+	{
+	  keyNavigate(ch, supTypeForm);
+	  if(ch == KEY_F(9))
+	    {
+	      i = j = trows = 0, cfUpdate = 0;
+	      list = 2;
+	      wclear(supTypeUpdateWin);
+	      box(supTypeUpdateWin,0,0);
+	      waddstr(supTypeUpdateWin, "Supplier Type");
+	      wmove(supTypeUpdateWin,1,1);
+	      wrefresh(supTypeUpdateWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM supplier_type ORDER BY supplier_type_id");	  
+	      trows = PQntuples(res);
+
+	      wrefresh(supTypeUpdateWin);
+	  
+	      while((p = wgetch(supTypeUpdateWin)) == '\n')
+		{
+		  if ( j + range < trows)
+		    j = j + range;	
+		  else
+		    j = j + (trows - j);
+		  for (i; i < j; i++)
+		    {
+		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(supTypeUpdateWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      list++;
+		      wclrtoeol(supTypeUpdateWin);
+		    }
+		  list = 2;      
+		  if  (i == trows)
+		    {
+		      wclrtobot(supTypeUpdateWin);  
+		      mvwprintw(supTypeUpdateWin,10,1,"End of list");
+		      box(supTypeUpdateWin,0,0);
+		      mvwprintw(supTypeUpdateWin,0,0, "Supplier Type");
+		      wmove(supTypeUpdateWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(supTypeUpdateWin,11,1,"Select Supplier: ");
+	      mvwscanw(supTypeUpdateWin,11,25, "%d", &upID);
+
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)upID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM supplier_type WHERE supplier_type_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      trows = PQntuples(res);
+	      if (trows == 1)
+		{
+		  mvwprintw(supTypeUpdateWin,13,1, "no or rows %d ",rows);
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(supTypeUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  wrefresh(supTypeUpdateWin);
+		  set_field_buffer(supTypeField[0],0,PQgetvalue(res,0,1));
+		  cfUpdate = 1;
+		}
+	      else
+		{
+		  mvwprintw(supTypeUpdateWin,12,1,"Number invalied");
+		  wrefresh(supTypeUpdateWin);		
+		  wrefresh(supTypeWin);
+		}
+	      noecho();
+	      PQclear(res);
+	    } //F9	
+	} // While F1
+      
       form_driver(supTypeForm,REQ_VALIDATION);
 
       strcpy(sdesc,field_buffer(supTypeField[0],0));
@@ -297,33 +396,52 @@ void suppTypeInsert()
 	  strcpy(sdesc, trimWS(sdesc));
 	  echo();
 	  mvwprintw(supTypeWin,rows-8,cols-46, "Save y/n: ");
+	  mvwprintw(supTypeWin,rows-7,cols-46,"(d = delete record)");
+	  wmove(supTypeWin,rows-8,cols-34);
 	  while((cf = wgetch(supTypeWin)) != 'y')
 	    {
-	      wmove(supTypeWin,rows-8,cols-36);
+	      wmove(supTypeWin,rows-8,cols-34);
 	      if (cf == 'n')
 		{
 		  mvwprintw(supTypeWin,rows-6,cols-46, "Data not saved");
 		  break;
 		}
+	      if (cf == 'd')
+		{  
+		  //supTypeDelete(upID);
+		  mvwprintw(supTypeWin,rows-6,cols-46, "Record deleted");                
+		  break;
+		}
 	    }
 	  if(cf == 'y')
 	    {
-	      supTypeInsert(sdesc);
-	      mvwprintw(supTypeWin,rows-6,cols-46, "Data saved");
+	      if (cfUpdate == 1)
+		{
+		  supTypeUpdate(upID,sdesc); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
+		  mvwprintw(supTypeWin,rows-6,cols-46, "Data updated");
+		  mvwprintw(supTypeWin,20,5, "cfUpdate %d,upID %d sdesc %s", cfUpdate,upID,sdesc);  //DEBUG
+		}
+	      else
+		{
+		  supTypeInsert(sdesc);
+		  mvwprintw(supTypeWin,rows-6,cols-46, "Data saved");
+		}
 	    }
 	}
-	  else
-	    {
-	      mvwprintw(supTypeWin,rows-6,cols-46, "Data invalid");
-	    }
-	  noecho();
+      else
+	{
+	  mvwprintw(supTypeWin,rows-6,cols-46, "Data invalid");
+	}
+      noecho();
 
       unpost_form(supTypeForm);
       free_form(supTypeForm);
       free_field(supTypeField[0]);
       free_field(supTypeField[1]);
 
-      mvwprintw(supTypeWin,rows-4,cols-46,"Do you want to add a new record y/n: ");
+      cfUpdate = 0;
+      mvwprintw(supTypeWin,rows-4,cols-46,"Do you want to update record y/n: ");
       echo();
       while((newRec = wgetch(supTypeWin)) != 'y')
 	{
@@ -332,10 +450,11 @@ void suppTypeInsert()
 	    break;
 	}
       noecho();
-
-      endwin();
-    }
+    }  //while newRec=y
+  PQfinish(conn);
+  endwin(); 
 }
+
 
 void paymentPeriodInsert()
 {
@@ -702,7 +821,7 @@ int suppAccountInsert()
 	      wrefresh(supWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexec(conn,"SELECT * FROM supplier WHERE active_ind = 1");	  
+	      res = PQexec(conn,"SELECT * FROM supplier WHERE active_ind = 1 ORDER BY supplier_id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(supWin);
@@ -717,10 +836,11 @@ int suppAccountInsert()
 		    {
 		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
 		      mvwprintw(supWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
-		      list++;	 
+		      list++;
+		      wclrtoeol(supWin);  
 		    }
 		  list = 2;      
-		  wclrtoeol(supWin);  
+		  //wclrtoeol(supWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(supWin);  
@@ -782,7 +902,7 @@ int suppAccountInsert()
 	      wrefresh(prtWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexec(conn,"SELECT * FROM property WHERE active_ind = 1");	  
+	      res = PQexec(conn,"SELECT * FROM property WHERE active_ind = 1 ORDER BY property_id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(prtWin);
@@ -797,10 +917,11 @@ int suppAccountInsert()
 		    {
 		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
 		      mvwprintw(prtWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
-		      list++;	 
+		      list++;
+		      wclrtoeol(prtWin);  
 		    }
 		  list = 2;      
-		  wclrtoeol(prtWin);  
+		  //wclrtoeol(prtWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(prtWin);  
@@ -862,7 +983,7 @@ int suppAccountInsert()
 	      wrefresh(supTypeWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexec(conn,"SELECT * FROM supplier_type");	  
+	      res = PQexec(conn,"SELECT * FROM supplier_type ORDER BY supplier_type_id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(supTypeWin);
@@ -877,10 +998,11 @@ int suppAccountInsert()
 		    {
 		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
 		      mvwprintw(supTypeWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
-		      list++;	 
+		      list++;
+		      wclrtoeol(supTypeWin);  
 		    }
 		  list = 2;      
-		  wclrtoeol(supTypeWin);  
+		  //wclrtoeol(supTypeWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(supTypeWin);  
@@ -942,7 +1064,7 @@ int suppAccountInsert()
 	      wrefresh(payWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexec(conn,"SELECT * FROM payment_period");	  
+	      res = PQexec(conn,"SELECT * FROM payment_period ORDER BY payment_period_id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(payWin);
@@ -957,10 +1079,11 @@ int suppAccountInsert()
 		    {
 		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
 		      mvwprintw(payWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
-		      list++;	 
+		      list++;
+		      wclrtoeol(payWin);  
 		    }
 		  list = 2;      
-		  wclrtoeol(payWin);  
+		  // wclrtoeol(payWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(payWin);  
@@ -1022,7 +1145,7 @@ int suppAccountInsert()
 	      wrefresh(paWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexec(conn,"SELECT * FROM provider_account WHERE active_ind = 1");	  
+	      res = PQexec(conn,"SELECT * FROM provider_account WHERE active_ind = 1 ORDER BY provider_acct_id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(paWin);
@@ -1037,10 +1160,11 @@ int suppAccountInsert()
 		    {
 		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
 		      mvwprintw(paWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,2),PQgetvalue(res,i,3));
-		      list++;	 
+		      list++;
+		      wclrtoeol(paWin);  
 		    }
 		  list = 2;      
-		  wclrtoeol(paWin);  
+		  //wclrtoeol(paWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(paWin);  
