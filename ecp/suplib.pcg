@@ -134,6 +134,42 @@ void payPeriodInsert(char payPeriod[])
    EXEC SQL DISCONNECT;
 }
 
+void payPerUpdate(int upID, char payPeriod[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+      int v_upID;
+      char v_payPeriod[30];
+   EXEC SQL END DECLARE SECTION;
+   
+   connectToDB();
+
+   v_upID = upID;
+   strcpy(v_payPeriod,payPeriod);
+    
+   EXEC SQL
+    UPDATE payment_period SET period = :v_payPeriod WHERE payment_period_id = :v_upID;  
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void payPerDelete(int upID)
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+      int v_upID;
+   EXEC SQL END DECLARE SECTION;
+   
+   connectToDB();
+
+   v_upID = upID;
+    
+   EXEC SQL
+     DELETE FROM payment_period WHERE payment_period_id = :v_upID;
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
 
 void prtInsert(int actInd, char prtPostCode[], char prtAddress[], char prtCity[])
 {

@@ -10,5 +10,7 @@ void supplierUpdate(int, int, char *);
 void supplierDelete(int);
 void supTypeUpdate(int, char *);
 void supTypeDelete(int);
+void payPerUpdate(int, char *);
+void payPerDelete(int);
 
 #endif

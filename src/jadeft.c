@@ -19,13 +19,13 @@ int main (void) {
   // provTypeInsert();
   // provInsert();  
   // provAccountInsert();
-   suppInsert();
-   suppTypeInsert();
+  // suppInsert();
+  // suppTypeInsert();
   // paymentPeriodInsert();
   // propertyInsert();
   // suppInsert();
   // suppTypeInsert();
-  // paymentPeriodInsert();
+   paymentPeriodInsert();
   // propertyInsert();
   //   suppAccountInsert();
 

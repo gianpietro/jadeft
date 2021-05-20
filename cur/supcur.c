@@ -154,7 +154,7 @@ void suppInsert()
 	      trows = PQntuples(res);
 	      if (trows == 1)
 		{
-		  mvwprintw(supUpdateWin,13,1, "no or rows %d ",rows);
+		  mvwprintw(supUpdateWin,13,1, "no or rows %d ",trows);
 		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
 		  mvwprintw(supUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
 		  wrefresh(supUpdateWin);
@@ -369,7 +369,7 @@ void suppTypeInsert()
 	      trows = PQntuples(res);
 	      if (trows == 1)
 		{
-		  mvwprintw(supTypeUpdateWin,13,1, "no or rows %d ",rows);
+		  mvwprintw(supTypeUpdateWin,13,1, "no or rows %d ",trows);
 		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
 		  mvwprintw(supTypeUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  wrefresh(supTypeUpdateWin);
@@ -460,12 +460,19 @@ void paymentPeriodInsert()
 {
   FIELD *payPerField[2];
   FORM *payPerForm;
-  WINDOW *payPerWin;
+  WINDOW *payPerWin, *payPerUpdateWin;
   int ch;
   char newRec = 'y';
   int rows, cols;
   char payPer[30];
   int cf;
+  int cfUpdate = 0;
+  int range = 5, list = 2, i = 0, j = 0;
+  char p;
+  int urows, ucols;
+  int trows, val, upID, *params[1], length[1],  formats[1];
+  PGconn *conn =  fdbcon();
+  PGresult *res;
 
   initscr();
   cbreak();
@@ -480,14 +487,18 @@ void paymentPeriodInsert()
 
       payPerForm = new_form(payPerField);
       scale_form(payPerForm, &rows, &cols);
-      payPerWin = newwin(rows+15,cols+5,1,120);  
+      payPerWin = newwin(rows+15,cols+5,1,120);
+      payPerUpdateWin = newwin(20,50,30,120);
       keypad(payPerWin, TRUE);
+      keypad(payPerUpdateWin, TRUE);
 
       set_form_win(payPerForm, payPerWin);	
       set_form_sub(payPerForm, derwin(payPerWin,rows,cols,2,2));
       getmaxyx(payPerWin,rows,cols);
+      getmaxyx(payPerUpdateWin, urows, ucols);
       
       box(payPerWin, 0,0);
+      box(payPerUpdateWin,0,0);
           
       if (payPerWin == NULL)
 	{
@@ -505,7 +516,90 @@ void paymentPeriodInsert()
       wmove(payPerWin,rows-14,cols-33);     /* move cursor */
 
       while((ch = wgetch(payPerWin)) != KEY_F(1))
-	keyNavigate(ch, payPerForm);
+	{
+	  keyNavigate(ch, payPerForm);
+	  if(ch == KEY_F(9))
+	    {
+	      i = j = trows = 0, cfUpdate = 0;
+	      list = 2;
+	      wclear(payPerUpdateWin);
+	      box(payPerUpdateWin,0,0);
+	      waddstr(payPerUpdateWin, "Pay Period");
+	      wmove(payPerUpdateWin,1,1);
+	      wrefresh(payPerUpdateWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM payment_period ORDER BY payment_period_id");	  
+	      trows = PQntuples(res);
+
+	      wrefresh(payPerUpdateWin);
+	  
+	      while((p = wgetch(payPerUpdateWin)) == '\n')
+		{
+		  if ( j + range < trows)
+		    j = j + range;	
+		  else
+		    j = j + (trows - j);
+		  for (i; i < j; i++)
+		    {
+		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(payPerUpdateWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      list++;
+		      wclrtoeol(payPerUpdateWin);
+		    }
+		  list = 2;      
+		  if  (i == trows)
+		    {
+		      wclrtobot(payPerUpdateWin);  
+		      mvwprintw(payPerUpdateWin,10,1,"End of list");
+		      box(payPerUpdateWin,0,0);
+		      mvwprintw(payPerUpdateWin,0,0, "Pay Period");
+		      wmove(payPerUpdateWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(payPerUpdateWin,11,1,"Select Option: ");
+	      mvwscanw(payPerUpdateWin,11,25, "%d", &upID);
+
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)upID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM payment_period WHERE payment_period_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      trows = PQntuples(res);
+	      if (trows == 1)
+		{
+		  mvwprintw(payPerUpdateWin,13,1, "no or rows %d ",trows);  //DEBUG
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(payPerUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  wrefresh(payPerUpdateWin);
+		  set_field_buffer(payPerField[0],0,PQgetvalue(res,0,1));
+		  //set_field_buffer(payPerField[1],0,PQgetvalue(res,0,2));
+		  cfUpdate = 1;
+		}
+	      else
+		{
+		  mvwprintw(payPerUpdateWin,12,1,"Number invalied");
+		  wrefresh(payPerUpdateWin);		
+		  wrefresh(payPerWin);
+		}
+	      noecho();
+	      PQclear(res);
+	    } //F9
+	} //while F1
+      
       form_driver(payPerForm,REQ_VALIDATION);
 
       strcpy(payPer,field_buffer(payPerField[0],0));
@@ -515,6 +609,8 @@ void paymentPeriodInsert()
 	  strcpy(payPer, trimWS(payPer));
 	  echo();
 	  mvwprintw(payPerWin,rows-8,cols-46, "Save y/n: ");
+	  mvwprintw(payPerWin,rows-7,cols-46,"(d = delete record)");
+	  wmove(payPerWin,rows-8,cols-36);
 	  while((cf = wgetch(payPerWin)) != 'y')
 	    {
 	      wmove(payPerWin,rows-8,cols-36);
@@ -523,11 +619,27 @@ void paymentPeriodInsert()
 		  mvwprintw(payPerWin,rows-6,cols-46, "Data not saved");
 		  break;
 		}
+	      if (cf == 'd')
+		{  
+		  //payPerDelete(upID);
+		  mvwprintw(payPerWin,rows-6,cols-46, "Record deleted");                
+		  break;
+		}
 	    }
-	  if(cf == 'y')
+	   if (cf == 'y')
 	    {
-	      payPeriodInsert(payPer);
-	      mvwprintw(payPerWin,rows-6,cols-46, "Data saved");
+	      if (cfUpdate == 1)
+		{
+		  payPerUpdate(upID,payPer); 
+		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
+		  mvwprintw(payPerWin,rows-6,cols-46, "Data updated");
+		  mvwprintw(payPerWin,rows-5,cols-46, "cfUpdate %d,upID %d payPer %s", cfUpdate,upID,payPer);  //DEBUG
+		}
+	      else
+		{
+		  payPeriodInsert(payPer);
+		  mvwprintw(payPerWin,rows-6,cols-46, "Data saved");	
+		}
 	    }
 	}
 	  else
@@ -541,6 +653,8 @@ void paymentPeriodInsert()
       free_field(payPerField[0]);
       free_field(payPerField[1]);
 
+      cfUpdate = 0;
+
       mvwprintw(payPerWin,rows-4,cols-46,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(payPerWin)) != 'y')
@@ -550,9 +664,9 @@ void paymentPeriodInsert()
 	    break;
 	}
       noecho();
-
-      endwin();
     }
+  PQfinish(conn);
+      endwin();    
 }
 
 void propertyInsert()
