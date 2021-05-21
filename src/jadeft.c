@@ -22,10 +22,10 @@ int main (void) {
   // suppInsert();
   // suppTypeInsert();
   // paymentPeriodInsert();
-  // propertyInsert();
-  // suppInsert();
+   propertyInsert();
+   suppInsert();
   // suppTypeInsert();
-   paymentPeriodInsert();
+  // paymentPeriodInsert();
   // propertyInsert();
   //   suppAccountInsert();
 
