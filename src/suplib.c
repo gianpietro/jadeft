@@ -362,6 +362,92 @@ void prtInsert(int actInd, char prtPostCode[], char prtAddress[], char prtCity[]
 
 }
 
+void prtUpdate(int upID, int actInd, char prtPostCode[], char prtAddress[], char prtCity[])
+{
+   /* exec sql begin declare section */
+      
+      
+      
+      
+      
+   
+#line 201 "suplib.pcg"
+ int v_upID ;
+ 
+#line 202 "suplib.pcg"
+ int v_actInd ;
+ 
+#line 203 "suplib.pcg"
+ char v_prtPostCode [ 10 ] ;
+ 
+#line 204 "suplib.pcg"
+ char v_prtAddress [ 30 ] ;
+ 
+#line 205 "suplib.pcg"
+ char v_prtCity [ 30 ] ;
+/* exec sql end declare section */
+#line 206 "suplib.pcg"
+
+  
+   connectToDB();
+
+   v_upID = upID;
+   v_actInd = actInd;
+   strcpy(v_prtPostCode, prtPostCode);
+   strcpy(v_prtAddress, prtAddress);
+   strcpy(v_prtCity,prtCity);
+
+   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "update property set active_ind = $1  , post_code = $2  , address = $3  , city = $4  where property_id = $5 ", 
+	ECPGt_int,&(v_actInd),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_prtPostCode),(long)10,(long)1,(10)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_prtAddress),(long)30,(long)1,(30)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_prtCity),(long)30,(long)1,(30)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
+#line 218 "suplib.pcg"
+  		 		 
+   { ECPGtrans(__LINE__, NULL, "commit");}
+#line 219 "suplib.pcg"
+
+
+   { ECPGdisconnect(__LINE__, "CURRENT");}
+#line 221 "suplib.pcg"
+
+}
+
+void prtDelete(int upID)
+{
+   /* exec sql begin declare section */
+      
+   
+#line 227 "suplib.pcg"
+ int v_upID ;
+/* exec sql end declare section */
+#line 228 "suplib.pcg"
+
+  
+   connectToDB();
+
+   v_upID = upID;
+
+   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from property where property_id = $1 ", 
+	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
+#line 235 "suplib.pcg"
+
+   { ECPGtrans(__LINE__, NULL, "commit");}
+#line 236 "suplib.pcg"
+
+
+   { ECPGdisconnect(__LINE__, "CURRENT");}
+#line 238 "suplib.pcg"
+
+}
+
 void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int safPrtID,
                       int safSupTypeID, int safStartDt, int safEndDt, int safPayID, double safAmount,
 		      char safComment[], char safAlias[], int safProAcctID)
@@ -380,43 +466,43 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
       
       
    
-#line 203 "suplib.pcg"
+#line 246 "suplib.pcg"
  int v_safActiveID ;
  
-#line 204 "suplib.pcg"
+#line 247 "suplib.pcg"
  char v_safSupAcctRef [ 30 ] ;
  
-#line 205 "suplib.pcg"
+#line 248 "suplib.pcg"
  int v_safSupID ;
  
-#line 206 "suplib.pcg"
+#line 249 "suplib.pcg"
  int v_safPrtID ;
  
-#line 207 "suplib.pcg"
+#line 250 "suplib.pcg"
  int v_safSupTypeID ;
  
-#line 208 "suplib.pcg"
+#line 251 "suplib.pcg"
  int v_safStartDt ;
  
-#line 209 "suplib.pcg"
+#line 252 "suplib.pcg"
  int v_safEndDt ;
  
-#line 210 "suplib.pcg"
+#line 253 "suplib.pcg"
  int v_safPayID ;
  
-#line 211 "suplib.pcg"
+#line 254 "suplib.pcg"
  double v_safAmount ;
  
-#line 212 "suplib.pcg"
+#line 255 "suplib.pcg"
  char v_safComment [ 30 ] ;
  
-#line 213 "suplib.pcg"
+#line 256 "suplib.pcg"
  char v_safAlias [ 10 ] ;
  
-#line 214 "suplib.pcg"
+#line 257 "suplib.pcg"
  int v_safProAcctID ;
 /* exec sql end declare section */
-#line 215 "suplib.pcg"
+#line 258 "suplib.pcg"
 
   
    connectToDB();
@@ -459,14 +545,14 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_safProAcctID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 236 "suplib.pcg"
+#line 279 "suplib.pcg"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 237 "suplib.pcg"
+#line 280 "suplib.pcg"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 239 "suplib.pcg"
+#line 282 "suplib.pcg"
 
 }
 

@@ -23,11 +23,9 @@ int main (void) {
   // suppTypeInsert();
   // paymentPeriodInsert();
    propertyInsert();
-   suppInsert();
-  // suppTypeInsert();
-  // paymentPeriodInsert();
-  // propertyInsert();
-  //   suppAccountInsert();
+
+
+  // suppAccountInsert();
 
   
   // system("clear");

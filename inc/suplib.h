@@ -12,5 +12,8 @@ void supTypeUpdate(int, char *);
 void supTypeDelete(int);
 void payPerUpdate(int, char *);
 void payPerDelete(int);
+void prtUpdate(int, int, char *, char *, char *);
+void prtDelete(int);
+
 
 #endif

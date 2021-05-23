@@ -62,7 +62,7 @@ void suppInsert()
       box(supWin, 0,0);
       box(supUpdateWin,0,0);
           
-      if (supWin == NULL)
+      if (supWin == NULL || supUpdateWin == NULL)
 	{
 	  addstr("Unable to create window");
 	  refresh();
@@ -197,7 +197,7 @@ void suppInsert()
 	      /* NEW CODE FOR DELETE */
 	      if (cf == 'd')
 		{  
-		      //supplierDelete(upID);
+		      supplierDelete(upID);
 		      mvwprintw(supWin,19,5, "Record deleted");                
 		      break;
 		 }		 
@@ -677,25 +677,18 @@ void propertyInsert()
   int ch;
   int cf;                 /* confirm save data */
   int actInd;             /* active_Ind */
-  char prtPostCode[10];   /* post_code */
+  char prtPostCode[30];   /* post_code */
   char prtAddress[30];
   char prtCity[30];
   int newRec= 'y';        /* Add another new record */
   int rows, cols;
-  int cfUpdate = 0;
-  int range = 5, list = 2, i = 0, j = 0;
-  char p;
-  int urows, ucols;
-  int trows, val, upID, *params[1], length[1],  formats[1];
-  PGconn *conn =  fdbcon();
-  PGresult *res;
-    
+
   initscr();
   cbreak();
   noecho();
   keypad(stdscr,TRUE);
 
-    while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
+  while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
       /* Add the fields required in the form */
       /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
@@ -714,21 +707,22 @@ void propertyInsert()
       scale_form(propertyForm, &rows, &cols);
 
       /* Add window which will be associated to form */
-      prtWin = newwin(rows+15, cols+20,1,1);
-      prtUpdateWin = newwin(20,50,30,1);
+      prtWin = newwin(31,81,1,1);
+      //prtUpdateWin = newwin(20,50,30,1);
+
       keypad(prtWin, TRUE);
-      keypad(prtUpdateWin, TRUE);
-             
+      //keypad(prtUpdateWin, TRUE);
+
       /* Set main and sub windows */
       set_form_win(propertyForm, prtWin);
       set_form_sub(propertyForm, derwin(prtWin,rows,cols,1,1));
       getmaxyx(prtWin,rows,cols);
-      getmaxyx(prtUpdateWin, urows, ucols);
-      
+      mvwprintw(prtWin,29,1,"row %d col %d", rows, cols);
+            
       box(prtWin, 0,0);
-      box(prtUpdateWin,0,0);
+      //box(prtUpdateWin,0,0);
           
-      if (prtWin == NULL)
+      if (prtWin == NULL)// || prtUpdateWin == NULL)
 	{
 	  addstr("Unable to create window");
 	  refresh();
@@ -737,105 +731,20 @@ void propertyInsert()
 
       waddstr(prtWin,"Property Entry Form");
 
-      post_form(propertyForm); 
+      post_form(propertyForm);
       wrefresh(prtWin);
 
-      //mvwprintw(prtWin,y+2,x+5,"Jade Finacial Tracker");
-      //mvwprintw(prtWin,rows-4, cols-65, "rows %d cols %d", rows, cols);
-      mvwprintw(prtWin,rows-21,cols-65, "Active Ind:");                           
-      mvwprintw(prtWin,rows-19,cols-65, "Post Code:");
-      mvwprintw(prtWin,rows-17,cols-65, "Address:");
-      mvwprintw(prtWin,rows-15,cols-65, "City:");
+      mvwprintw(prtWin,3,5, "Active Ind:");                           
+      mvwprintw(prtWin,5,5, "Post Code:");
+      mvwprintw(prtWin,7,5, "Address:");
+      mvwprintw(prtWin,9,5, "City:");
             
-      mvwprintw(prtWin,rows-2,cols-65,"Press F1 when form complete");
-      wmove(prtWin, rows-21,cols-48);     /* move cursor */
+      mvwprintw(prtWin,28,1,"Press F1 when form complete");
+      wmove(prtWin,3,23);     /* move cursor */
 
-      while((ch = wgetch(prtWin)) != KEY_F(1))
-	{
-	  keyNavigate(ch, propertyForm);
-	  if(ch == KEY_F(9))
-	    {
-	      i = j = trows = 0, cfUpdate = 0;
-	      list = 2;
-	      wclear(prtUpdateWin);
-	      box(prtUpdateWin,0,0);
-	      waddstr(prtUpdateWin, "Property");
-	      wmove(prtUpdateWin,1,1);
-	      wrefresh(prtUpdateWin);
-
-	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexec(conn,"SELECT * FROM property WHERE active_ind = 1 ORDER BY property_id");	  
-	      trows = PQntuples(res);
-
-	      wrefresh(prtUpdateWin);
-	  
-	      while((p = wgetch(prtUpdateWin)) == '\n')
-		{
-		  if ( j + range < trows)
-		    j = j + range;	
-		  else
-		    j = j + (trows - j);
-		  for (i; i < j; i++)
-		    {
-		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
-		      mvwprintw(prtUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
-		      list++;
-		      wclrtoeol(prtUpdateWin);
-		    }
-		  list = 2;      
-		  if  (i == trows)
-		    {
-		      wclrtobot(prtUpdateWin);  
-		      mvwprintw(prtUpdateWin,10,1,"End of list");
-		      box(prtUpdateWin,0,0);
-		      mvwprintw(prtUpdateWin,0,0, "Property");
-		      wmove(prtUpdateWin,10,1);
-		      break;
-		    }
-		}	  
-	      echo();  
-	      mvwprintw(prtUpdateWin,11,1,"Select Option: ");
-	      mvwscanw(prtUpdateWin,11,25, "%d", &upID);
-
-	      PQclear(res);
-	  
-	      val = htonl((uint32_t)upID);
-	      params[0] = (int *)&val;
-	      length[0] = sizeof(val);
-	      formats[0] = 1;
-
-	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexecParams(conn, "SELECT * FROM property WHERE property_id = $1;"
-				 ,1
-				 ,NULL
-				 ,(const char *const *)params
-				 ,length
-				 ,formats
-				 ,0);
-	  
-	      trows = PQntuples(res);
-	      if (trows == 1)
-		{
-		  mvwprintw(prtUpdateWin,13,1, "no or rows %d ",trows);
-		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
-		  mvwprintw(prtUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
-		  wrefresh(prtUpdateWin);
-		  set_field_buffer(propertyField[0],0,PQgetvalue(res,0,1));
-		  set_field_buffer(propertyField[1],0,PQgetvalue(res,0,2));
-		  set_field_buffer(propertyField[2],0,PQgetvalue(res,0,3));
-		  set_field_buffer(propertyField[3],0,PQgetvalue(res,0,4));
-		  cfUpdate = 1;
-		}
-	      else
-		{
-		  mvwprintw(prtUpdateWin,12,1,"Number invalied");
-		  wrefresh(prtUpdateWin);		
-		  wrefresh(prtWin);
-		}
-	      noecho();
-	      PQclear(res);
-	    } //F9
-	} //while F1
+      while((ch = wgetch(prtWin)) != KEY_F(1))	
+	keyNavigate(ch, propertyForm);
+      	
 	  
       form_driver(propertyForm,REQ_VALIDATION);
     
@@ -847,45 +756,29 @@ void propertyInsert()
 
       if ((form_driver(propertyForm,REQ_VALIDATION) == E_OK) && (actInd >= 1) && (!isspace(*prtPostCode)))
 	{
-	  strcpy(prtPostCode, trimWS(prtPostCode));  
+	  strcpy(prtPostCode, trimWS(prtPostCode));
 	  echo();
-	  mvwprintw(prtWin,rows-8,cols-65,"Save: y/n: ");
-	  mvwprintw(prtUpdateWin,rows-7,cols-65,"(d = delete record)");
-	  wmove(prtWin,rows-8,cols-55);
+	  mvwprintw(prtWin,15,5,"Save: y/n: ");
+	  mvwprintw(prtWin,16,5,"(d = delete record)");
+	  wmove(prtWin,15,18);
 	  while((cf = wgetch(prtWin)) != 'y')
 	    {
-	      wmove(prtWin,rows-8,cols-54);
+	      wmove(prtWin,15,18);
 	      if (cf == 'n')
 		{
-		  mvwprintw(prtWin,rows-6,cols-65, "Data not saved");
+		  mvwprintw(prtWin,22,5, "Data not saved");
 		  break;
 		}
-	      if (cf == 'd')
-		{  
-		  //DELETE_FUNCTION(upID);
-		  mvwprintw(prtWin,rows-6,cols-65, "Record deleted");                
-		  break;
-		 }	      
 	    }	  
 	  if (cf == 'y')
-	     {
-	      if (cfUpdate == 1)
-		{
-		  //FUNCTION_UPDATE(upID, actInd, prtPostCode, prtAddress, prtCity); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
-		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(prtWin,rows-6,cols-65, "Data updated");
-		  mvwprintw(prtWin,rows-5,cols-65, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, prtPostCode);  //DEBUG
-		}
-	      else
-		{
-		  prtInsert(actInd, prtPostCode, prtAddress, prtCity);
-	          mvwprintw(prtWin,rows-6,cols-65, "Data saved");		  
-		}
+	    {
+	      prtInsert(actInd, prtPostCode, prtAddress, prtCity);
+	      mvwprintw(prtWin,22,5, "Data saved");		  	
 	    }	  
 	}
       else
 	{
-	  mvwprintw(prtWin,rows-6,cols-65, "Data invalid");
+	  mvwprintw(prtWin,22,5, "Data invalid");
 	}
       noecho();
 
@@ -895,21 +788,22 @@ void propertyInsert()
       free_field(propertyField[1]);
       free_field(propertyField[2]);
       free_field(propertyField[3]);
+      //free_field(propertyField[4]);
 
-      cfUpdate = 0;
+      //cfUpdate = 0;
 
-      mvwprintw(prtWin,rows-4,cols-65,"Do you want to add a new record y/n: ");
+      mvwprintw(prtWin,25,5,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(prtWin)) != 'y')
 	{
-	  wmove(prtWin,rows-4,cols-28);
+	  wmove(prtWin,25,42);
 	  if(newRec == 'n')
 	    break;
 	}
       noecho();
-    }
-    PQfinish(conn);
-  endwin();
+      delwin(prtWin);
+    }  //while newrec = y
+  endwin();  
 }
 
 
