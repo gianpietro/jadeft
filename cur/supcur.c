@@ -682,6 +682,14 @@ void propertyInsert()
   char prtCity[30];
   int newRec= 'y';        /* Add another new record */
   int rows, cols;
+  int cfUpdate = 0;
+  int range = 5, list = 2, i = 0, j = 0;
+  char p;
+  int urows, ucols;
+  int trows, val, upID, *params[1], length[1],  formats[1];
+
+  PGconn *conn =  fdbcon();
+  PGresult *res;
 
   initscr();
   cbreak();
@@ -708,19 +716,18 @@ void propertyInsert()
 
       /* Add window which will be associated to form */
       prtWin = newwin(31,81,1,1);
-      //prtUpdateWin = newwin(20,50,30,1);
+      prtUpdateWin = newwin(20,50,1,120);
 
       keypad(prtWin, TRUE);
-      //keypad(prtUpdateWin, TRUE);
+      keypad(prtUpdateWin, TRUE);
 
       /* Set main and sub windows */
       set_form_win(propertyForm, prtWin);
       set_form_sub(propertyForm, derwin(prtWin,rows,cols,1,1));
       getmaxyx(prtWin,rows,cols);
-      mvwprintw(prtWin,29,1,"row %d col %d", rows, cols);
             
       box(prtWin, 0,0);
-      //box(prtUpdateWin,0,0);
+      box(prtUpdateWin,0,0);
           
       if (prtWin == NULL)// || prtUpdateWin == NULL)
 	{
@@ -730,6 +737,7 @@ void propertyInsert()
 	}
 
       waddstr(prtWin,"Property Entry Form");
+      mvwprintw(prtWin,29,1,"row %d col %d", rows, cols);
 
       post_form(propertyForm);
       wrefresh(prtWin);
@@ -742,8 +750,93 @@ void propertyInsert()
       mvwprintw(prtWin,28,1,"Press F1 when form complete");
       wmove(prtWin,3,23);     /* move cursor */
 
-      while((ch = wgetch(prtWin)) != KEY_F(1))	
-	keyNavigate(ch, propertyForm);
+      while((ch = wgetch(prtWin)) != KEY_F(1))
+	{
+	  keyNavigate(ch, propertyForm);
+if(ch == KEY_F(9))
+	    {
+	      i = j = trows = 0, cfUpdate = 0;
+	      list = 2;
+	      wclear(prtUpdateWin);
+	      box(prtUpdateWin,0,0);
+	      waddstr(prtUpdateWin, "Property");
+	      wmove(prtUpdateWin,1,1);
+	      wrefresh(prtUpdateWin);
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexec(conn,"SELECT * FROM property WHERE active_ind = 1 ORDER BY property_id");	  
+	      trows = PQntuples(res);
+
+	      wrefresh(prtUpdateWin);
+	  
+	      while((p = wgetch(prtUpdateWin)) == '\n')
+		{
+		  if ( j + range < trows)
+		    j = j + range;	
+		  else
+		    j = j + (trows - j);
+		  for (i; i < j; i++)
+		    {
+		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		      mvwprintw(prtUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      list++;
+		      wclrtoeol(prtUpdateWin);
+		    }
+		  list = 2;      
+		  if  (i == trows)
+		    {
+		      wclrtobot(prtUpdateWin);  
+		      mvwprintw(prtUpdateWin,10,1,"End of list");
+		      box(prtUpdateWin,0,0);
+		      mvwprintw(prtUpdateWin,0,0, "Property");
+		      wmove(prtUpdateWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(prtUpdateWin,11,1,"Select Option: ");
+	      mvwscanw(prtUpdateWin,11,25, "%d", &upID);
+
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)upID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexecParams(conn, "SELECT * FROM property WHERE property_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      trows = PQntuples(res);
+	      if (trows == 1)
+		{
+		  mvwprintw(prtUpdateWin,13,1, "no or rows %d ",trows);
+		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		  mvwprintw(prtUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  wrefresh(prtUpdateWin);
+		  set_field_buffer(propertyField[0],0,PQgetvalue(res,0,1));
+		  set_field_buffer(propertyField[1],0,PQgetvalue(res,0,2));
+		  set_field_buffer(propertyField[2],0,PQgetvalue(res,0,3));
+		  set_field_buffer(propertyField[3],0,PQgetvalue(res,0,4));
+		  cfUpdate = 1;
+		}
+	      else
+		{
+		  mvwprintw(prtUpdateWin,12,1,"Number invalied");
+		  wrefresh(prtUpdateWin);		
+		  wrefresh(prtWin);
+		}
+	      noecho();
+	      PQclear(res);
+	      } //while F9 
+	} //while F1
+    
       	
 	  
       form_driver(propertyForm,REQ_VALIDATION);
@@ -769,12 +862,33 @@ void propertyInsert()
 		  mvwprintw(prtWin,22,5, "Data not saved");
 		  break;
 		}
-	    }	  
+	            if (cf == 'd')
+		{  
+		  prtDelete(upID);
+		  mvwprintw(prtWin,rows-6,cols-65, "Record deleted");                
+		  break;
+		 }	      
+	    }
 	  if (cf == 'y')
-	    {
-	      prtInsert(actInd, prtPostCode, prtAddress, prtCity);
-	      mvwprintw(prtWin,22,5, "Data saved");		  	
-	    }	  
+	        {
+		    if (cfUpdate == 1)
+		{
+		  prtUpdate(upID, actInd, prtPostCode, prtAddress, prtCity); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
+		  mvwprintw(prtWin,rows-6,cols-65, "Data updated");
+		  mvwprintw(prtWin,rows-5,cols-65, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, prtPostCode);  //DEBUG
+		}
+		else 
+		  {
+		  prtInsert(actInd, prtPostCode, prtAddress, prtCity);
+	          mvwprintw(prtWin,rows-6,cols-65, "Data saved");		  
+		  }
+	    }
+	  //if (cf == 'y')
+	  //{
+	      //prtInsert(actInd, prtPostCode, prtAddress, prtCity);
+	  //  mvwprintw(prtWin,22,5, "Data saved");		  	
+	  //}	  
 	}
       else
 	{
@@ -790,7 +904,7 @@ void propertyInsert()
       free_field(propertyField[3]);
       //free_field(propertyField[4]);
 
-      //cfUpdate = 0;
+      cfUpdate = 0;
 
       mvwprintw(prtWin,25,5,"Do you want to add a new record y/n: ");
       echo();
@@ -803,6 +917,7 @@ void propertyInsert()
       noecho();
       delwin(prtWin);
     }  //while newrec = y
+  PQfinish(conn);
   endwin();  
 }
 
