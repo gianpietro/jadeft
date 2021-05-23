@@ -753,7 +753,7 @@ void propertyInsert()
       while((ch = wgetch(prtWin)) != KEY_F(1))
 	{
 	  keyNavigate(ch, propertyForm);
-if(ch == KEY_F(9))
+	  if(ch == KEY_F(9))
 	    {
 	      i = j = trows = 0, cfUpdate = 0;
 	      list = 2;
@@ -834,10 +834,8 @@ if(ch == KEY_F(9))
 		}
 	      noecho();
 	      PQclear(res);
-	      } //while F9 
+	    } //while F9 
 	} //while F1
-    
-      	
 	  
       form_driver(propertyForm,REQ_VALIDATION);
     
@@ -862,33 +860,28 @@ if(ch == KEY_F(9))
 		  mvwprintw(prtWin,22,5, "Data not saved");
 		  break;
 		}
-	            if (cf == 'd')
+	      if (cf == 'd')
 		{  
 		  prtDelete(upID);
 		  mvwprintw(prtWin,rows-6,cols-65, "Record deleted");                
 		  break;
-		 }	      
+		}	      
 	    }
 	  if (cf == 'y')
-	        {
-		    if (cfUpdate == 1)
+	    {
+	      if (cfUpdate == 1)
 		{
 		  prtUpdate(upID, actInd, prtPostCode, prtAddress, prtCity); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(prtWin,rows-6,cols-65, "Data updated");
 		  mvwprintw(prtWin,rows-5,cols-65, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, prtPostCode);  //DEBUG
 		}
-		else 
-		  {
+	      else 
+		{
 		  prtInsert(actInd, prtPostCode, prtAddress, prtCity);
 	          mvwprintw(prtWin,rows-6,cols-65, "Data saved");		  
-		  }
+		}
 	    }
-	  //if (cf == 'y')
-	  //{
-	      //prtInsert(actInd, prtPostCode, prtAddress, prtCity);
-	  //  mvwprintw(prtWin,22,5, "Data saved");		  	
-	  //}	  
 	}
       else
 	{
@@ -902,7 +895,6 @@ if(ch == KEY_F(9))
       free_field(propertyField[1]);
       free_field(propertyField[2]);
       free_field(propertyField[3]);
-      //free_field(propertyField[4]);
 
       cfUpdate = 0;
 
@@ -924,24 +916,25 @@ if(ch == KEY_F(9))
 
 int suppAccountInsert()
 {
-  WINDOW * supAcctWin, * supWin, * supTypeWin, * prtWin, * payWin, * paWin;
+  WINDOW * supAcctWin, * supWin, * supTypeWin, * prtWin, * payWin, * paWin, *supUpdateWin;
   FORM * supAcctForm;
   FIELD * supAcctField[13];
   int i = 0, j = 0;
   int range = 5;
   char p;
   int ch;
-  int srow, scol, strow, stcol, sarow, sacol, prrow, prcol, pyrow, pycol, parow, pacol;
+  int srow, scol, strow, stcol, sarow, sacol, prrow, prcol, pyrow, pycol, parow, pacol, urows, ucols;
   int list = 2;
   int supID, prtID, supTID, payID, proANo;
   char supIDstr[5], prtIDstr[5], supTIDstr[5], payIDstr[5], proANostr[30];
   int rows;
-  int val, *params[1], length[1],  formats[1];
+  int val, upID, *params[1], length[1],  formats[1];
   int safActiveID, safSupID, safPrtID, safSupTypeID, safStartDt, safEndDt, safPayID, safProAcctID;
   float safAmount;
-  char safSupAcctRef[30], safComment[30], safAlias[10];
+  char safSupAcctRef[30], safComment[30], safAlias[30];
   int cf;
   int newRec = 'y';
+  int cfUpdate = 0;
 
   PGconn *conn =  fdbcon();
   PGresult *res;
@@ -989,6 +982,7 @@ int suppAccountInsert()
       supTypeWin = newwin(20,50,1,120);
       payWin = newwin(20,50,1,120);
       paWin = newwin(20,50,1,120);
+      supUpdateWin = newwin(40,73,1,120);
       
       keypad(supAcctWin, TRUE);
       keypad(supWin, TRUE);
@@ -996,6 +990,7 @@ int suppAccountInsert()
       keypad(supTypeWin, TRUE);
       keypad(payWin, TRUE);
       keypad(paWin, TRUE);
+      keypad(supUpdateWin, TRUE);
 
       set_form_win(supAcctForm,supAcctWin);
       set_form_sub(supAcctForm, derwin(supAcctWin,sarow,sacol,1,1));
@@ -1005,20 +1000,23 @@ int suppAccountInsert()
       getmaxyx(supTypeWin, strow, stcol);
       getmaxyx(payWin, pyrow, pycol);
       getmaxyx(paWin, parow, pacol);
+      getmaxyx(supUpdateWin, urows, ucols);
       box(supAcctWin,0,0);
       box(supWin,0,0);
       box(prtWin,0,0);
       box(supTypeWin, 0,0);
       box(payWin, 0,0);
       box(paWin, 0,0);
+      box(supUpdateWin,0,0);
       waddstr(supAcctWin, "Supplier Account Form");
       waddstr(supWin, "Supplier");
       waddstr(prtWin, "Property");
       waddstr(supTypeWin, "Supplier Type");
       waddstr(payWin, "Payment Period");
       waddstr(paWin, "Provider Account");
+      waddstr(supUpdateWin, "Supplier Account");
 
-      if(supAcctWin == NULL || supWin == NULL || prtWin == NULL ||supTypeWin == NULL || payWin == NULL || paWin == NULL)
+      if(supAcctWin == NULL || supWin == NULL || prtWin == NULL ||supTypeWin == NULL || payWin == NULL || paWin == NULL || supUpdateWin == NULL)
 	{
 	  endwin();
 	  puts("Unable to create window");
@@ -1028,7 +1026,7 @@ int suppAccountInsert()
       post_form(supAcctForm);
       wrefresh(supAcctWin);
 
-      //mvwprintw(supAcctWin, 37, 5,"row %d col %d", sarow, sacol);
+      mvwprintw(supAcctWin, 37, 5,"row %d col %d", sarow, sacol);
 
       mvwprintw(supAcctWin, 3,5, "Active Ind:");
       mvwprintw(supAcctWin, 5,5, "Supplier Account No:");
@@ -1453,6 +1451,96 @@ int suppAccountInsert()
 	      noecho();
 	      PQclear(res);
 	    } // F6
+	if(ch == KEY_F(9))
+	    {
+	      i = j = rows = 0, cfUpdate = 0;
+	      list = 2;
+	      wclear(supUpdateWin);
+	      box(supUpdateWin,0,0);
+	      waddstr(supUpdateWin, "Supplier Account");
+	      wmove(supUpdateWin,1,1);
+	      wrefresh(supUpdateWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM supplier_account WHERE active_ind = 1 ORDER BY supplier_acct_id");	  
+	      rows = PQntuples(res);
+
+	      wrefresh(supUpdateWin);
+	  
+	      while((p = wgetch(supUpdateWin)) == '\n')
+		{
+		  if ( j + range < rows)
+		    j = j + range;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(supUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      list++;
+		      wclrtoeol(supUpdateWin);
+		    }
+		  list = 2;      
+		  if  (i == rows)
+		    {
+		      wclrtobot(supUpdateWin);  
+		      mvwprintw(supUpdateWin,10,1,"End of list");
+		      box(supUpdateWin,0,0);
+		      mvwprintw(supUpdateWin,0,0, "Supplier Account");
+		      wmove(supUpdateWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(supUpdateWin,11,1,"Select Option: ");
+	      mvwscanw(supUpdateWin,11,25, "%d", &upID);
+
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)upID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM supplier_account WHERE supplier_acct_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(supUpdateWin,13,1, "no or rows %d ",rows);
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(supUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  wrefresh(supUpdateWin);
+		  set_field_buffer(supAcctField[0],0,PQgetvalue(res,0,1));
+		  set_field_buffer(supAcctField[1],0,PQgetvalue(res,0,2));
+		  set_field_buffer(supAcctField[2],0,PQgetvalue(res,0,3));
+		  set_field_buffer(supAcctField[3],0,PQgetvalue(res,0,4));
+		  set_field_buffer(supAcctField[4],0,PQgetvalue(res,0,5));
+		  set_field_buffer(supAcctField[5],0,PQgetvalue(res,0,6));
+		  set_field_buffer(supAcctField[6],0,PQgetvalue(res,0,7));
+		  set_field_buffer(supAcctField[7],0,PQgetvalue(res,0,8));
+		  set_field_buffer(supAcctField[8],0,PQgetvalue(res,0,9));
+		  set_field_buffer(supAcctField[9],0,PQgetvalue(res,0,10));
+		  set_field_buffer(supAcctField[10],0,PQgetvalue(res,0,11));
+		  set_field_buffer(supAcctField[11],0,PQgetvalue(res,0,12));
+		  cfUpdate = 1;
+		}
+	      else
+		{
+		  mvwprintw(supUpdateWin,12,1,"Number invalied");
+		  wrefresh(supUpdateWin);		
+		  wrefresh(supAcctWin);
+		}
+	      noecho();
+	      PQclear(res);
+	    } //F9
       } //while not F1
 
     /* code goes here for assign buffer value and validate prior to insert */
@@ -1487,7 +1575,9 @@ int suppAccountInsert()
       if ((form_driver(supAcctForm,REQ_VALIDATION) == E_OK) && (safActiveID >= 1))
 	{
 	  echo();
-	  mvwprintw(supAcctWin,32,5,"Save: y/n: ");     
+	  mvwprintw(supAcctWin,32,5,"Save: y/n: ");
+	  mvwprintw(supUpdateWin,33,5,"(d = delete record)");
+	  wmove(supUpdateWin,32,5);
 
 	  while((cf = wgetch(supAcctWin)) != 'y')
 	    {
@@ -1497,12 +1587,29 @@ int suppAccountInsert()
 		  mvwprintw(supAcctWin,34,5, "Data not saved");
 		  break;
 		}
+	      if (cf == 'd')
+		{  
+		  //DELETE_FUNCTION(upID);
+		  mvwprintw(supAcctWin,34,5, "Record deleted");                
+		  break;
+		}	      
 	    }	  
 	  if (cf == 'y')
 	    {
-	      supAccountInsert(safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
-			       safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID);
-	      mvwprintw(supAcctWin,34,5, "Data saved");
+	      if (cfUpdate == 1)
+		{
+		  /* FUNCTION_UPDATE(upID,safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
+		     safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID); */ //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
+		  mvwprintw(supAcctWin,19,5, "Data updated");
+		  mvwprintw(supAcctWin,20,5, "cfUpdate %d,upID %d, safSupAcctRef %d, safSupID %d", cfUpdate,upID, safSupAcctRef, safSupID);  //DEBUG
+		}
+	      else
+		{
+		  supAccountInsert(safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
+				   safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID);
+		  mvwprintw(supAcctWin,34,5, "Data saved");
+		}
 	    }
 	}
       else
@@ -1528,6 +1635,8 @@ int suppAccountInsert()
       free_field(supAcctField[10]);
       free_field(supAcctField[11]);
 
+      cfUpdate = 0;
+
       mvwprintw(supAcctWin,37,5,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(supAcctWin)) != 'y')
@@ -1537,6 +1646,7 @@ int suppAccountInsert()
 	    break;
 	}
       noecho();
+      delwin(supAcctWin);
     } //while newRec = y
 
   PQfinish(conn);
