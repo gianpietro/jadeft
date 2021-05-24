@@ -282,7 +282,69 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
   EXEC SQL DISCONNECT;
 }
 
+void supAccountUpdate(int upID,int safActiveID ,char safSupAcctRef[],int safSupID, int safPrtID,
+                      int safSupTypeID, int safStartDt, int safEndDt, int safPayID, double safAmount,
+		      char safComment[], char safAlias[], int safProAcctID)
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     int v_upID;
+     int v_safActiveID;
+     char v_safSupAcctRef[30];
+     int v_safSupID;
+     int v_safPrtID;
+     int v_safSupTypeID;
+     int v_safStartDt;
+     int v_safEndDt;
+     int v_safPayID;
+     double v_safAmount;
+     char v_safComment[30];
+     char v_safAlias[10];
+     int v_safProAcctID;
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+   
+   v_upID = upID;
+   v_safActiveID = safActiveID;
+   strcpy(v_safSupAcctRef, safSupAcctRef);
+   v_safSupID = safSupID;
+   v_safPrtID = safPrtID;
+   v_safSupTypeID = safSupTypeID;
+   v_safStartDt = safStartDt;
+   v_safEndDt = safEndDt;
+   v_safPayID = safPayID;
+   v_safAmount = safAmount;
+   strcpy(v_safComment, safComment);
+   strcpy(v_safAlias, safAlias);
+   v_safProAcctID = safProAcctID;
 
+   EXEC SQL
+     UPDATE supplier_account SET active_ind = :v_safActiveID, supplier_acct_ref = :v_safSupAcctRef, supplier_id = :v_safSupID,
+                                 property_id = :v_safPrtID, supplier_type_id = :v_safSupTypeID, start_date = :v_safStartDt,
+				 end_date = :v_safEndDt, payment_period_id = :v_safPayID, amount = :v_safAmount,
+				 comment = :v_safComment, alias = :v_safAlias, provider_acct_id = :v_safProAcctID
+				 WHERE supplier_acct_id = :v_upID;
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void supAccountDelete(int upID)
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     int v_upID;
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   v_upID = upID;
+
+   EXEC SQL
+     DELETE FROM supplier_account WHERE supplier_acct_id = :v_upID;
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
  
 
 

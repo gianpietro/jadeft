@@ -1589,7 +1589,7 @@ int suppAccountInsert()
 		}
 	      if (cf == 'd')
 		{  
-		  //DELETE_FUNCTION(upID);
+		  supAccountDelete(upID);
 		  mvwprintw(supAcctWin,34,5, "Record deleted");                
 		  break;
 		}	      
@@ -1598,8 +1598,8 @@ int suppAccountInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  /* FUNCTION_UPDATE(upID,safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
-		     safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID); */ //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  supAccountUpdate(upID, safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
+		     safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(supAcctWin,19,5, "Data updated");
 		  mvwprintw(supAcctWin,20,5, "cfUpdate %d,upID %d, safSupAcctRef %d, safSupID %d", cfUpdate,upID, safSupAcctRef, safSupID);  //DEBUG

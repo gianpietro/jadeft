@@ -14,6 +14,7 @@ void payPerUpdate(int, char *);
 void payPerDelete(int);
 void prtUpdate(int, int, char *, char *, char *);
 void prtDelete(int);
-
+void supAccountUpdate(int, int, char *, int, int, int, int, int, int, double, char *, char *, int );
+void supAccountDelete(int );
 
 #endif
