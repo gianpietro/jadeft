@@ -2,12 +2,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <form.h>
+#include <panel.h>
 #include <libpq-fe.h>
 #include <arpa/inet.h>
 #include "../inc/supcur.h"
 #include "../inc/suplib.h"
 #include "../inc/jadlib.h"
-
 
 void suppInsert()
 {
@@ -935,6 +935,8 @@ int suppAccountInsert()
   int cf;
   int newRec = 'y';
   int cfUpdate = 0;
+  PANEL *supUpdatePanel, *supPanel;
+  
 
   PGconn *conn =  fdbcon();
   PGresult *res;
@@ -983,6 +985,14 @@ int suppAccountInsert()
       payWin = newwin(20,50,1,120);
       paWin = newwin(20,50,1,120);
       supUpdateWin = newwin(40,73,1,120);
+
+      supUpdatePanel = new_panel(supUpdateWin);
+      supPanel = new_panel(supWin);
+      hide_panel(supUpdatePanel);
+      hide_panel(supPanel);
+      update_panels();
+      doupdate();
+
       
       keypad(supAcctWin, TRUE);
       keypad(supWin, TRUE);
@@ -1015,6 +1025,7 @@ int suppAccountInsert()
       waddstr(payWin, "Payment Period");
       waddstr(paWin, "Provider Account");
       waddstr(supUpdateWin, "Supplier Account");
+      
 
       if(supAcctWin == NULL || supWin == NULL || prtWin == NULL ||supTypeWin == NULL || payWin == NULL || paWin == NULL || supUpdateWin == NULL)
 	{
@@ -1045,6 +1056,10 @@ int suppAccountInsert()
 
       while((ch = wgetch(supAcctWin)) != KEY_F(1))
       {
+	hide_panel(supUpdatePanel);
+	hide_panel(supPanel);
+	update_panels();
+	doupdate();
 	keyNavigate(ch, supAcctForm);
 	if(ch == KEY_F(2))
 	    {
@@ -1054,13 +1069,16 @@ int suppAccountInsert()
 	      box(supWin,0,0);
 	      waddstr(supWin, "Supplier");
 	      wmove(supWin,1,1);
-	      wrefresh(supWin);
+	      //wrefresh(supWin);
+	      show_panel(supPanel);
+	      update_panels();
+	      doupdate();
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM supplier WHERE active_ind = 1 ORDER BY supplier_id");	  
 	      rows = PQntuples(res);
 
-	      wrefresh(supWin);
+	      //wrefresh(supWin);
 	  
 	      while((p = wgetch(supWin)) == '\n')
 		{
@@ -1073,7 +1091,8 @@ int suppAccountInsert()
 		       /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
 		      mvwprintw(supWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
 		      list++;
-		      wclrtoeol(supWin);  
+		      wclrtoeol(supWin);
+		      /* box(supWin,0,0); will redraw box but removes header */		      
 		    }
 		  list = 2;      
 		  //wclrtoeol(supWin);  
@@ -1102,7 +1121,7 @@ int suppAccountInsert()
 	      formats[0] = 1;
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexecParams(conn, "SELECT * FROM supplier WHERE supplier_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM supplier WHERE active_ind = 1 and supplier_id = $1 ORDER BY supplier_id;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
@@ -1111,6 +1130,7 @@ int suppAccountInsert()
 				 ,0);
 	  
 	      rows = PQntuples(res);
+	      //mvwprintw(supWin,11,1,"rows %d", rows);
 	      if (rows == 1)
 		{
 		  mvwprintw(supWin,13,1, "no or rows %d ",rows);
@@ -1122,10 +1142,13 @@ int suppAccountInsert()
 		{
 		  mvwprintw(supWin,12,1,"Number invalied");
 		  wrefresh(supWin);		
-		  wrefresh(supAcctWin);
+		  //wrefresh(supAcctWin);
 		}
 	      noecho();
 	      PQclear(res);
+	      //hide_panel(supPanel);
+	      //update_panels();
+	      //doupdate();
 	    } //F2
 	if(ch == KEY_F(3))
 	    {
@@ -1183,7 +1206,7 @@ int suppAccountInsert()
 	      formats[0] = 1;
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexecParams(conn, "SELECT * FROM property WHERE property_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM property WHERE active_ind = 1 AND property_id = $1 ORDER BY property_id;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
@@ -1264,7 +1287,7 @@ int suppAccountInsert()
 	      formats[0] = 1;
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexecParams(conn, "SELECT * FROM supplier_type WHERE supplier_type_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM supplier_type WHERE supplier_type_id = $1 ORDER BY supplier_type_id;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
@@ -1345,7 +1368,7 @@ int suppAccountInsert()
 	      formats[0] = 1;
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexecParams(conn, "SELECT * FROM payment_period WHERE payment_period_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM payment_period WHERE payment_period_id = $1 ORDER BY payment_period_id;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
@@ -1426,7 +1449,7 @@ int suppAccountInsert()
 	      formats[0] = 1;
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexecParams(conn, "SELECT * FROM provider_account WHERE provider_acct_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM provider_account WHERE active_ind = 1 AND provider_acct_id = $1 ORDER BY provider_acct_id;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
@@ -1452,14 +1475,18 @@ int suppAccountInsert()
 	      PQclear(res);
 	    } // F6
 	if(ch == KEY_F(9))
-	    {
+	    {	      
 	      i = j = rows = 0, cfUpdate = 0;
 	      list = 2;
 	      wclear(supUpdateWin);
 	      box(supUpdateWin,0,0);
 	      waddstr(supUpdateWin, "Supplier Account");
 	      wmove(supUpdateWin,1,1);
-	      wrefresh(supUpdateWin);
+	      //wrefresh(supUpdateWin);
+	      show_panel(supUpdatePanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(supAcctWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM supplier_account WHERE active_ind = 1 ORDER BY supplier_acct_id");	  
@@ -1503,7 +1530,7 @@ int suppAccountInsert()
 	      formats[0] = 1;
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
-	      res = PQexecParams(conn, "SELECT * FROM supplier_account WHERE supplier_acct_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM supplier_account WHERE active_ind = 1 AND supplier_acct_id = $1 ORDER BY supplier_acct_id;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
@@ -1517,7 +1544,7 @@ int suppAccountInsert()
 		  mvwprintw(supUpdateWin,13,1, "no or rows %d ",rows);
 		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
 		  mvwprintw(supUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
-		  wrefresh(supUpdateWin);
+		  //wrefresh(supUpdateWin);
 		  set_field_buffer(supAcctField[0],0,PQgetvalue(res,0,1));
 		  set_field_buffer(supAcctField[1],0,PQgetvalue(res,0,2));
 		  set_field_buffer(supAcctField[2],0,PQgetvalue(res,0,3));
@@ -1536,11 +1563,15 @@ int suppAccountInsert()
 		{
 		  mvwprintw(supUpdateWin,12,1,"Number invalied");
 		  wrefresh(supUpdateWin);		
-		  wrefresh(supAcctWin);
+		  wrefresh(supAcctWin);		  
 		}
 	      noecho();
 	      PQclear(res);
-	    } //F9
+	      //hide_panel(supUpdatePanel);
+	      //update_panels();
+	      //doupdate();
+	      //wrefresh(supAcctWin);
+	    } //F9	
       } //while not F1
 
     /* code goes here for assign buffer value and validate prior to insert */
@@ -1559,6 +1590,7 @@ int suppAccountInsert()
       strcpy(safAlias, trimWS(field_buffer(supAcctField[10],0)));
       safProAcctID = atoi(field_buffer(supAcctField[11],0));
 
+      /*
       mvwprintw(supAcctWin, 3,65, "%d",safActiveID);
       mvwprintw(supAcctWin, 5,65, "%s",safSupAcctRef);
       mvwprintw(supAcctWin, 7,65, "%d",safSupID);
@@ -1571,13 +1603,14 @@ int suppAccountInsert()
       mvwprintw(supAcctWin, 21,65, "%s",safComment);
       mvwprintw(supAcctWin, 23,65, "%s",safAlias);
       mvwprintw(supAcctWin, 25,65, "%d",safProAcctID);
+      */
 
       if ((form_driver(supAcctForm,REQ_VALIDATION) == E_OK) && (safActiveID >= 1))
 	{
 	  echo();
-	  mvwprintw(supAcctWin,32,5,"Save: y/n: ");
-	  mvwprintw(supUpdateWin,33,5,"(d = delete record)");
-	  wmove(supUpdateWin,32,5);
+	  mvwprintw(supAcctWin,32,5,"Save y/n: ");
+	  mvwprintw(supAcctWin,33,5,"(d = delete record)");
+	  wmove(supAcctWin,32,16);
 
 	  while((cf = wgetch(supAcctWin)) != 'y')
 	    {
@@ -1601,8 +1634,8 @@ int suppAccountInsert()
 		  supAccountUpdate(upID, safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
 		     safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(supAcctWin,19,5, "Data updated");
-		  mvwprintw(supAcctWin,20,5, "cfUpdate %d,upID %d, safSupAcctRef %d, safSupID %d", cfUpdate,upID, safSupAcctRef, safSupID);  //DEBUG
+		  mvwprintw(supAcctWin,34,5, "Data updated");
+		  mvwprintw(supAcctWin,35,5, "cfUpdate %d,upID %d, safSupAcctRef %s, safSupID %d", cfUpdate,upID, safSupAcctRef, safSupID);  //DEBUG
 		}
 	      else
 		{
