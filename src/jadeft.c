@@ -24,7 +24,7 @@ int main (void) {
    paymentPeriodInsert();
    propertyInsert();
    suppAccountInsert();
-
+   //test
   
   // system("clear");
    printf("Completed Enter 1 to exit: ");
