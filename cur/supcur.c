@@ -916,6 +916,7 @@ void propertyInsert()
 
 int suppAccountInsert()
 {
+  PANEL *supUpdatePanel, *supPanel, *prtPanel, *supTypePanel, *payPanel, *paPanel;
   WINDOW * supAcctWin, * supWin, * supTypeWin, * prtWin, * payWin, * paWin, *supUpdateWin;
   FORM * supAcctForm;
   FIELD * supAcctField[13];
@@ -935,7 +936,6 @@ int suppAccountInsert()
   int cf;
   int newRec = 'y';
   int cfUpdate = 0;
-  PANEL *supUpdatePanel, *supPanel;
   
 
   PGconn *conn =  fdbcon();
@@ -988,8 +988,12 @@ int suppAccountInsert()
 
       supUpdatePanel = new_panel(supUpdateWin);
       supPanel = new_panel(supWin);
-      hide_panel(supUpdatePanel);
-      hide_panel(supPanel);
+      prtPanel = new_panel(prtWin);
+      supTypePanel = new_panel(supTypeWin);
+      payPanel = new_panel(payWin);
+      paPanel = new_panel(paWin);
+      //hide_panel(supUpdatePanel);
+      //hide_panel(supPanel);
       update_panels();
       doupdate();
 
@@ -1058,6 +1062,10 @@ int suppAccountInsert()
       {
 	hide_panel(supUpdatePanel);
 	hide_panel(supPanel);
+	hide_panel(prtPanel);
+	hide_panel(supTypePanel);
+	hide_panel(payPanel);
+	hide_panel(paPanel);
 	update_panels();
 	doupdate();
 	keyNavigate(ch, supAcctForm);
@@ -1158,6 +1166,9 @@ int suppAccountInsert()
 	      box(prtWin,0,0);
 	      waddstr(prtWin, "Property");
 	      wmove(prtWin,1,1);
+	      show_panel(prtPanel);
+	      update_panels();
+	      doupdate();
 	      wrefresh(prtWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
@@ -1226,7 +1237,7 @@ int suppAccountInsert()
 		{
 		  mvwprintw(prtWin,12,1,"Number invalied");
 		  wrefresh(prtWin);		
-		  wrefresh(supAcctWin);
+		  //wrefresh(supAcctWin);
 		}
 	      noecho();
 	      PQclear(res);
@@ -1239,7 +1250,10 @@ int suppAccountInsert()
 	      box(supTypeWin,0,0);
 	      waddstr(supTypeWin, "Supplier Type");
 	      wmove(supTypeWin,1,1);
-	      wrefresh(supTypeWin);
+	      show_panel(supTypePanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(supTypeWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM supplier_type ORDER BY supplier_type_id");	  
@@ -1307,7 +1321,7 @@ int suppAccountInsert()
 		{
 		  mvwprintw(supTypeWin,12,1,"Number invalied");
 		  wrefresh(supTypeWin);		
-		  wrefresh(supAcctWin);
+		  //wrefresh(supAcctWin);
 		}
 	      noecho();
 	      PQclear(res);
@@ -1320,7 +1334,10 @@ int suppAccountInsert()
 	      box(payWin,0,0);
 	      waddstr(payWin, "Payment Period");
 	      wmove(payWin,1,1);
-	      wrefresh(payWin);
+	      show_panel(payPanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(payWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM payment_period ORDER BY payment_period_id");	  
@@ -1401,7 +1418,10 @@ int suppAccountInsert()
 	      box(paWin,0,0);
 	      waddstr(paWin, "Provider Account");
 	      wmove(paWin,1,1);
-	      wrefresh(paWin);
+	      show_panel(paPanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(paWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM provider_account WHERE active_ind = 1 ORDER BY provider_acct_id");	  
@@ -1563,16 +1583,20 @@ int suppAccountInsert()
 		{
 		  mvwprintw(supUpdateWin,12,1,"Number invalied");
 		  wrefresh(supUpdateWin);		
-		  wrefresh(supAcctWin);		  
+		  //wrefresh(supAcctWin);		  
 		}
 	      noecho();
 	      PQclear(res);
-	      //hide_panel(supUpdatePanel);
-	      //update_panels();
-	      //doupdate();
-	      //wrefresh(supAcctWin);
 	    } //F9	
       } //while not F1
+      hide_panel(supUpdatePanel);
+      hide_panel(supPanel);
+      hide_panel(prtPanel);
+      hide_panel(supTypePanel);
+      hide_panel(payPanel);
+      hide_panel(paPanel);
+      update_panels();
+      doupdate();
 
     /* code goes here for assign buffer value and validate prior to insert */
       form_driver(supAcctForm,REQ_VALIDATION);
