@@ -192,7 +192,7 @@ void provInsert()
 		}
 	      if (cf == 'd')
 		{  
-		  //DELETE_FUNCTION(upID);
+		  providerDelete(upID);
 		  mvwprintw(proWin,rows-6,cols-65, "Record deleted");                
 		  break;
 		}
@@ -201,7 +201,7 @@ void provInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //FUNCTION_UPDATE(upID,actInd,pname); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  providerUpdate(upID,actInd,pname); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(proWin,19,5, "Data updated");
 		  mvwprintw(proWin,20,5, "cfUpdate %d,upID %d actInd %d pname %s", cfUpdate,upID,actInd, pname);  //DEBUG
@@ -408,7 +408,7 @@ void provTypeInsert()
 		}
 	      if (cf == 'd')
 		{  
-		  //DELETE_FUNCTION(upID);
+		  proTypeDelete(upID);
 		  mvwprintw(proTypeWin,rows-6,cols-46, "Record deleted");                
 		  break;
 		}
@@ -417,7 +417,7 @@ void provTypeInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //FUNCTION_UPDATE(upID,pdesc); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  proTypeUpdate(upID,pdesc); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(proTypeWin,19,5, "Data updated");
 		  mvwprintw(proTypeWin,20,5, "cfUpdate %d,upID %d pdesc %s", cfUpdate,upID,pdesc);  //DEBUG
@@ -463,9 +463,9 @@ void provTypeInsert()
    for provider and provider type to select for provoder account */
 int provAccountInsert()
 {
-  WINDOW * proListWin, * proAcctWin, *proTypeWin, *proAccountUpdateWin;
-  FORM * proAcctForm;
-  FIELD * proAcctField[7];
+  WINDOW *proListWin, *proAcctWin, *proTypeWin, *proAccountUpdateWin;
+  FORM *proAcctForm;
+  FIELD *proAcctField[7];
   int i = 0, j = 0;
   int range = 5;
   char p;
@@ -822,7 +822,7 @@ int provAccountInsert()
 		}
 	      if (cf == 'd')
 		{  
-		  //DELETE_FUNCTION(upID);
+		  proAccountDelete(upID);
 		  mvwprintw(proAcctWin,parow-8,pacol-64, "Record deleted");                
 		  break;
 		}
@@ -831,7 +831,7 @@ int provAccountInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //FUNCTION_UPDATE(upID,pafActiveID, pafID, pafAccountNo, pafSortCode, pafRef, pafTypeID); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  proAccountUpdate(upID,pafActiveID, pafID, pafAccountNo, pafSortCode, pafRef, pafTypeID); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(proAcctWin,19,5, "Data updated");
 		  mvwprintw(proAcctWin,20,5, "cfUpdate %d,upID %d pafActiveID %d padID %d", cfUpdate,upID,pafActiveID, pafID);  //DEBUG

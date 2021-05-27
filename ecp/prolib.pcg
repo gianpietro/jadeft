@@ -25,6 +25,44 @@ void providerInsert(int activeInd, char proName[])
    EXEC SQL DISCONNECT;
 }
 
+void providerUpdate(int upID, int activeInd, char proName[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+      int v_upID;
+      int v_activeInd;
+      char v_proName[30];
+   EXEC SQL END DECLARE SECTION;
+   
+   connectToDB();
+
+   v_upID = upID;
+   v_activeInd = activeInd;
+   strcpy(v_proName,proName);
+    
+   EXEC SQL  
+    UPDATE provider SET active_ind = :v_activeInd, provider_name = :v_proName WHERE provider_id = :v_upID;
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void providerDelete(int upID)
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+      int v_upID;      
+   EXEC SQL END DECLARE SECTION;
+   
+   connectToDB();
+
+   v_upID = upID;
+       
+   EXEC SQL
+    DELETE FROM provider WHERE provider_id = :v_upID;
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
 void proTypeInsert(char proTypeDesc[])
 {
    EXEC SQL BEGIN DECLARE SECTION;
@@ -37,6 +75,42 @@ void proTypeInsert(char proTypeDesc[])
 
    EXEC SQL
      INSERT INTO provider_type(description) VALUES(:v_proTypeDesc);
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void proTypeUpdate(int upID, char proTypeDesc[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     int v_upID;
+     char v_proTypeDesc[30];
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   v_upID = upID;
+   strcpy(v_proTypeDesc, proTypeDesc);
+
+   EXEC SQL
+     UPDATE provider_type SET description = :v_proTypeDesc WHERE provider_type_id = :v_upID;
+   EXEC SQL COMMIT;
+
+   EXEC SQL DISCONNECT;
+}
+
+void proTypeDelete(int upID)
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+     int v_upID;
+   EXEC SQL END DECLARE SECTION;
+  
+   connectToDB();
+
+   v_upID = upID;
+   
+   EXEC SQL
+     DELETE FROM provider_type WHERE provider_type_id = :v_upID;
    EXEC SQL COMMIT;
 
    EXEC SQL DISCONNECT;
@@ -65,6 +139,52 @@ void proAccountInsert(int pafActiveID, int pafID, char pafAccountNo[], int pafSo
  EXEC SQL
    INSERT INTO provider_account(active_ind, provider_id, provider_acct_no, sort_code, preference, provider_type_id) VALUES (:v_pafActiveID, :v_pafID, :v_pafAccountNo,
    :v_pafSortCode, :v_pafRef, :v_pafTypeID);
+ EXEC SQL COMMIT;
+
+ EXEC SQL DISCONNECT;
+}
+
+void proAccountUpdate(int upID, int pafActiveID, int pafID, char pafAccountNo[], int pafSortCode, char pafRef[], int pafTypeID)
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+    int v_upID;
+    int v_pafActiveID;
+    int v_pafID;
+    char v_pafAccountNo[30];
+    int v_pafSortCode;
+    char v_pafRef[30];
+    int v_pafTypeID;
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+  v_pafActiveID = pafActiveID;
+  v_pafID = pafID;
+  strcpy(v_pafAccountNo, pafAccountNo);
+  v_pafSortCode = pafSortCode;
+  strcpy(v_pafRef, pafRef);
+  v_pafTypeID = pafTypeID;
+
+ EXEC SQL
+   UPDATE provider_account SET active_ind = :v_pafActiveID, provider_id = :v_pafID, provider_acct_no = :v_pafAccountNo, sort_code = :v_pafSortCode, preference = :v_pafRef, provider_type_id = :v_pafTypeID WHERE provider_acct_id = :v_upID;
+ EXEC SQL COMMIT;
+
+ EXEC SQL DISCONNECT;
+}
+
+void proAccountDelete(int upID)
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+    int v_upID;
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+
+ EXEC SQL
+   DELETE FROM provider_account WHERE provider-acct_id = :v_upID;
  EXEC SQL COMMIT;
 
  EXEC SQL DISCONNECT;
