@@ -13,15 +13,22 @@ void provInsert()
 {
   FIELD *providerField[3];
   FORM *providerForm;
-  WINDOW *proWin;
+  WINDOW *proWin, *proUpdateWin;
   int ch;
   int cf;            /* confirm save data */
   int actInd;        /* active_Ind */
   char pname[30];    /* provider_name */ 
-  //int index , i;
   int newRec= 'y';   /* Add another new record */
   int rows, cols;
-    
+  int cfUpdate = 0;
+  int range = 5, list = 2, i = 0, j = 0;
+  char p;
+  int urows, ucols;
+  int trows, val, upID, *params[1], length[1], formats[1];
+
+  PGconn *conn =  fdbcon();
+  PGresult *res;
+     
   initscr();
   cbreak();
   noecho();
@@ -44,17 +51,21 @@ void provInsert()
       scale_form(providerForm, &rows, &cols);
 
       /* Add window which will be associated to form */
-      proWin = newwin(rows+15, cols+20,1,1);  
+      proWin = newwin(rows+15, cols+20,1,1);
+      proUpdateWin = newwin(20,50,1,120);
       keypad(proWin, TRUE);
+      keypad(proUpdateWin, TRUE);
        
       /* Set main and sub windows */
       set_form_win(providerForm, proWin);
       set_form_sub(providerForm, derwin(proWin,rows,cols,2,2));
       getmaxyx(proWin,rows,cols);
+      getmaxyx(proUpdateWin, urows, ucols);
       
       box(proWin, 0,0);
+      box(proUpdateWin,0,0);
           
-      if (proWin == NULL)
+      if (proWin == NULL || proUpdateWin == NULL)
 	{
 	  addstr("Unable to create window");
 	  refresh();
@@ -73,7 +84,90 @@ void provInsert()
       wmove(proWin, rows-16,cols-48);     /* move cursor */
 
       while((ch = wgetch(proWin)) != KEY_F(1))
-	keyNavigate(ch, providerForm);
+	{
+	  keyNavigate(ch, providerForm);
+	  if(ch == KEY_F(9))
+	    {
+	      i = j = trows = 0, cfUpdate = 0;
+	      list = 2;
+	      wclear(proUpdateWin);
+	      box(proUpdateWin,0,0);
+	      waddstr(proUpdateWin, "Supplier");
+	      wmove(proUpdateWin,1,1);
+	      wrefresh(proUpdateWin);
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1 ORDER BY provider_id");	  
+	      trows = PQntuples(res);
+
+	      wrefresh(proUpdateWin);
+	  
+	      while((p = wgetch(proUpdateWin)) == '\n')
+		{
+		  if ( j + range < trows)
+		    j = j + range;	
+		  else
+		    j = j + (trows - j);
+		  for (i; i < j; i++)
+		    {
+		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
+		      mvwprintw(proUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      list++;
+		      wclrtoeol(proUpdateWin);
+		    }
+		  list = 2;      
+		  if  (i == trows)
+		    {
+		      wclrtobot(proUpdateWin);  
+		      mvwprintw(proUpdateWin,10,1,"End of list");
+		      box(proUpdateWin,0,0);
+		      mvwprintw(proUpdateWin,0,0, "Provider");
+		      wmove(proUpdateWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(proUpdateWin,11,1,"Select Option: ");
+	      mvwscanw(proUpdateWin,11,25, "%d", &upID);
+
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)upID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
+	      res = PQexecParams(conn, "SELECT * FROM provider WHERE provider_id = $1 ORDER BY provider_id;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      trows = PQntuples(res);
+	      if (trows == 1)
+		{
+		  mvwprintw(proUpdateWin,13,1, "no or rows %d ",trows);
+		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
+		  mvwprintw(proUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  wrefresh(proUpdateWin);
+		  set_field_buffer(providerField[0],0,PQgetvalue(res,0,1));
+		  set_field_buffer(providerField[1],0,PQgetvalue(res,0,2));
+		  cfUpdate = 1;
+		}
+	      else
+		{
+		  mvwprintw(proUpdateWin,12,1,"Number invalied");
+		  wrefresh(proUpdateWin);		
+		  //wrefresh(proWin);
+		}
+	      noecho();
+	      PQclear(res);
+	    } //F9
+	} //while F1
+      
       form_driver(providerForm,REQ_VALIDATION);	 /* Validates data in form and buffers and assigned values in fields */	  
     
       /* Assign data entered in field */
@@ -84,7 +178,9 @@ void provInsert()
 	{
 	  strcpy(pname, trimWS(pname));  
 	  echo();
-	  mvwprintw(proWin,rows-8,cols-65,"Save: y/n: ");     
+	  mvwprintw(proWin,rows-8,cols-65,"Save: y/n: ");
+	  mvwprintw(proWin,rows-7,cols-65,"(d = delete record)");
+	  wmove(proWin,rows-8,cols-55);
 
 	  while((cf = wgetch(proWin)) != 'y')
 	    {
@@ -94,11 +190,27 @@ void provInsert()
 		  mvwprintw(proWin,rows-6,cols-65, "Data not saved");
 		  break;
 		}
+	      if (cf == 'd')
+		{  
+		  //DELETE_FUNCTION(upID);
+		  mvwprintw(proWin,rows-6,cols-65, "Record deleted");                
+		  break;
+		}
 	    }	  
 	  if (cf == 'y')
 	    {
-	      providerInsert(actInd,pname);   /* Save data to database */
-	      mvwprintw(proWin,rows-6,cols-65, "Data saved");
+	      if (cfUpdate == 1)
+		{
+		  //FUNCTION_UPDATE(upID,actInd,pname); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
+		  mvwprintw(proWin,19,5, "Data updated");
+		  mvwprintw(proWin,20,5, "cfUpdate %d,upID %d actInd %d pname %s", cfUpdate,upID,actInd, pname);  //DEBUG
+		}
+	      else
+		{
+		  providerInsert(actInd,pname);   /* Save data to database */
+		  mvwprintw(proWin,rows-6,cols-65, "Data saved");
+		}
 	    }
 	}
       else
@@ -113,6 +225,8 @@ void provInsert()
       free_field(providerField[1]);
       free_field(providerField[2]);
 
+      cfUpdate = 0;
+
       mvwprintw(proWin,rows-4,cols-65,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(proWin)) != 'y')
@@ -122,7 +236,9 @@ void provInsert()
 	    break;
 	}
       noecho();
-    } 
+      delwin(proWin);
+    }
+    PQfinish(conn);
   endwin();
 }
 

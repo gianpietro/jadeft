@@ -17,14 +17,14 @@ int main (void) {
   scanf("%d",&x);
 
   // provTypeInsert();
-  // provInsert();  
+   provInsert();  
   // provAccountInsert();
-   suppInsert();
-   suppTypeInsert();
-   paymentPeriodInsert();
-   propertyInsert();
-   suppAccountInsert();
-   //test
+  // suppInsert();
+  // suppTypeInsert();
+  // paymentPeriodInsert();
+  // propertyInsert();
+  // suppAccountInsert();
+   
   
   // system("clear");
    printf("Completed Enter 1 to exit: ");

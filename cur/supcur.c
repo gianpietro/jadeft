@@ -1489,7 +1489,7 @@ int suppAccountInsert()
 		{
 		  mvwprintw(paWin,12,1,"Number invalied");
 		  wrefresh(paWin);		
-		  wrefresh(supAcctWin);
+		  //wrefresh(supAcctWin);
 		}
 	      noecho();
 	      PQclear(res);
