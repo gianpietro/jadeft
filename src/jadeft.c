@@ -16,8 +16,8 @@ int main (void) {
   printf("Enter 1 to continue: ");
   scanf("%d",&x);
 
-  // provTypeInsert();
-   provInsert();  
+   provTypeInsert();
+   // provInsert();  
   // provAccountInsert();
   // suppInsert();
   // suppTypeInsert();
