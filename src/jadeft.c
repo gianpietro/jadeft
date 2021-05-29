@@ -16,14 +16,18 @@ int main (void) {
   printf("Enter 1 to continue: ");
   scanf("%d",&x);
 
-  //provTypeInsert();
-   // provInsert();  
+  /* provider schema */
+  // provInsert();  
+  // provTypeInsert();   
+  // provAccountInsert();
+
+  /* supplier schema */
+   suppInsert();
+   suppTypeInsert();
+   propertyInsert();
+   paymentPeriodInsert();
+   suppAccountInsert();
    provAccountInsert();
-  // suppInsert();
-  // suppTypeInsert();
-  // paymentPeriodInsert();
-  // propertyInsert();
-  // suppAccountInsert();
    
   
   // system("clear");

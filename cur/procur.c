@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <form.h>
+#include <panel.h>
 #include <libpq-fe.h>
 #include <arpa/inet.h>
 #include "../inc/procur.h"
@@ -14,6 +15,7 @@ void provInsert()
   FIELD *providerField[3];
   FORM *providerForm;
   WINDOW *proWin, *proUpdateWin;
+  PANEL *proPanel, *mainPanel;
   int ch;
   int cf;            /* confirm save data */
   int actInd;        /* active_Ind */
@@ -53,6 +55,12 @@ void provInsert()
       /* Add window which will be associated to form */
       proWin = newwin(rows+15, cols+20,1,1);
       proUpdateWin = newwin(20,50,1,120);
+
+      proPanel = new_panel(proUpdateWin);
+      mainPanel = new_panel(proWin);
+      update_panels();
+      doupdate();
+      
       keypad(proWin, TRUE);
       keypad(proUpdateWin, TRUE);
        
@@ -85,6 +93,10 @@ void provInsert()
 
       while((ch = wgetch(proWin)) != KEY_F(1))
 	{
+	  hide_panel(proPanel);
+	  show_panel(mainPanel);
+	  update_panels();
+	  doupdate();
 	  keyNavigate(ch, providerForm);
 	  if(ch == KEY_F(9))
 	    {
@@ -92,9 +104,12 @@ void provInsert()
 	      list = 2;
 	      wclear(proUpdateWin);
 	      box(proUpdateWin,0,0);
-	      waddstr(proUpdateWin, "Supplier");
+	      waddstr(proUpdateWin, "Provider");
 	      wmove(proUpdateWin,1,1);
-	      wrefresh(proUpdateWin);
+	      show_panel(proPanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(proUpdateWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1 ORDER BY provider_id");	  
@@ -167,6 +182,9 @@ void provInsert()
 	      PQclear(res);
 	    } //F9
 	} //while F1
+      hide_panel(proPanel);
+      update_panels();
+      doupdate();
       
       form_driver(providerForm,REQ_VALIDATION);	 /* Validates data in form and buffers and assigned values in fields */	  
     
@@ -236,9 +254,12 @@ void provInsert()
 	    break;
 	}
       noecho();
+      hide_panel(mainPanel);
+      update_panels();
+      doupdate();
       delwin(proWin);
     }
-    PQfinish(conn);
+    PQfinish(conn);    
   endwin();
 }
 
@@ -248,6 +269,7 @@ void provTypeInsert()
   FIELD *proTypeField[2];
   FORM *proTypeForm;
   WINDOW *proTypeWin, *proTypeUpdateWin;
+  PANEL *proTypePanel, *mainPanel;
   int ch;
   char newRec = 'y';
   int rows, cols;
@@ -277,6 +299,12 @@ void provTypeInsert()
       scale_form(proTypeForm, &rows, &cols);
       proTypeWin = newwin(rows+15,cols+5,1,120);
       proTypeUpdateWin = newwin(20,50,30,120);
+
+      proTypePanel = new_panel(proTypeUpdateWin);
+      mainPanel = new_panel(proTypeWin);
+      update_panels();
+      doupdate();
+      
       keypad(proTypeWin, TRUE);
       keypad(proTypeUpdateWin, TRUE);
 
@@ -305,6 +333,10 @@ void provTypeInsert()
 
       while((ch = wgetch(proTypeWin)) != KEY_F(1))
 	{
+	  hide_panel(proTypePanel);
+	  show_panel(mainPanel);
+	  update_panels();
+	  doupdate();	  
 	  keyNavigate(ch, proTypeForm);
 	  if(ch == KEY_F(9))
 	    {
@@ -314,6 +346,9 @@ void provTypeInsert()
 	      box(proTypeUpdateWin,0,0);
 	      waddstr(proTypeUpdateWin, "Provider Type");
 	      wmove(proTypeUpdateWin,1,1);
+	      show_panel(proTypePanel);
+	      update_panels();
+	      doupdate();	  
 	      wrefresh(proTypeUpdateWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
@@ -387,6 +422,10 @@ void provTypeInsert()
 	      PQclear(res);
 	    } //F9
 	} //while F1
+      hide_panel(proTypePanel);
+      update_panels();
+      doupdate();	  
+      
       form_driver(proTypeForm,REQ_VALIDATION);
 
       strcpy(pdesc,field_buffer(proTypeField[0],0));
@@ -451,6 +490,9 @@ void provTypeInsert()
 	    break;
 	}
       noecho();
+      hide_panel(mainPanel);
+      update_panels();
+      doupdate();
       delwin(proTypeWin);
       //endwin();
     }
@@ -466,6 +508,7 @@ int provAccountInsert()
   WINDOW *proListWin, *proAcctWin, *proTypeWin, *proAccountUpdateWin;
   FORM *proAcctForm;
   FIELD *proAcctField[7];
+  PANEL *proPanel, *proTypePanel, *proAccountUpdatePanel, *mainPanel;
   int i = 0, j = 0;
   int range = 5;
   char p;
@@ -515,6 +558,14 @@ int provAccountInsert()
       proListWin = newwin(20,50,1,120);
       proTypeWin = newwin(20,50,23,120);
       proAccountUpdateWin = newwin(parow+20,pacol+10,1,120);
+
+      proPanel = new_panel(proListWin);
+      proTypePanel = new_panel(proTypeWin);
+      proAccountUpdatePanel = new_panel(proAccountUpdateWin);
+      mainPanel = new_panel(proAcctWin);
+      update_panels();
+      doupdate();
+      
       keypad(proAcctWin, TRUE);
       keypad(proListWin, TRUE);
       keypad(proTypeWin, TRUE);
@@ -546,16 +597,22 @@ int provAccountInsert()
 
       // mvwprintw(proAcctWin, parow-3,pacol-3, "rows %d cols %d",parow,pacol);
       mvwprintw(proAcctWin, parow-30,pacol-64, "Active Ind:");
-      mvwprintw(proAcctWin, parow-28,pacol-64, "Provider ID:");
+      mvwprintw(proAcctWin, parow-28,pacol-64, "Provider ID(F2):");
       mvwprintw(proAcctWin, parow-26,pacol-64, "Account Number:");
       mvwprintw(proAcctWin, parow-24,pacol-64, "Sort Code:");
       mvwprintw(proAcctWin, parow-22,pacol-64, "Reference:");
-      mvwprintw(proAcctWin, parow-20,pacol-64, "Provider Type ID:");
+      mvwprintw(proAcctWin, parow-20,pacol-64, "Provider Type ID(F3):");
       wmove(proAcctWin,parow-30,pacol-39);
       wrefresh(proAcctWin);
   
       while((ch = wgetch(proAcctWin)) != KEY_F(1))
 	{
+	  hide_panel(proPanel);
+	  hide_panel(proTypePanel);
+	  hide_panel(proAccountUpdatePanel);
+	  show_panel(mainPanel);
+	  update_panels();
+	  doupdate();	  
 	  keyNavigate(ch, proAcctForm);
 	  if(ch == KEY_F(2))
 	    {
@@ -565,7 +622,10 @@ int provAccountInsert()
 	      box(proListWin,0,0);
 	      waddstr(proListWin, "Provider List");
 	      wmove(proListWin,1,1);
-	      wrefresh(proListWin);
+	      //wrefresh(proListWin);
+	      show_panel(proPanel);
+	      update_panels();
+	      doupdate();
 	  
 	      res = PQexec(conn,"SELECT * FROM provider WHERE active_ind = 1 ORDER BY provider_id");	  
 	      rows = PQntuples(res);
@@ -641,7 +701,10 @@ int provAccountInsert()
 	      box(proTypeWin,0,0);
 	      waddstr(proTypeWin, "Provider Type");
 	      wmove(proTypeWin,1,1);
-	      wrefresh(proTypeWin);
+	      show_panel(proTypePanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(proTypeWin);
 
 	      res = PQexec(conn,"SELECT * FROM provider_type ORDER BY provider_type_id");
 	      rows = PQntuples(res);
@@ -717,7 +780,10 @@ int provAccountInsert()
 	      box(proAccountUpdateWin,0,0);
 	      waddstr(proAccountUpdateWin, "Provider Account");
 	      wmove(proAccountUpdateWin,1,1);
-	      wrefresh(proAccountUpdateWin);
+	      show_panel(proAccountUpdatePanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(proAccountUpdateWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM provider_account WHERE active_ind = 1 ORDER BY provider_acct_id");	  
@@ -794,6 +860,11 @@ int provAccountInsert()
 	      PQclear(res);
 	    } //F9	  
 	}//while F1
+      hide_panel(proPanel);
+      hide_panel(proTypePanel);
+      hide_panel(proAccountUpdatePanel);
+      update_panels();
+      doupdate();
 
       /* code goes here for assign buffer value and validate prior to insert */
       form_driver(proAcctForm,REQ_VALIDATION);
@@ -870,6 +941,9 @@ int provAccountInsert()
 	    break;
 	}
       noecho();
+      hide_panel(mainPanel);
+      update_panels();
+      doupdate();
       delwin(proAcctWin);
     }
 

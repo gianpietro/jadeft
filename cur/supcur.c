@@ -14,6 +14,7 @@ void suppInsert()
   FIELD *supplierField[3];
   FORM *supplierForm;
   WINDOW *supWin, *supUpdateWin;
+  PANEL *supPanel, *mainPanel;
   int ch;
   int cf, cfUpdate = 0;
   int range = 5, list = 2, i = 0, j = 0;
@@ -51,6 +52,12 @@ void suppInsert()
       /* Add window which will be associated to form */
       supWin = newwin(rows+20, cols+10,1,1);
       supUpdateWin = newwin(20,50,1,120);
+
+      supPanel = new_panel(supUpdateWin);
+      mainPanel = new_panel(supWin);
+      update_panels();
+      doupdate();
+      
       keypad(supWin, TRUE);
       keypad(supUpdateWin, TRUE);
        
@@ -82,8 +89,12 @@ void suppInsert()
       mvwprintw(supWin,23,5,"Press F1 when form complete");
       wmove(supWin,3,23);     /* move cursor */
 
-      while((ch = wgetch(supWin)) != KEY_F(1))
+      while((ch = wgetch(supWin)) != KEY_F(1))	
 	{
+	  hide_panel(supPanel);
+	  show_panel(mainPanel);
+	  update_panels();
+	  doupdate();
 	  keyNavigate(ch, supplierForm);
 	  if(ch == KEY_F(9))
 	    {
@@ -93,7 +104,10 @@ void suppInsert()
 	      box(supUpdateWin,0,0);
 	      waddstr(supUpdateWin, "Supplier");
 	      wmove(supUpdateWin,1,1);
-	      wrefresh(supUpdateWin);
+	      show_panel(supPanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(supUpdateWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM supplier WHERE active_ind = 1 ORDER BY supplier_id");	  
@@ -172,6 +186,9 @@ void suppInsert()
 	      PQclear(res);
 	    } //F9
       } //while F1
+      hide_panel(supPanel);
+      update_panels();
+      doupdate();
 	
       form_driver(supplierForm,REQ_VALIDATION);
     
@@ -239,6 +256,10 @@ void suppInsert()
 	    break;
 	}
       noecho();
+      hide_panel(mainPanel);
+      update_panels();
+      doupdate();
+      delwin(supWin);
     }
     PQfinish(conn);  
   endwin();
@@ -250,6 +271,7 @@ void suppTypeInsert()
   FIELD *supTypeField[2];
   FORM *supTypeForm;
   WINDOW *supTypeWin, *supTypeUpdateWin;
+  PANEL *supTypePanel, *mainPanel;
   int ch;
   char newRec = 'y';
   int rows, cols;
@@ -278,6 +300,12 @@ void suppTypeInsert()
       scale_form(supTypeForm, &rows, &cols);
       supTypeWin = newwin(rows+15,cols+5,1,120);
       supTypeUpdateWin = newwin(20,50,30,120);
+
+      supTypePanel = new_panel(supTypeUpdateWin);
+      mainPanel = new_panel(supTypeWin);
+      update_panels();
+      doupdate();
+      
       keypad(supTypeWin, TRUE);
       keypad(supTypeUpdateWin, TRUE);
       
@@ -305,6 +333,10 @@ void suppTypeInsert()
 
       while((ch = wgetch(supTypeWin)) != KEY_F(1))
 	{
+	  hide_panel(supTypePanel);
+	  show_panel(mainPanel);
+	  update_panels();
+	  doupdate();	  
 	  keyNavigate(ch, supTypeForm);
 	  if(ch == KEY_F(9))
 	    {
@@ -314,7 +346,10 @@ void suppTypeInsert()
 	      box(supTypeUpdateWin,0,0);
 	      waddstr(supTypeUpdateWin, "Supplier Type");
 	      wmove(supTypeUpdateWin,1,1);
-	      wrefresh(supTypeUpdateWin);
+	      show_panel(supTypePanel);
+	      update_panels();
+	      doupdate();	  
+	      //wrefresh(supTypeUpdateWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM supplier_type ORDER BY supplier_type_id");	  
@@ -386,6 +421,9 @@ void suppTypeInsert()
 	      PQclear(res);
 	    } //F9	
 	} // While F1
+      hide_panel(supTypePanel);
+      update_panels();
+      doupdate();	  
       
       form_driver(supTypeForm,REQ_VALIDATION);
 
@@ -450,6 +488,10 @@ void suppTypeInsert()
 	    break;
 	}
       noecho();
+      hide_panel(mainPanel);
+      update_panels();
+      doupdate();
+      delwin(supTypeWin);
     }  //while newRec=y
   PQfinish(conn);
   endwin(); 
@@ -461,6 +503,7 @@ void paymentPeriodInsert()
   FIELD *payPerField[2];
   FORM *payPerForm;
   WINDOW *payPerWin, *payPerUpdateWin;
+  PANEL *payPerPanel, *mainPanel;
   int ch;
   char newRec = 'y';
   int rows, cols;
@@ -489,6 +532,12 @@ void paymentPeriodInsert()
       scale_form(payPerForm, &rows, &cols);
       payPerWin = newwin(rows+15,cols+5,1,120);
       payPerUpdateWin = newwin(20,50,30,120);
+
+      payPerPanel = new_panel(payPerUpdateWin);
+      mainPanel = new_panel(payPerWin);
+      update_panels();
+      doupdate();
+      
       keypad(payPerWin, TRUE);
       keypad(payPerUpdateWin, TRUE);
 
@@ -517,6 +566,10 @@ void paymentPeriodInsert()
 
       while((ch = wgetch(payPerWin)) != KEY_F(1))
 	{
+	  hide_panel(payPerPanel);
+	  show_panel(mainPanel);
+	  update_panels();
+	  doupdate();
 	  keyNavigate(ch, payPerForm);
 	  if(ch == KEY_F(9))
 	    {
@@ -526,7 +579,10 @@ void paymentPeriodInsert()
 	      box(payPerUpdateWin,0,0);
 	      waddstr(payPerUpdateWin, "Pay Period");
 	      wmove(payPerUpdateWin,1,1);
-	      wrefresh(payPerUpdateWin);
+	      show_panel(payPerPanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(payPerUpdateWin);
 
 	      /* ASSIGN THE REQUIRED SELECT STATEMENT */
 	      res = PQexec(conn,"SELECT * FROM payment_period ORDER BY payment_period_id");	  
@@ -599,6 +655,9 @@ void paymentPeriodInsert()
 	      PQclear(res);
 	    } //F9
 	} //while F1
+      hide_panel(payPerPanel);
+      update_panels();
+      doupdate();
       
       form_driver(payPerForm,REQ_VALIDATION);
 
@@ -664,6 +723,10 @@ void paymentPeriodInsert()
 	    break;
 	}
       noecho();
+      hide_panel(mainPanel);
+      update_panels();
+      doupdate();
+      delwin(payPerWin);
     }
   PQfinish(conn);
   endwin();    
@@ -674,6 +737,7 @@ void propertyInsert()
   FIELD *propertyField[5];
   FORM *propertyForm;
   WINDOW *prtWin, *prtUpdateWin;
+  PANEL *prtPanel, *mainPanel;
   int ch;
   int cf;                 /* confirm save data */
   int actInd;             /* active_Ind */
@@ -718,6 +782,11 @@ void propertyInsert()
       prtWin = newwin(31,81,1,1);
       prtUpdateWin = newwin(20,50,1,120);
 
+      prtPanel = new_panel(prtUpdateWin);
+      mainPanel = new_panel(prtWin);
+      update_panels();
+      doupdate();
+
       keypad(prtWin, TRUE);
       keypad(prtUpdateWin, TRUE);
 
@@ -752,6 +821,10 @@ void propertyInsert()
 
       while((ch = wgetch(prtWin)) != KEY_F(1))
 	{
+	  hide_panel(prtPanel);
+	  show_panel(mainPanel);
+	  update_panels();
+	  doupdate();
 	  keyNavigate(ch, propertyForm);
 	  if(ch == KEY_F(9))
 	    {
@@ -761,7 +834,10 @@ void propertyInsert()
 	      box(prtUpdateWin,0,0);
 	      waddstr(prtUpdateWin, "Property");
 	      wmove(prtUpdateWin,1,1);
-	      wrefresh(prtUpdateWin);
+	      show_panel(prtPanel);
+	      update_panels();
+	      doupdate();
+	      //wrefresh(prtUpdateWin);
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
 	      res = PQexec(conn,"SELECT * FROM property WHERE active_ind = 1 ORDER BY property_id");	  
@@ -836,6 +912,9 @@ void propertyInsert()
 	      PQclear(res);
 	    } //while F9 
 	} //while F1
+      hide_panel(prtPanel);
+      update_panels();
+      doupdate();
 	  
       form_driver(propertyForm,REQ_VALIDATION);
     
@@ -907,6 +986,9 @@ void propertyInsert()
 	    break;
 	}
       noecho();
+      hide_panel(mainPanel);
+      update_panels();
+      doupdate();
       delwin(prtWin);
     }  //while newrec = y
   PQfinish(conn);
@@ -916,7 +998,7 @@ void propertyInsert()
 
 int suppAccountInsert()
 {
-  PANEL *supUpdatePanel, *supPanel, *prtPanel, *supTypePanel, *payPanel, *paPanel;
+  PANEL *supUpdatePanel, *supPanel, *prtPanel, *supTypePanel, *payPanel, *paPanel, *mainPanel;
   WINDOW * supAcctWin, * supWin, * supTypeWin, * prtWin, * payWin, * paWin, *supUpdateWin;
   FORM * supAcctForm;
   FIELD * supAcctField[13];
@@ -992,6 +1074,7 @@ int suppAccountInsert()
       supTypePanel = new_panel(supTypeWin);
       payPanel = new_panel(payWin);
       paPanel = new_panel(paWin);
+      mainPanel = new_panel(supAcctWin);
       //hide_panel(supUpdatePanel);
       //hide_panel(supPanel);
       update_panels();
@@ -1066,6 +1149,7 @@ int suppAccountInsert()
 	hide_panel(supTypePanel);
 	hide_panel(payPanel);
 	hide_panel(paPanel);
+	show_panel(mainPanel);
 	update_panels();
 	doupdate();
 	keyNavigate(ch, supAcctForm);
@@ -1703,6 +1787,9 @@ int suppAccountInsert()
 	    break;
 	}
       noecho();
+      hide_panel(mainPanel);
+      update_panels();
+      doupdate();
       delwin(supAcctWin);
     } //while newRec = y
 

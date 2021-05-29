@@ -137,8 +137,8 @@ void proAccountInsert(int pafActiveID, int pafID, char pafAccountNo[], int pafSo
   v_pafTypeID = pafTypeID;
 
  EXEC SQL
-   INSERT INTO provider_account(active_ind, provider_id, provider_acct_no, sort_code, preference, provider_type_id) VALUES (:v_pafActiveID, :v_pafID, :v_pafAccountNo,
-   :v_pafSortCode, :v_pafRef, :v_pafTypeID);
+   INSERT INTO provider_account(active_ind, provider_id, provider_acct_no, sort_code, preference, provider_type_id)
+         VALUES (:v_pafActiveID, :v_pafID, :v_pafAccountNo,:v_pafSortCode, :v_pafRef, :v_pafTypeID);
  EXEC SQL COMMIT;
 
  EXEC SQL DISCONNECT;
@@ -167,7 +167,9 @@ void proAccountUpdate(int upID, int pafActiveID, int pafID, char pafAccountNo[],
   v_pafTypeID = pafTypeID;
 
  EXEC SQL
-   UPDATE provider_account SET active_ind = :v_pafActiveID, provider_id = :v_pafID, provider_acct_no = :v_pafAccountNo, sort_code = :v_pafSortCode, preference = :v_pafRef, provider_type_id = :v_pafTypeID WHERE provider_acct_id = :v_upID;
+   UPDATE provider_account SET active_ind = :v_pafActiveID, provider_id = :v_pafID, provider_acct_no = :v_pafAccountNo,
+                               sort_code = :v_pafSortCode, preference = :v_pafRef, provider_type_id = :v_pafTypeID
+			   WHERE provider_acct_id = :v_upID;
  EXEC SQL COMMIT;
 
  EXEC SQL DISCONNECT;
