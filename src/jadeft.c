@@ -6,6 +6,7 @@
 #include "../inc/prolib.h"
 #include "../inc/procur.h"
 #include "../inc/supcur.h"
+#include "../inc/invcur.h"
 
 int main (void) {
   int x;
@@ -22,12 +23,14 @@ int main (void) {
   // provAccountInsert();
 
   /* supplier schema */
-   suppInsert();
-   suppTypeInsert();
-   propertyInsert();
-   paymentPeriodInsert();
-   suppAccountInsert();
-   provAccountInsert();
+  // suppInsert();
+  // suppTypeInsert();
+  // propertyInsert();
+  // paymentPeriodInsert();
+  // suppAccountInsert();
+  // provAccountInsert();
+
+     invInsert();
    
   
   // system("clear");

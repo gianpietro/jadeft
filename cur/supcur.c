@@ -225,7 +225,8 @@ void suppInsert()
 	      if (cfUpdate == 1)
 		{
 		  supplierUpdate(upID,actInd,sname);
-		  mvwprintw(supWin,19,5, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, sname);
+		  mvwprintw(supWin,19,5, "Data updated");
+		  mvwprintw(supWin,20,5, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, sname);
 		}
 	      else
 		{
