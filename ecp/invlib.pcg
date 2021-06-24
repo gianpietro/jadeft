@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <libpq-fe.h>
+#include "../inc/invlib.h"
+#include "../inc/fdbcon.h"
+
+void invoiceInsert(char invfNo[], int invfStartDt, int invfEndDt, int invfSupAcctID, char invfDesc[], double invfAmount)
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   char v_invfNo[30];
+   int v_invfStartDt;
+   int v_invfEndDt;
+   int v_invfSupAcctID;
+   char v_invfDesc[30];
+   double v_invfAmount;
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+   strcpy(v_invfNo, invfNo);
+   v_invfStartDt = invfStartDt;
+   v_invfEndDt = invfEndDt;
+   v_invfSupAcctID = invfSupAcctID;
+   strcpy(v_invfDesc, invfDesc);
+   v_invfAmount = invfAmount;
+
+  EXEC SQL
+   INSERT INTO supplier_invoice(invoice_no, start_date, end_date, supplier_acct_id, description, amount)
+   VALUES(:v_invfNo, :v_invfStartDt, :v_invfEndDt, :v_invfSupAcctID, :v_invfDesc, :v_invfAmount);
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+
+void invoiceUpdate(int upID, char invfNo[], int invfStartDt, int invfEndDt, int invfSupAcctID, char invfDesc[], double invfAmount)
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;
+   char v_invfNo[30];
+   int v_invfStartDt;
+   int v_invfEndDt;
+   int v_invfSupAcctID;
+   char v_invfDesc[30];
+   double v_invfAmount;
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+   v_upID = upID;
+   strcpy(v_invfNo, invfNo);
+   v_invfStartDt = invfStartDt;
+   v_invfEndDt = invfEndDt;
+   v_invfSupAcctID = invfSupAcctID;
+   strcpy(v_invfDesc, invfDesc);
+   v_invfAmount = invfAmount;
+
+  EXEC SQL
+   UPDATE supplier_invoice SET invoice_no = :v_invfNo, start_date = :v_invfStartDt, end_date = :v_invfEndDt,
+                               supplier_acct_id = :v_invfSupAcctID, description = :v_invfDesc, amount = :v_invfAmount
+			       WHERE supplier_invoice_id = :v_upID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+void invoiceDelete(int upID)
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+
+  EXEC SQL
+   DELETE FROM supplier_invoice WHERE supplier_invoice_id = :v_upID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+
+  
+			       
+			       
+   

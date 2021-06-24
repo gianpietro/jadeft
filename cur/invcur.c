@@ -6,6 +6,7 @@
 #include <libpq-fe.h>
 #include <arpa/inet.h>
 #include "../inc/invcur.h"
+#include "../inc/invlib.h"
 #include "../inc/jadlib.h"
 
 
@@ -300,7 +301,7 @@ void invInsert()
 		}
 	      if (cf == 'd')
 		{  
-		  //invoiceDelete(upID);
+		  invoiceDelete(upID);
 		  mvwprintw(invWin,27,5, "Record deleted");                
 		  break;
 		}	      
@@ -309,14 +310,14 @@ void invInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //invoiceUpdate(upID, invfNo, invfStartDt, invfEndDt, invfSupAcctID, invfDesc, invfAmount);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  invoiceUpdate(upID, invfNo, invfStartDt, invfEndDt, invfSupAcctID, invfDesc, invfAmount);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(invWin,27,5, "Data updated");
 		  mvwprintw(invWin,28,5, "cfUpdate %d,upID %d, invfNo %s, invfSupAcctID %d", cfUpdate,upID, invfNo, invfSupAcctID);  //DEBUG
 		}
       	      else
 		{
-		  //invoiceInsert(invfNo, invfStartDt, invfEndDt, invfSupAcctID, invfDesc, invfAmount);
+		  invoiceInsert(invfNo, invfStartDt, invfEndDt, invfSupAcctID, invfDesc, invfAmount);
 		  mvwprintw(invWin,27,5, "Data saved");
 		}
 	    }
