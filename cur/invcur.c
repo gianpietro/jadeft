@@ -240,7 +240,7 @@ void invInsert()
 	      formats[0] = 1;
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
-	      res = PQexecParams(conn, "SELECT * FROM supplier_invoice ORDER BY supplier_invoice_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM supplier_invoice WHERE supplier_invoice_id = $1;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
