@@ -15,7 +15,7 @@ void invInsert()
   FIELD *invoiceField[7];
   FORM *invoiceForm;
   WINDOW *invWin, *supAcctWin, *invUpdateWin;
-  PANEL *invPanel;
+  PANEL *invPanel, *invUpdatePanel, *supAcctPanel;
   int newRec = 'y';
   int invrow, invcol, sarow, sacol, urows, ucols;
   int list = 2, i = 0, j = 0;
@@ -63,6 +63,12 @@ void invInsert()
       invWin = newwin(invrow+20,invcol+10,1,1);
       supAcctWin = newwin(20,50,1,120);
       invUpdateWin = newwin(20,50,1,120);
+
+      invPanel = new_panel(invWin);
+      invUpdatePanel = new_panel(invUpdateWin);
+      supAcctPanel = new_panel(supAcctWin);
+      update_panels();
+      doupdate();
       
       keypad(invWin, TRUE);
       keypad(supAcctWin, TRUE);
@@ -103,6 +109,11 @@ void invInsert()
       
       while((ch = wgetch(invWin)) != KEY_F(1))
 	{
+	  hide_panel(supAcctPanel);
+	  hide_panel(invUpdatePanel);
+	  show_panel(invPanel);
+	  update_panels();
+	  doupdate();
 	  keyNavigate(ch, invoiceForm);
 	  // I had to set validation for the field at this point as would cause
 	  // navigation to stop when entering subsequent data after first entry
@@ -115,13 +126,16 @@ void invInsert()
 	      box(supAcctWin,0,0);
 	      waddstr(supAcctWin, "Supplier Account");
 	      wmove(supAcctWin,1,1);
-	      wrefresh(supAcctWin);
+	      //wrefresh(supAcctWin);
+	      show_panel(supAcctPanel);
+	      update_panels();
+	      doupdate();	
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
 	      res = PQexec(conn,"SELECT * FROM supplier_account WHERE active_ind = 1 ORDER BY supplier_acct_id");	  
 	      rows = PQntuples(res);
 
-	      wrefresh(supAcctWin);
+	      //wrefresh(supAcctWin);
 	  
 	      while((p = wgetch(supAcctWin)) == '\n')
 		{
@@ -183,7 +197,7 @@ void invInsert()
 		{
 		  mvwprintw(supAcctWin,12,1,"Number invalid");
 		  wrefresh(supAcctWin);		
-		  wrefresh(invWin);
+		  //wrefresh(invWin);
 		}
 	      noecho();
 	      PQclear(res);
@@ -196,7 +210,10 @@ void invInsert()
 	      box(invUpdateWin,0,0);
 	      waddstr(invUpdateWin, "Invoice");
 	      wmove(invUpdateWin,1,1);
-	      wrefresh(invUpdateWin);
+	      //wrefresh(invUpdateWin);
+	      show_panel(invUpdatePanel);
+	      update_panels();
+	      doupdate();
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
 	      res = PQexec(conn,"SELECT * FROM supplier_invoice ORDER BY supplier_invoice_id");	  
@@ -254,7 +271,7 @@ void invInsert()
 		  mvwprintw(invUpdateWin,13,1, "no or rows %d ",rows);
 		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
 		  mvwprintw(invUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
-		  wrefresh(invUpdateWin);
+		  //wrefresh(invUpdateWin);
 		  set_field_buffer(invoiceField[0],0,PQgetvalue(res,0,1));
 		  set_field_buffer(invoiceField[1],0,PQgetvalue(res,0,2));
 		  set_field_buffer(invoiceField[2],0,PQgetvalue(res,0,3));
@@ -273,6 +290,10 @@ void invInsert()
 	      PQclear(res);
 	    } //F9	 	   
 	} // while F1
+      hide_panel(supAcctPanel);
+      hide_panel(invUpdatePanel);
+      update_panels();
+      doupdate();
 
       form_driver(invoiceForm,REQ_VALIDATION);
 
@@ -349,10 +370,10 @@ void invInsert()
 	    break;
 	}
       noecho();
-      //hide_panel(mainPanel);
-      //update_panels();
-      //doupdate();
-      //delwin(invWin);	
+      hide_panel(invPanel);
+      update_panels();
+      doupdate();
+      delwin(invWin);	
     } //while newRec
   PQfinish(conn);
   endwin();
