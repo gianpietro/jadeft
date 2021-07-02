@@ -7,6 +7,7 @@
 #include "../inc/procur.h"
 #include "../inc/supcur.h"
 #include "../inc/invcur.h"
+#include "../inc/doccur.h"
 
 int main (void) {
   int x;
@@ -27,10 +28,11 @@ int main (void) {
   // suppTypeInsert();
   // propertyInsert();
   // paymentPeriodInsert();
-     suppAccountInsert();
+  // suppAccountInsert();
   // provAccountInsert();
+  // invInsert();
+  documentTypeInsert();
 
-     invInsert();
    
   
   // system("clear");

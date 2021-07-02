@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <libpq-fe.h>
+#include "../inc/doclib.h"
+#include "../inc/fdbcon.h"
+
+void docTypeInsert(char dtDesc[])
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   char v_dtDesc[30];
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  strcpy(v_dtDesc, dtDesc);
+
+  EXEC SQL
+   INSERT INTO document_type(description) VALUES(:v_dtDesc);
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+void docTypeUpdate(int upID,char dtDesc[])
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;
+   char v_dtDesc[30];
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+  strcpy(v_dtDesc, dtDesc);
+
+  EXEC SQL
+   UPDATE document_type SET description = :v_dtDesc WHERE type_id = :v_upID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+void docTypeDelete(int upID)
+{
+ EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;
+   char v_dtDesc[30];
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+
+  EXEC SQL
+   DELETE FROM document_type WHERE type_id = :v_upID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+ 

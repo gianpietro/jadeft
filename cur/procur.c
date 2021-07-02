@@ -90,6 +90,7 @@ void provInsert()
       mvwprintw(proWin,rows-14,cols-65, "Provider Name:");
       mvwprintw(proWin,rows-2,cols-65,"Press F1 when form complete");
       wmove(proWin, rows-16,cols-48);     /* move cursor */
+      //mvwprintw(proWin,15,4,"rows %d, cols %d", rows, cols );
 
       while((ch = wgetch(proWin)) != KEY_F(1))
 	{
