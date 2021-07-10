@@ -19,9 +19,9 @@ int main (void) {
   scanf("%d",&x);
 
   /* provider schema */
-  // provInsert();  
-  // provTypeInsert();   
-  // provAccountInsert();
+   provInsert();  
+   provTypeInsert();   
+   provAccountInsert();
 
   /* supplier schema */
   // suppInsert();
@@ -30,8 +30,12 @@ int main (void) {
   // paymentPeriodInsert();
   // suppAccountInsert();
   // provAccountInsert();
+
+   /* invoice schema */
   // invInsert();
-  documentTypeInsert();
+
+   /*document schema */
+  // documentTypeInsert();
 
    
   
