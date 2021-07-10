@@ -7,6 +7,7 @@ OBJDIR = lib
 BINDIR = bin
 SRCDIR = src
 CURDIR = cur
+INCDIR = inc
 
 CFLAGS = -g
 

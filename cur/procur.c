@@ -23,7 +23,7 @@ void provInsert()
   int newRec= 'y';   /* Add another new record */
   int rows, cols;
   int cfUpdate = 0;
-  int range = 5, list = 2, i = 0, j = 0;
+  int list = 2, i = 0, j = 0; 
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1], formats[1];
@@ -44,7 +44,7 @@ void provInsert()
       providerField[1] = new_field(1, 30, 4, 22, 0, 0);      
       providerField[2] = NULL;
 
-      /* Field 1 digit allowed in range from 1 to 2 */
+      /* Field 1 digit allowed in RANGE from 1 to 2 */
       set_field_type(providerField[0],TYPE_INTEGER,1,1,2);
       /* Field allowed values of A-Z a-z and hyphen */
       set_field_type(providerField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");   
@@ -120,8 +120,8 @@ void provInsert()
 	  
 	      while((p = wgetch(proUpdateWin)) == '\n')
 		{
-		  if ( j + range < trows)
-		    j = j + range;	
+		  if ( j + RANGE < trows)
+		    j = j + RANGE;	
 		  else
 		    j = j + (trows - j);
 		  for (i; i < j; i++)
@@ -277,7 +277,7 @@ void provTypeInsert()
   char pdesc[30];
   int cf;
   int cfUpdate = 0;
-  int range = 5, list = 2, i = 0, j = 0;
+  int list = 2, i = 0, j = 0;
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1],  formats[1];
@@ -360,8 +360,8 @@ void provTypeInsert()
 	  
 	      while((p = wgetch(proTypeUpdateWin)) == '\n')
 		{
-		  if ( j + range < trows)
-		    j = j + range;	
+		  if ( j + RANGE < trows)
+		    j = j + RANGE;	
 		  else
 		    j = j + (trows - j);
 		  for (i; i < j; i++)
@@ -510,11 +510,10 @@ int provAccountInsert()
   FORM *proAcctForm;
   FIELD *proAcctField[7];
   PANEL *proPanel, *proTypePanel, *proAccountUpdatePanel, *mainPanel;
-  int i = 0, j = 0;
-  int range = 5;
+  int list = 2, i = 0, j = 0;
+  //int RANGE = 5;
   char p;
   int ch, nrow, ncol, parow, pacol, ptrow, ptcol, urows, ucols;
-  int list = 2;
   int proID, proTypeID;
   char proIDstr[5];  // store provide_id as str
   char proTypestr[5];
@@ -635,8 +634,8 @@ int provAccountInsert()
 	  
 	      while((p = wgetch(proListWin)) == '\n')
 		{
-		  if ( j + range < rows)
-		    j = j + range;	
+		  if ( j + RANGE < rows)
+		    j = j + RANGE;	
 		  else
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
@@ -714,8 +713,8 @@ int provAccountInsert()
 
 	      while((p = wgetch(proTypeWin)) == '\n')
 		{
-		  if ( j + range < rows)
-		    j = j + range;	
+		  if ( j + RANGE < rows)
+		    j = j + RANGE;	
 		  else
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
@@ -794,8 +793,8 @@ int provAccountInsert()
 	  
 	      while((p = wgetch(proAccountUpdateWin)) == '\n')
 		{
-		  if ( j + range < rows)
-		    j = j + range;	
+		  if ( j + RANGE < rows)
+		    j = j + RANGE;	
 		  else
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
