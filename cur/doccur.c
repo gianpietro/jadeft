@@ -268,7 +268,9 @@ void documentInsert()
   int docProAcctID;
   char docProAcctIDstr[5];
   int val, *params[1], length[1], formats[1];
-
+  char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
+  char parentSelected[1][9];
+    
 
   PGconn *conn = fdbcon();
   PGresult *res;
@@ -350,7 +352,7 @@ void documentInsert()
       mvwprintw(docWin, 25,5, "Start Date:");
       mvwprintw(docWin, 27,5, "End Date:");
       mvwprintw(docWin, 29,5, "Catalog:");
-      mvwprintw(docWin,40,5, "ParentID: F2-Provider F3-Supplier F4-Invoice");
+      mvwprintw(docWin, 40,5, "ParentID: F2-Provider F3-Supplier F4-Invoice");
       wmove(docWin,3,34);
       wrefresh(docWin);     
 
@@ -362,6 +364,7 @@ void documentInsert()
 	  keyNavigate(ch, docForm);
 	  if(ch == KEY_F(2))
 	    {
+	      strcpy(parentSelected[0], parentType[0]);	     /* assign PROVIDER to parentSelected to be used for catalog field */
 	      i = j = rows = 0;
 	      list = 2;
 	      wclear(proAcctWin);
@@ -433,6 +436,7 @@ void documentInsert()
 	      else
 		{
 		  mvwprintw(proAcctWin,12,1,"Number invalied");
+		  mvwprintw(proAcctWin,3,1,"parent type %s",parentSelected[0]);
 		  wrefresh(proAcctWin);		
 		  //wrefresh(supAcctWin);
 		}
