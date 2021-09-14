@@ -19,9 +19,9 @@ int main (void) {
   scanf("%d",&x);
 
   /* provider schema */
-   provInsert();  
-   provTypeInsert();   
-   provAccountInsert();
+  // provInsert();  
+  // provTypeInsert();   
+  // provAccountInsert();
 
   /* supplier schema */
   // suppInsert();
@@ -36,7 +36,7 @@ int main (void) {
 
    /*document schema */
   // documentTypeInsert();
-
+  documentInsert();
    
   
   // system("clear");

@@ -262,6 +262,7 @@ void provInsert()
     }
     PQfinish(conn);    
   endwin();
+
 }
 
 /* Function to display Provider Type form for data entry */

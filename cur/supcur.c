@@ -116,8 +116,8 @@ void suppInsert()
 	      wrefresh(supUpdateWin);
 	  
 	      while((p = wgetch(supUpdateWin)) == '\n')
-		{
-		  if ( j + range < trows)
+		{		 
+		  if ( j + range < trows)  
 		    j = j + range;	
 		  else
 		    j = j + (trows - j);
@@ -495,7 +495,7 @@ void suppTypeInsert()
       delwin(supTypeWin);
     }  //while newRec=y
   PQfinish(conn);
-  endwin(); 
+  endwin();
 }
 
 
@@ -730,7 +730,7 @@ void paymentPeriodInsert()
       delwin(payPerWin);
     }
   PQfinish(conn);
-  endwin();    
+  endwin();
 }
 
 void propertyInsert()
@@ -799,7 +799,7 @@ void propertyInsert()
       box(prtWin, 0,0);
       box(prtUpdateWin,0,0);
           
-      if (prtWin == NULL)// || prtUpdateWin == NULL)
+      if (prtWin == NULL || prtUpdateWin == NULL)
 	{
 	  addstr("Unable to create window");
 	  refresh();
@@ -993,7 +993,7 @@ void propertyInsert()
       delwin(prtWin);
     }  //while newrec = y
   PQfinish(conn);
-  endwin();  
+  endwin();
 }
 
 
@@ -1031,18 +1031,18 @@ int suppAccountInsert()
   
   while (newRec == 'y')
     {
-      supAcctField[0] = new_field(1,1,2,33,0,0);    /* active_ind */
+      supAcctField[0] = new_field(1,1,2,33,0,0);    /* active_ind        */
       supAcctField[1] = new_field(1,30,4,33,0,0);   /* supplier_acct_ref */
-      supAcctField[2] = new_field(1,5,6,33,0,0);    /* supplier_id */
-      supAcctField[3] = new_field(1,5,8,33,0,0);    /* property_id */
-      supAcctField[4] = new_field(1,5,10,33,0,0);   /* supplier_type_id */
-      supAcctField[5] = new_field(1,8,12,33,0,0);   /* start_date */
-      supAcctField[6] = new_field(1,8,14,33,0,0);   /* end_date */
+      supAcctField[2] = new_field(1,5,6,33,0,0);    /* supplier_id       */
+      supAcctField[3] = new_field(1,5,8,33,0,0);    /* property_id       */
+      supAcctField[4] = new_field(1,5,10,33,0,0);   /* supplier_type_id  */
+      supAcctField[5] = new_field(1,8,12,33,0,0);   /* start_date        */
+      supAcctField[6] = new_field(1,8,14,33,0,0);   /* end_date          */
       supAcctField[7] = new_field(1,5,16,33,0,0);   /* payment_period_id */
-      supAcctField[8] = new_field(1,10,18,33,0,0);  /* amount */
-      supAcctField[9] = new_field(1,30,20,33,0,0);  /* comment */
-      supAcctField[10] = new_field(1,10,22,33,0,0); /* alias */
-      supAcctField[11] = new_field(1,5,24,33,0,0);  /* provider_acct_id */
+      supAcctField[8] = new_field(1,10,18,33,0,0);  /* amount            */
+      supAcctField[9] = new_field(1,30,20,33,0,0);  /* comment           */
+      supAcctField[10] = new_field(1,10,22,33,0,0); /* alias             */
+      supAcctField[11] = new_field(1,5,24,33,0,0);  /* provider_acct_id  */
       supAcctField[12] = NULL;
 
       set_field_type(supAcctField[0],TYPE_INTEGER,1,1,2);
@@ -1127,10 +1127,10 @@ int suppAccountInsert()
 
       mvwprintw(supAcctWin, 37, 5,"row %d col %d", sarow, sacol);
 
-      mvwprintw(supAcctWin, 3,5, "Active Ind:");
-      mvwprintw(supAcctWin, 5,5, "Supplier Account No:");
-      mvwprintw(supAcctWin, 7,5, "Supplier ID(F2):");
-      mvwprintw(supAcctWin, 9,5, "Property ID(F3):");
+      mvwprintw(supAcctWin, 3,5,  "Active Ind:");
+      mvwprintw(supAcctWin, 5,5,  "Supplier Account No:");
+      mvwprintw(supAcctWin, 7,5,  "Supplier ID(F2):");
+      mvwprintw(supAcctWin, 9,5,  "Property ID(F3):");
       mvwprintw(supAcctWin, 11,5, "Supplier Type ID(F4):");
       mvwprintw(supAcctWin, 13,5, "Start Date:");
       mvwprintw(supAcctWin, 15,5, "End Date:");
