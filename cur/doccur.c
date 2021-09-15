@@ -4,6 +4,7 @@
 #include <form.h>
 #include <panel.h>
 #include <libpq-fe.h>
+#include <libpq/libpq-fs.h>
 #include <arpa/inet.h>
 #include "../inc/doccur.h"
 #include "../inc/doclib.h"
@@ -270,7 +271,8 @@ void documentInsert()
   int val, *params[1], length[1], formats[1];
   char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
   char parentSelected[1][9];
-    
+  int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
+  char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9];
 
   PGconn *conn = fdbcon();
   PGresult *res;
@@ -295,7 +297,7 @@ void documentInsert()
       docField[10] = NULL;
       
       set_field_type(docField[0],TYPE_INTEGER,0,1,99999);
-      set_field_type(docField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(docField[1],TYPE_REGEXP,"^[A-Za-z0-9 -./]+$");
       set_field_type(docField[2],TYPE_INTEGER,0,1,99999);
       set_field_type(docField[3],TYPE_INTEGER,0,1,99999);
       set_field_type(docField[4],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
@@ -358,6 +360,7 @@ void documentInsert()
 
       while((ch = wgetch(docWin)) != KEY_F(1))
 	{
+	  hide_panel(proAcctPanel);
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -436,9 +439,9 @@ void documentInsert()
 	      else
 		{
 		  mvwprintw(proAcctWin,12,1,"Number invalied");
-		  mvwprintw(proAcctWin,3,1,"parent type %s",parentSelected[0]);
+		  // strcpy(docfCat, parentSelected[0]);     //DEBUG
+		  //mvwprintw(proAcctWin,3,1,"parent type %s",docfCat); // DEBUG CODE
 		  wrefresh(proAcctWin);		
-		  //wrefresh(supAcctWin);
 		}
 	      noecho();
 	      PQclear(res);	      
@@ -449,6 +452,17 @@ void documentInsert()
       doupdate();
 
       form_driver(docForm, REQ_VALIDATION);
+
+      docfParentID = atoi(field_buffer(docField[0],0));
+      strcpy(docfFileName, trimWS(field_buffer(docField[1],0)));
+      //docfOid = atoi(field_buffer(docField[2],0));
+      docfTypeID = atoi(field_buffer(docField[3],0));
+      strcpy(docfRef, trimWS(field_buffer(docField[4],0)));
+      strcpy(docfTitle, trimWS(field_buffer(docField[5],0)));
+      strcpy(docfDecs, trimWS(field_buffer(docField[6],0)));
+      docfStartDt = atoi(field_buffer(docField[7],0));
+      docfEndDt = atoi(field_buffer(docField[8],0));
+      strcpy(docfCat, parentSelected[0]);     
 
       if((form_driver(docForm,REQ_VALIDATION) == E_OK))
 	{
@@ -483,7 +497,7 @@ void documentInsert()
 		}
       	      else
 		{
-		  //docInsert(dtDesc);
+		  documentImport(docfParentID, docfFileName, docfTypeID, docfRef, docfTitle, docfDecs, docfStartDt, docfEndDt, parentSelected);
 		  mvwprintw(docWin,34,5, "Data saved");
 		}
 	    }
@@ -528,3 +542,25 @@ void documentInsert()
   endwin();
 
 } //end
+
+/* Need to import the document and obtain the OID 
+then the document table needs to be updated with all the required fields
+including OID and catalog fields which are not entered ny the user */
+void documentImport(int dParentID, char dFileName[], int dTypeID, char dRef[], char dTitle[],char dDesc[], int dStartDt, int dEndDt, char dCatalog[1][9])
+{
+  Oid objImportID;
+  char path[strlen("/tmp/")+strlen(dFileName)+1];
+
+  PGconn *conn = fdbcon();
+  PGresult *res;
+
+  strcat(path, "/tmp/");
+  strcat(path, dFileName);
+  
+  res = PQexec(conn, "BEGIN");
+  PQclear(res);
+  objImportID = lo_import(conn, path);
+  res = PQexec(conn, "END");
+  PQclear(res);
+ 
+}
