@@ -7,5 +7,6 @@
 PGconn * fdbcon();
 char * trimWS(char *);
 void keyNavigate(int ch, FORM * f);
+int checkFileExists(char *);
 
 #endif

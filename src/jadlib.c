@@ -2,6 +2,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <form.h>
+#include <unistd.h>      /* access() used to check file exists */
 #include <libpq-fe.h>
 #include "../inc/jadlib.h"
 
@@ -60,4 +61,17 @@ char * trimWS(char *s)
   s[index + 1] = '\0';
 
   return s;
+}
+
+int checkFileExists(char fName[])
+{
+  //char f[] = "/tmp";
+  //char e[strlen(fName)];
+  //strcpy(e,fName);
+  //strcat(f,e);
+  
+  if(access(fName, F_OK) == 0)
+    return 1;                 /* file exists */
+  else
+    return 2;     
 }

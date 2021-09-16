@@ -273,8 +273,8 @@ void documentInsert()
   char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
   char parentSelected[1][9];
   int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
-  char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9]; 
-
+  char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9];
+  int fExist;
   PGconn *conn = fdbcon();
   PGresult *res;
 
@@ -472,10 +472,9 @@ void documentInsert()
 	  char e[strlen(docfFileName)]; 
 	  strcpy(e,docfFileName);
 	  strcat(f,e);
-	  if(access(f, F_OK ) != 0 ) {                             
+	  fExist = checkFileExists(f);
+	  if (fExist == 2)
 	    mvwprintw(docWin,30,5, "Error no file %s",f);
-	  }
-	  // mvwprintw(docWin,31,5, "%s", f); DEBUG
 	  	    
 	  echo();   
 	  mvwprintw(docWin,32,5, "Save y/n: ");
