@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <form.h>
 #include <panel.h>
+#include <unistd.h>      /* access() used to check file exists */
 #include <libpq-fe.h>
 #include <libpq/libpq-fs.h>
 #include <arpa/inet.h>
@@ -272,7 +273,7 @@ void documentInsert()
   char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
   char parentSelected[1][9];
   int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
-  char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9];
+  char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9]; 
 
   PGconn *conn = fdbcon();
   PGresult *res;
@@ -466,7 +467,17 @@ void documentInsert()
 
       if((form_driver(docForm,REQ_VALIDATION) == E_OK))
 	{
-	  echo();
+	  /* check to see if the file name entered exists */
+	  char f[] = "/tmp/";
+	  char e[strlen(docfFileName)]; 
+	  strcpy(e,docfFileName);
+	  strcat(f,e);
+	  if(access(f, F_OK ) != 0 ) {                             
+	    mvwprintw(docWin,30,5, "Error no file %s",f);
+	  }
+	  // mvwprintw(docWin,31,5, "%s", f); DEBUG
+	  	    
+	  echo();   
 	  mvwprintw(docWin,32,5, "Save y/n: ");
 	  mvwprintw(docWin,33,5, "(d = delete record)");
 	  wmove(docWin,32,16);
@@ -497,7 +508,7 @@ void documentInsert()
 		}
       	      else
 		{
-		  documentImport(docfParentID, docfFileName, docfTypeID, docfRef, docfTitle, docfDecs, docfStartDt, docfEndDt, parentSelected);
+		  documentImport(docfParentID, f, docfTypeID, docfRef, docfTitle, docfDecs, docfStartDt, docfEndDt, parentSelected);
 		  mvwprintw(docWin,34,5, "Data saved");
 		}
 	    }
@@ -543,23 +554,21 @@ void documentInsert()
 
 } //end
 
-/* Need to import the document and obtain the OID 
-then the document table needs to be updated with all the required fields
-including OID and catalog fields which are not entered ny the user */
-void documentImport(int dParentID, char dFileName[], int dTypeID, char dRef[], char dTitle[],char dDesc[], int dStartDt, int dEndDt, char dCatalog[1][9])
+/* Import the document and obtain the OID. 
+Update the document table with all the required fields
+including OID and catalog fields which are not entered by the user */
+void documentImport(int dParentID, char f[], int dTypeID, char dRef[], char dTitle[],char dDesc[], int dStartDt, int dEndDt, char dCatalog[1][9])
 {
   Oid objImportID;
-  char path[strlen("/tmp/")+strlen(dFileName)+1];
-
+  
   PGconn *conn = fdbcon();
   PGresult *res;
 
-  strcat(path, "/tmp/");
-  strcat(path, dFileName);
-  
+/*File which is located in tmp directory is imported
+  into pg_largeobject table and Oid number returned.*/
   res = PQexec(conn, "BEGIN");
   PQclear(res);
-  objImportID = lo_import(conn, path);
+  objImportID = lo_import(conn, f);  
   res = PQexec(conn, "END");
   PQclear(res);
  
