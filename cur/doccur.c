@@ -254,12 +254,12 @@ void documentTypeInsert()
 
 void documentInsert()
 {
-  PANEL *docPanel, *proAcctPanel;
-  WINDOW *docWin, *proAcctWin;
+  PANEL *docPanel, *proAcctPanel, *supAcctPanel, *supInvPanel;
+  WINDOW *docWin, *proAcctWin, *supAcctWin, *supInvWin;
   FORM *docForm;
   FIELD *docField[11];
   int newRec = 'y';
-  int docrow, doccol, parow, pacol;
+  int docrow, doccol, parow, pacol, sarow, sacol, invrow, invcol;
   int ch;
   int cf;
   int cfUpdate = 0;
@@ -267,8 +267,8 @@ void documentInsert()
   int list = 2;
   int rows;
   char p;
-  int docProAcctID;
-  char docProAcctIDstr[5];
+  int docProAcctID, supAcctID, supInvID;
+  char docProAcctIDstr[5], supAcctIDStr[5], supInvIDStr[5];
   int val, *params[1], length[1], formats[1];
   char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
   char parentSelected[9];
@@ -317,26 +317,39 @@ void documentInsert()
 
       docWin = newwin(docrow+15,doccol+10,1,1);
       proAcctWin = newwin(20,50,1,120);
+      supAcctWin = newwin(20,50,1,120);
+      supInvWin = newwin(20,50,1,120);
 
       docPanel = new_panel(docWin);
       proAcctPanel = new_panel(proAcctWin);
+      supAcctPanel = new_panel(supAcctWin);
+      supInvPanel = new_panel(supInvWin);
+      
       update_panels();
       doupdate();
 
       keypad(docWin, TRUE);
       keypad(proAcctWin, TRUE);
+      keypad(supAcctWin, TRUE);
+      keypad(supInvWin, TRUE);
 
       set_form_win(docForm, docWin);
       set_form_sub(docForm, derwin(docWin, docrow, doccol, 1, 1));
       getmaxyx(docWin, docrow, doccol);
       getmaxyx(proAcctWin, parow, pacol);
+      getmaxyx(supAcctWin, sarow, sacol);
+      getmaxyx(supInvWin, invrow, invcol);
       box(docWin,0,0);
       box(proAcctWin,0,0);
+      box(supAcctWin,0,0);
+      box(supInvWin,0,0);
       waddstr(docWin, "Document Import Form");
       waddstr(proAcctWin, "Provider Account");
+      waddstr(supAcctWin, "Suppler Account");
+      waddstr(supInvWin, "Invoice");
 
 
-      if(docWin == NULL || proAcctWin == NULL)
+      if(docWin == NULL || proAcctWin == NULL  || supAcctWin == NULL || supInvWin == NULL)
 	{
 	  addstr("Unable to create window");
 	  refresh();
@@ -363,6 +376,8 @@ void documentInsert()
       while((ch = wgetch(docWin)) != KEY_F(1))
 	{
 	  hide_panel(proAcctPanel);
+	  hide_panel(supAcctPanel);
+	  hide_panel(supInvPanel);
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -447,7 +462,177 @@ void documentInsert()
 		}
 	      noecho();
 	      PQclear(res);	      
-	    } //F2	  
+	    } //F2
+	  if(ch == KEY_F(3))
+	    {
+	      strcpy(parentSelected, parentType[1]);
+	      i = j = rows = 0;
+	      list = 2;
+	      wclear(supAcctWin);
+	      box(supAcctWin,0,0);
+	      waddstr(supAcctWin, "Supplier Account");
+	      wmove(supAcctWin,1,1);
+	      //wrefresh(supAcctWin);
+	      show_panel(supAcctPanel);
+	      update_panels();
+	      doupdate();	
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexec(conn,"SELECT * FROM supplier_account WHERE active_ind = 1 ORDER BY supplier_acct_id");	  
+	      rows = PQntuples(res);
+
+	      //wrefresh(supAcctWin);
+	  
+	      while((p = wgetch(supAcctWin)) == '\n')
+		{
+		  if ( j + RANGE < rows)
+		    j = j + RANGE;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		      mvwprintw(supAcctWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      list++;
+		      wclrtoeol(supAcctWin);  
+		    }
+		  list = 2;      
+		  //wclrtoeol(supAcctWin);  
+		  if  (i == rows)
+		    {
+		      wclrtobot(supAcctWin);  
+		      mvwprintw(supAcctWin,10,1,"End of list");
+		      box(supAcctWin,0,0);
+		      mvwprintw(supAcctWin,0,0, "Supplier Account");
+		      wmove(supAcctWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(supAcctWin,11,1,"Select Option: ");
+	      mvwscanw(supAcctWin,11,25, "%5s", &supAcctIDStr);
+	      set_field_buffer(docField[0],0, supAcctIDStr);
+
+	      // CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES 
+	      supAcctID = atoi(field_buffer(docField[0],0));
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)supAcctID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexecParams(conn, "SELECT * FROM supplier_account WHERE active_ind = 1 AND supplier_acct_id = $1 ORDER BY supplier_acct_id;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(supAcctWin,13,1, "no or rows %d ",rows);
+		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		  mvwprintw(supAcctWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  wrefresh(supAcctWin);
+		}
+	      else
+		{
+		  mvwprintw(supAcctWin,12,1,"Number invalid");
+		  wrefresh(supAcctWin);		
+		  //wrefresh(MAIN_WIN);
+		}
+	      noecho();
+	      PQclear(res);
+	    } // F3
+	  if(ch == KEY_F(4))
+	    {
+	      strcpy(parentSelected, parentType[2]);
+	      i = j = rows = 0;
+	      list = 2;
+	      wclear(supInvWin);
+	      box(supInvWin,0,0);
+	      waddstr(supInvWin, "Invoice");
+	      wmove(supInvWin,1,1);
+	      //wrefresh(supInvWin);
+	      show_panel(supInvPanel);
+	      update_panels();
+	      doupdate();	
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexec(conn,"SELECT * FROM supplier_invoice ORDER BY supplier_invoice_id");	  
+	      rows = PQntuples(res);
+
+	      //wrefresh(supInvWin);
+	  
+	      while((p = wgetch(supInvWin)) == '\n')
+		{
+		  if ( j + RANGE < rows)
+		    j = j + RANGE;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		      mvwprintw(supInvWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4));
+		      list++;
+		      wclrtoeol(supInvWin);  
+		    }
+		  list = 2;      
+		  //wclrtoeol(supInvWin);  
+		  if  (i == rows)
+		    {
+		      wclrtobot(supInvWin);  
+		      mvwprintw(supInvWin,10,1,"End of list");
+		      box(supInvWin,0,0);
+		      mvwprintw(supInvWin,0,0, "Invoice");
+		      wmove(supInvWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(supInvWin,11,1,"Select Option: ");
+	      mvwscanw(supInvWin,11,25, "%5s", &supInvIDStr);
+	      set_field_buffer(docField[0],0, supInvIDStr);
+
+	      // CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES 
+	      supInvID = atoi(field_buffer(docField[0],0));
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)supInvID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexecParams(conn, "SELECT * FROM supplier_invoice WHERE supplier_invoice_id = $1 ORDER BY supplier_invoice_id;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(supInvWin,13,1, "no or rows %d ",rows);
+		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		  mvwprintw(supInvWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  wrefresh(supInvWin);
+		}
+	      else
+		{
+		  mvwprintw(supInvWin,12,1,"Number invalid");
+		  wrefresh(supInvWin);		
+		  //wrefresh(MAIN_WIN);
+		}
+	      noecho();
+	      PQclear(res);
+	    } // F4
 	} //while not F1
 
       update_panels();
@@ -464,7 +649,8 @@ void documentInsert()
       strcpy(docfDecs, trimWS(field_buffer(docField[6],0)));
       docfStartDt = atoi(field_buffer(docField[7],0));
       docfEndDt = atoi(field_buffer(docField[8],0));
-      strcpy(docfCat, parentSelected);     
+      strcpy(docfCat, parentSelected);
+      set_field_buffer(docField[9],0,docfCat);
 
       if((form_driver(docForm,REQ_VALIDATION) == E_OK))
 	{
