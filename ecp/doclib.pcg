@@ -59,4 +59,45 @@ void docTypeDelete(int upID)
   EXEC SQL DISCONNECT;
 }
 
+void docImportInsert(int dParentID, char e[], int objImportID, int dTypeID, char dRef[], char dTitle[], char dDesc[], int dStartDt, int dEndDt, char dCatalog[])
+{
+ EXEC SQL BEGIN DECLARE SECTION;
+   int v_dParentID;
+   char v_e[30];
+   int v_objImportID;
+   int v_dTypeID;
+   char v_dRef[50];
+   char v_dTitle[100];
+   char v_dDesc[150];
+   int v_dStartDt;
+   int v_dEndDt;
+   char v_dCatalog[30];
+ EXEC SQL END DECLARE SECTION;
+
+ connectToDB();
+
+  v_dParentID =	dParentID;
+  strcpy(v_e, e);
+  v_objImportID	= objImportID;
+  v_dTypeID = dTypeID;
+  strcpy(v_dRef, dRef);
+  strcpy(v_dTitle, dTitle);
+  strcpy(v_dDesc,dDesc);
+  v_dStartDt = dStartDt;
+  v_dEndDt = dEndDt;
+  strcpy(v_dCatalog, dCatalog);
+
+  EXEC SQL
+    INSERT INTO documents(parent_id, file_name, oid_value, type_id, document_ref, title, description, start_date, end_date, catalog)
+    VALUES(:v_dParentID, :v_e, :v_objImportID, :v_dTypeID, :v_dRef, :v_dTitle, :v_dDesc, :v_dStartDt, :v_dEndDt, :v_dCatalog);
+
+ EXEC SQL COMMIT;
+
+ EXEC SQL DISCONNECT;
+}
+
+
+
+
+
  

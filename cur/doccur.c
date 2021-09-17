@@ -271,7 +271,8 @@ void documentInsert()
   char docProAcctIDstr[5];
   int val, *params[1], length[1], formats[1];
   char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
-  char parentSelected[1][9];
+  char parentSelected[9];
+  //char parentSelected[1][9];
   int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
   char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9];
   int fExist;
@@ -368,7 +369,7 @@ void documentInsert()
 	  keyNavigate(ch, docForm);
 	  if(ch == KEY_F(2))
 	    {
-	      strcpy(parentSelected[0], parentType[0]);	     /* assign PROVIDER to parentSelected to be used for catalog field */
+	      strcpy(parentSelected, parentType[0]);	     /* assign PROVIDER to parentSelected to be used for catalog field */
 	      i = j = rows = 0;
 	      list = 2;
 	      wclear(proAcctWin);
@@ -463,7 +464,7 @@ void documentInsert()
       strcpy(docfDecs, trimWS(field_buffer(docField[6],0)));
       docfStartDt = atoi(field_buffer(docField[7],0));
       docfEndDt = atoi(field_buffer(docField[8],0));
-      strcpy(docfCat, parentSelected[0]);     
+      strcpy(docfCat, parentSelected);     
 
       if((form_driver(docForm,REQ_VALIDATION) == E_OK))
 	{
@@ -507,7 +508,7 @@ void documentInsert()
 		}
       	      else
 		{
-		  documentImport(docfParentID, f, docfTypeID, docfRef, docfTitle, docfDecs, docfStartDt, docfEndDt, parentSelected);
+		  documentImport(docfParentID, f, e, docfTypeID, docfRef, docfTitle, docfDecs, docfStartDt, docfEndDt, parentSelected);
 		  mvwprintw(docWin,34,5, "Data saved");
 		}
 	    }
@@ -556,9 +557,14 @@ void documentInsert()
 /* Import the document and obtain the OID. 
 Update the document table with all the required fields
 including OID and catalog fields which are not entered by the user */
-void documentImport(int dParentID, char f[], int dTypeID, char dRef[], char dTitle[],char dDesc[], int dStartDt, int dEndDt, char dCatalog[1][9])
+void documentImport(int dParentID, char f[], char e[], int dTypeID, char dRef[], char dTitle[],char dDesc[], int dStartDt, int dEndDt, char dCatalog[])
 {
   Oid objImportID;
+  //int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
+  //char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9];
+  //char params[11];
+  //int length[11];
+  //int formats[11];
   
   PGconn *conn = fdbcon();
   PGresult *res;
@@ -570,5 +576,16 @@ void documentImport(int dParentID, char f[], int dTypeID, char dRef[], char dTit
   objImportID = lo_import(conn, f);  
   res = PQexec(conn, "END");
   PQclear(res);
- 
+
+  /*
+  docfParentID = htonl((uint32_t)dParentID);
+  params[0] = (int *) &docfParentID;
+  length[0] = sizeof(docfParentID);
+
+  strcpy(docfFileName, e);
+  strcpy(params[1], docfFileName);
+  length[1] = sizeof(docfFileName);
+  */
+  docImportInsert(dParentID, e, objImportID, dTypeID, dRef, dTitle, dDesc, dStartDt, dEndDt, dCatalog);
+  PQfinish(conn);
 }
