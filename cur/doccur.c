@@ -254,12 +254,12 @@ void documentTypeInsert()
 
 void documentInsert()
 {
-  PANEL *docPanel, *proAcctPanel, *supAcctPanel, *supInvPanel;
-  WINDOW *docWin, *proAcctWin, *supAcctWin, *supInvWin;
+  PANEL *docPanel, *proAcctPanel, *supAcctPanel, *supInvPanel, *docTypePanel;
+  WINDOW *docWin, *proAcctWin, *supAcctWin, *supInvWin, *docTypeWin;
   FORM *docForm;
   FIELD *docField[11];
   int newRec = 'y';
-  int docrow, doccol, parow, pacol, sarow, sacol, invrow, invcol;
+  int docrow, doccol, parow, pacol, sarow, sacol, invrow, invcol, trow, tcol;
   int ch;
   int cf;
   int cfUpdate = 0;
@@ -267,8 +267,8 @@ void documentInsert()
   int list = 2;
   int rows;
   char p;
-  int docProAcctID, supAcctID, supInvID;
-  char docProAcctIDstr[5], supAcctIDStr[5], supInvIDStr[5];
+  int docProAcctID, supAcctID, supInvID, docTypeID;
+  char docProAcctIDstr[5], supAcctIDStr[5], supInvIDStr[5], docTypeIDStr[5];
   int val, *params[1], length[1], formats[1];
   char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
   char parentSelected[9];
@@ -319,11 +319,13 @@ void documentInsert()
       proAcctWin = newwin(20,50,1,120);
       supAcctWin = newwin(20,50,1,120);
       supInvWin = newwin(20,50,1,120);
+      docTypeWin = newwin(20,50,1,120);
 
       docPanel = new_panel(docWin);
       proAcctPanel = new_panel(proAcctWin);
       supAcctPanel = new_panel(supAcctWin);
       supInvPanel = new_panel(supInvWin);
+      docTypePanel = new_panel(docTypeWin);
       
       update_panels();
       doupdate();
@@ -339,17 +341,20 @@ void documentInsert()
       getmaxyx(proAcctWin, parow, pacol);
       getmaxyx(supAcctWin, sarow, sacol);
       getmaxyx(supInvWin, invrow, invcol);
+      getmaxyx(docTypeWin, trow, tcol);
       box(docWin,0,0);
       box(proAcctWin,0,0);
       box(supAcctWin,0,0);
       box(supInvWin,0,0);
+      box(docTypeWin,0,0);
       waddstr(docWin, "Document Import Form");
       waddstr(proAcctWin, "Provider Account");
       waddstr(supAcctWin, "Suppler Account");
       waddstr(supInvWin, "Invoice");
+      waddstr(docTypeWin, "Document Type");
 
 
-      if(docWin == NULL || proAcctWin == NULL  || supAcctWin == NULL || supInvWin == NULL)
+      if(docWin == NULL || proAcctWin == NULL  || supAcctWin == NULL || supInvWin == NULL || docTypeWin == NULL)
 	{
 	  addstr("Unable to create window");
 	  refresh();
@@ -378,6 +383,7 @@ void documentInsert()
 	  hide_panel(proAcctPanel);
 	  hide_panel(supAcctPanel);
 	  hide_panel(supInvPanel);
+	  hide_panel(docTypePanel);
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -633,6 +639,90 @@ void documentInsert()
 	      noecho();
 	      PQclear(res);
 	    } // F4
+	  if(ch == KEY_F(5))
+	    {
+	      i = j = rows = 0;
+	      list = 2;
+	      wclear(docTypeWin);
+	      box(docTypeWin,0,0);
+	      waddstr(docTypeWin, "Document Type");
+	      wmove(docTypeWin,1,1);
+	      //wrefresh(docTypeWin);
+	      show_panel(docTypePanel);
+	      update_panels();
+	      doupdate();	
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexec(conn,"SELECT * FROM document_type ORDER BY type_id");	  
+	      rows = PQntuples(res);
+
+	      //wrefresh(docTypeWin);
+	  
+	      while((p = wgetch(docTypeWin)) == '\n')
+		{
+		  if ( j + RANGE < rows)
+		    j = j + RANGE;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		      mvwprintw(docTypeWin,list,1,"%s %s ", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      list++;
+		      wclrtoeol(docTypeWin);  
+		    }
+		  list = 2;      
+		  //wclrtoeol(docTypeWin);  
+		  if  (i == rows)
+		    {
+		      wclrtobot(docTypeWin);  
+		      mvwprintw(docTypeWin,10,1,"End of list");
+		      box(docTypeWin,0,0);
+		      mvwprintw(docTypeWin,0,0, "Document Type");
+		      wmove(docTypeWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(docTypeWin,11,1,"Select Option: ");
+	      mvwscanw(docTypeWin,11,25, "%5s", &docTypeIDStr);
+	      set_field_buffer(docField[3],0, docTypeIDStr);
+
+	      // CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES 
+	      docTypeID = atoi(field_buffer(docField[3],0));
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)docTypeID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexecParams(conn, "SELECT * FROM document_type WHERE type_id = $1 ORDER BY type_id;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(docTypeWin,13,1, "no or rows %d ",rows);
+		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		  mvwprintw(docTypeWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  wrefresh(docTypeWin);
+		}
+	      else
+		{
+		  mvwprintw(docTypeWin,12,1,"Number invalid");
+		  wrefresh(docTypeWin);		
+		  //wrefresh(MAIN_WIN);
+		}
+	      noecho();
+	      PQclear(res);
+	    } // F5
 	} //while not F1
 
       update_panels();
@@ -741,16 +831,11 @@ void documentInsert()
 } //end
 
 /* Import the document and obtain the OID. 
-Update the document table with all the required fields
-including OID and catalog fields which are not entered by the user */
+   Update the document table with all the required fields
+   including OID and catalog fields which are not entered by the user */
 void documentImport(int dParentID, char f[], char e[], int dTypeID, char dRef[], char dTitle[],char dDesc[], int dStartDt, int dEndDt, char dCatalog[])
 {
   Oid objImportID;
-  //int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
-  //char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9];
-  //char params[11];
-  //int length[11];
-  //int formats[11];
   
   PGconn *conn = fdbcon();
   PGresult *res;
@@ -763,15 +848,10 @@ void documentImport(int dParentID, char f[], char e[], int dTypeID, char dRef[],
   res = PQexec(conn, "END");
   PQclear(res);
 
-  /*
-  docfParentID = htonl((uint32_t)dParentID);
-  params[0] = (int *) &docfParentID;
-  length[0] = sizeof(docfParentID);
-
-  strcpy(docfFileName, e);
-  strcpy(params[1], docfFileName);
-  length[1] = sizeof(docfFileName);
-  */
-  docImportInsert(dParentID, e, objImportID, dTypeID, dRef, dTitle, dDesc, dStartDt, dEndDt, dCatalog);
+  if (objImportID > 0)
+    {
+      docImportInsert(dParentID, e, objImportID, dTypeID, dRef, dTitle, dDesc, dStartDt, dEndDt, dCatalog);
+    }
+  
   PQfinish(conn);
 }
