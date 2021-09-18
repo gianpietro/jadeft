@@ -742,7 +742,7 @@ void documentInsert()
       strcpy(docfCat, parentSelected);
       set_field_buffer(docField[9],0,docfCat);
 
-      if((form_driver(docForm,REQ_VALIDATION) == E_OK))
+      if((form_driver(docForm,REQ_VALIDATION) == E_OK) && docfParentID >=1 && docfTypeID >=1)
 	{
 	  /* check to see if the file name entered exists */
 	  char f[] = "/tmp/";
