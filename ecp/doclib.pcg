@@ -87,14 +87,53 @@ void docImportInsert(int dParentID, char e[], int objImportID, int dTypeID, char
   v_dEndDt = dEndDt;
   strcpy(v_dCatalog, dCatalog);
 
-  EXEC SQL
-    INSERT INTO documents(parent_id, file_name, oid_value, type_id, document_ref, title, description, start_date, end_date, catalog)
+  EXEC SQL 
+     INSERT INTO documents(parent_id, file_name, oid_value, type_id, document_ref, title, description, start_date, end_date, catalog)
     VALUES(:v_dParentID, :v_e, :v_objImportID, :v_dTypeID, :v_dRef, :v_dTitle, :v_dDesc, :v_dStartDt, :v_dEndDt, :v_dCatalog);
 
  EXEC SQL COMMIT;
 
  EXEC SQL DISCONNECT;
 }
+
+void docImportUpdate(int upID, int dParentID, char e[], int objImportID, int dTypeID, char dRef[], char dTitle[], char dDesc[], int dStartDt, int dEndDt, char dCatalog[])
+{
+ EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;
+   int v_dParentID;
+   char v_e[30];
+   int v_objImportID;
+   int v_dTypeID;
+   char v_dRef[50];
+   char v_dTitle[100];
+   char v_dDesc[150];
+   int v_dStartDt;
+   int v_dEndDt;
+   char v_dCatalog[30];
+ EXEC SQL END DECLARE SECTION;
+
+ connectToDB();
+   v_upID = upID; 
+   v_dParentID = dParentID;
+   strcpy(v_e, e);
+   v_objImportID = objImportID;
+   v_dTypeID = dTypeID;
+   strcpy(v_dRef, dRef);
+   strcpy(v_dTitle, dTitle);
+   strcpy(v_dDesc,dDesc);
+   v_dStartDt = dStartDt;
+   v_dEndDt = dEndDt;
+   strcpy(v_dCatalog, dCatalog);
+
+  EXEC SQL
+      UPDATE documents set parent_id = :v_dParentID, file_name = :v_e, oid_value = :v_objImportID, type_id = :v_dTypeID, document_ref = :v_dRef, title = :v_dTitle, description = :v_dDesc, start_date = :v_dStartDt, end_date = :v_dEndDt, catalog = :v_dCatalog WHERE document_id = :v_upID;
+ 
+  EXEC SQL COMMIT;
+ 
+  EXEC SQL DISCONNECT;
+}
+
+
 
 
 

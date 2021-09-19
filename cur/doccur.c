@@ -254,12 +254,12 @@ void documentTypeInsert()
 
 void documentInsert()
 {
-  PANEL *docPanel, *proAcctPanel, *supAcctPanel, *supInvPanel, *docTypePanel;
-  WINDOW *docWin, *proAcctWin, *supAcctWin, *supInvWin, *docTypeWin;
+  PANEL *docPanel, *proAcctPanel, *supAcctPanel, *supInvPanel, *docTypePanel, *docUpdatePanel;
+  WINDOW *docWin, *proAcctWin, *supAcctWin, *supInvWin, *docTypeWin, *docUpdateWin;
   FORM *docForm;
   FIELD *docField[11];
   int newRec = 'y';
-  int docrow, doccol, parow, pacol, sarow, sacol, invrow, invcol, trow, tcol;
+  int docrow, doccol, parow, pacol, sarow, sacol, invrow, invcol, trow, tcol, urow, ucol;
   int ch;
   int cf;
   int cfUpdate = 0;
@@ -274,8 +274,10 @@ void documentInsert()
   char parentSelected[9];
   //char parentSelected[1][9];
   int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
-  char docfFileName[30], docfRef[50], docfTitle[100], docfDecs[150], docfCat[9];
+  char docfFileName[30], docfRef[50], docfTitle[100], docfDesc[150], docfCat[30];
   int fExist;
+  int upID;
+  
   PGconn *conn = fdbcon();
   PGresult *res;
 
@@ -320,12 +322,14 @@ void documentInsert()
       supAcctWin = newwin(20,50,1,120);
       supInvWin = newwin(20,50,1,120);
       docTypeWin = newwin(20,50,1,120);
+      docUpdateWin = newwin(20,50,1,120);
 
       docPanel = new_panel(docWin);
       proAcctPanel = new_panel(proAcctWin);
       supAcctPanel = new_panel(supAcctWin);
       supInvPanel = new_panel(supInvWin);
       docTypePanel = new_panel(docTypeWin);
+      docUpdatePanel = new_panel(docUpdateWin);
       
       update_panels();
       doupdate();
@@ -334,6 +338,8 @@ void documentInsert()
       keypad(proAcctWin, TRUE);
       keypad(supAcctWin, TRUE);
       keypad(supInvWin, TRUE);
+      keypad(docTypeWin, TRUE);
+      keypad(docUpdateWin, TRUE);
 
       set_form_win(docForm, docWin);
       set_form_sub(docForm, derwin(docWin, docrow, doccol, 1, 1));
@@ -342,19 +348,22 @@ void documentInsert()
       getmaxyx(supAcctWin, sarow, sacol);
       getmaxyx(supInvWin, invrow, invcol);
       getmaxyx(docTypeWin, trow, tcol);
+      getmaxyx(docUpdateWin, urow, ucol);
       box(docWin,0,0);
       box(proAcctWin,0,0);
       box(supAcctWin,0,0);
       box(supInvWin,0,0);
       box(docTypeWin,0,0);
+      box(docUpdateWin,0,0);
       waddstr(docWin, "Document Import Form");
       waddstr(proAcctWin, "Provider Account");
       waddstr(supAcctWin, "Suppler Account");
       waddstr(supInvWin, "Invoice");
       waddstr(docTypeWin, "Document Type");
+      waddstr(docUpdateWin, "Document");      
 
 
-      if(docWin == NULL || proAcctWin == NULL  || supAcctWin == NULL || supInvWin == NULL || docTypeWin == NULL)
+      if(docWin == NULL || proAcctWin == NULL  || supAcctWin == NULL || supInvWin == NULL || docTypeWin == NULL  || docUpdateWin == NULL)
 	{
 	  addstr("Unable to create window");
 	  refresh();
@@ -375,6 +384,7 @@ void documentInsert()
       mvwprintw(docWin, 27,5, "End Date:");
       mvwprintw(docWin, 29,5, "Catalog:");
       mvwprintw(docWin, 40,5, "ParentID: F2-Provider F3-Supplier F4-Invoice");
+      mvwprintw(docWin, docrow-2, 5, "Press F1 when form compkete (F9 for Update)");
       wmove(docWin,3,34);
       wrefresh(docWin);     
 
@@ -384,6 +394,7 @@ void documentInsert()
 	  hide_panel(supAcctPanel);
 	  hide_panel(supInvPanel);
 	  hide_panel(docTypePanel);
+	  hide_panel(docUpdatePanel);
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -723,8 +734,104 @@ void documentInsert()
 	      noecho();
 	      PQclear(res);
 	    } // F5
-	} //while not F1
+	  if(ch == KEY_F(9))
+	    {
+	      i = j = rows = 0, cfUpdate = 0;
+	      list = 2;
+	      wclear(docUpdateWin);
+	      box(docUpdateWin,0,0);
+	      waddstr(docUpdateWin, "Document");
+	      wmove(docUpdateWin,1,1);
+	      //wrefresh(docUpdateWin);
+	      show_panel(docUpdatePanel);
+	      update_panels();
+	      doupdate();
 
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexec(conn,"SELECT * FROM documents ORDER BY document_id");	  
+	      rows = PQntuples(res);
+
+	      wrefresh(docUpdateWin);
+	  
+	      while((p = wgetch(docUpdateWin)) == '\n')
+		{
+		  if ( j + RANGE < rows)
+		    j = j + RANGE;	
+		  else
+		    j = j + (rows - j);
+		  for (i; i < j; i++)
+		    {
+		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		      mvwprintw(docUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      list++;
+		      wclrtoeol(docUpdateWin);
+		    }
+		  list = 2;      
+		  if  (i == rows)
+		    {
+		      wclrtobot(docUpdateWin);  
+		      mvwprintw(docUpdateWin,10,1,"End of list");
+		      box(docUpdateWin,0,0);
+		      mvwprintw(docUpdateWin,0,0, "Document");
+		      wmove(docUpdateWin,10,1);
+		      break;
+		    }
+		}	  
+	      echo();  
+	      mvwprintw(docUpdateWin,11,1,"Select Option: ");
+	      mvwscanw(docUpdateWin,11,25, "%d", &upID);
+
+	      PQclear(res);
+	  
+	      val = htonl((uint32_t)upID);
+	      params[0] = (int *)&val;
+	      length[0] = sizeof(val);
+	      formats[0] = 1;
+
+	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      res = PQexecParams(conn, "SELECT * FROM documents WHERE document_id = $1;"
+				 ,1
+				 ,NULL
+				 ,(const char *const *)params
+				 ,length
+				 ,formats
+				 ,0);
+	  
+	      rows = PQntuples(res);
+	      if (rows == 1)
+		{
+		  mvwprintw(docUpdateWin,13,1, "no or rows %d ",rows);
+		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		  mvwprintw(docUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  //wrefresh(docUpdateWin);
+		  set_field_buffer(docField[0],0,PQgetvalue(res,0,1));
+		  set_field_buffer(docField[1],0,PQgetvalue(res,0,2));
+		  set_field_buffer(docField[2],0,PQgetvalue(res,0,3));
+		  set_field_buffer(docField[3],0,PQgetvalue(res,0,4));
+		  set_field_buffer(docField[4],0,PQgetvalue(res,0,5));
+		  set_field_buffer(docField[5],0,PQgetvalue(res,0,6));
+		  set_field_buffer(docField[6],0,PQgetvalue(res,0,7));
+		  set_field_buffer(docField[7],0,PQgetvalue(res,0,8));
+		  set_field_buffer(docField[8],0,PQgetvalue(res,0,9));
+		  set_field_buffer(docField[9],0,PQgetvalue(res,0,10));
+		  cfUpdate = 1;
+		  wrefresh(docUpdateWin);
+		}
+	      else
+		{
+		  mvwprintw(docUpdateWin,12,1,"Number invalied");
+		  wrefresh(docUpdateWin);		
+		  //wrefresh(PARENT_WIN);
+		}
+	      noecho();
+	      PQclear(res);
+	    } //F9	 	   
+	} //while not F1
+      hide_panel(proAcctPanel);
+      hide_panel(supAcctPanel);
+      hide_panel(supInvPanel);
+      hide_panel(docTypePanel);
+      hide_panel(docUpdatePanel);
       update_panels();
       doupdate();
 
@@ -736,12 +843,26 @@ void documentInsert()
       docfTypeID = atoi(field_buffer(docField[3],0));
       strcpy(docfRef, trimWS(field_buffer(docField[4],0)));
       strcpy(docfTitle, trimWS(field_buffer(docField[5],0)));
-      strcpy(docfDecs, trimWS(field_buffer(docField[6],0)));
+      strcpy(docfDesc, trimWS(field_buffer(docField[6],0)));
       docfStartDt = atoi(field_buffer(docField[7],0));
       docfEndDt = atoi(field_buffer(docField[8],0));
       strcpy(docfCat, parentSelected);
-      set_field_buffer(docField[9],0,docfCat);
+      //set_field_buffer(docField[9],0,docfCat);
 
+      if(cfUpdate == 1)
+	{
+	  set_field_buffer(docField[9],0,docfCat);
+	  docfOid = atoi(field_buffer(docField[2],0));	  
+	  char p[30];
+	  strcpy(p,field_buffer(docField[9],0));
+	  strcpy(docfCat,p);
+	}
+      else
+	{
+	  strcpy(docfCat, parentSelected);
+	  set_field_buffer(docField[9],0,docfCat);
+	}
+			 
       if((form_driver(docForm,REQ_VALIDATION) == E_OK) && docfParentID >=1 && docfTypeID >=1)
 	{
 	  /* check to see if the file name entered exists */
@@ -750,7 +871,7 @@ void documentInsert()
 	  strcpy(e,docfFileName);
 	  strcat(f,e);
 	  fExist = checkFileExists(f);
-	  if (fExist == 2)
+	  if (fExist == 2 && cfUpdate == 0)
 	    mvwprintw(docWin,30,5, "Error no file %s",f);
 	  	    
 	  echo();   
@@ -777,14 +898,25 @@ void documentInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //docUpdate(upID, dtDesc);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  //set_field_buffer(docField[9],0,docfCat);
+		  mvwprintw(docWin, 3,65,  "%d", docfParentID);
+		  mvwprintw(docWin, 5,65,  "%s", e);
+		  mvwprintw(docWin, 7,65,  "%d", docfOid);
+		  mvwprintw(docWin, 9,65,  "%d", docfTypeID);
+		  mvwprintw(docWin, 11,65, "%s", docfRef);
+		  mvwprintw(docWin, 14,65, "%s", docfTitle);
+		  mvwprintw(docWin, 19,65, "%s", docfDesc);
+		  mvwprintw(docWin, 25,65, "%d", docfStartDt);
+		  mvwprintw(docWin, 27,65, "%d", docfEndDt);
+		  mvwprintw(docWin, 29,65, "%s", docfCat); 
+		  docImportUpdate(upID, docfParentID, e, docfOid, docfTypeID, docfRef, docfTitle,docfDesc, docfStartDt, docfEndDt,docfCat);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(docWin,34,5, "Data updated");
 		  //mvwprintw(docWin,35,5, "cfUpdate %d,upID %d, dtDesc %s", cfUpdate,upID, dtDesc);  //DEBUG
 		}
       	      else
 		{
-		  documentImport(docfParentID, f, e, docfTypeID, docfRef, docfTitle, docfDecs, docfStartDt, docfEndDt, parentSelected);
+		  documentImport(docfParentID, f, e, docfTypeID, docfRef, docfTitle, docfDesc, docfStartDt, docfEndDt, parentSelected);
 		  mvwprintw(docWin,34,5, "Data saved");
 		}
 	    }

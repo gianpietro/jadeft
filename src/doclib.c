@@ -204,6 +204,107 @@ void docImportInsert(int dParentID, char e[], int objImportID, int dTypeID, char
 
 }
 
+void docImportUpdate(int upID, int dParentID, char e[], int objImportID, int dTypeID, char dRef[], char dTitle[], char dDesc[], int dStartDt, int dEndDt, char dCatalog[])
+{
+ /* exec sql begin declare section */
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+ 
+#line 102 "doclib.pcg"
+ int v_upID ;
+ 
+#line 103 "doclib.pcg"
+ int v_dParentID ;
+ 
+#line 104 "doclib.pcg"
+ char v_e [ 30 ] ;
+ 
+#line 105 "doclib.pcg"
+ int v_objImportID ;
+ 
+#line 106 "doclib.pcg"
+ int v_dTypeID ;
+ 
+#line 107 "doclib.pcg"
+ char v_dRef [ 50 ] ;
+ 
+#line 108 "doclib.pcg"
+ char v_dTitle [ 100 ] ;
+ 
+#line 109 "doclib.pcg"
+ char v_dDesc [ 150 ] ;
+ 
+#line 110 "doclib.pcg"
+ int v_dStartDt ;
+ 
+#line 111 "doclib.pcg"
+ int v_dEndDt ;
+ 
+#line 112 "doclib.pcg"
+ char v_dCatalog [ 30 ] ;
+/* exec sql end declare section */
+#line 113 "doclib.pcg"
+
+
+ connectToDB();
+   v_upID = upID; 
+   v_dParentID = dParentID;
+   strcpy(v_e, e);
+   v_objImportID = objImportID;
+   v_dTypeID = dTypeID;
+   strcpy(v_dRef, dRef);
+   strcpy(v_dTitle, dTitle);
+   strcpy(v_dDesc,dDesc);
+   v_dStartDt = dStartDt;
+   v_dEndDt = dEndDt;
+   strcpy(v_dCatalog, dCatalog);
+
+  { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "update documents set parent_id = $1  , file_name = $2  , oid_value = $3  , type_id = $4  , document_ref = $5  , title = $6  , description = $7  , start_date = $8  , end_date = $9  , catalog = $10  where document_id = $11 ", 
+	ECPGt_int,&(v_dParentID),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_e),(long)30,(long)1,(30)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_int,&(v_objImportID),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_int,&(v_dTypeID),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_dRef),(long)50,(long)1,(50)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_dTitle),(long)100,(long)1,(100)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_dDesc),(long)150,(long)1,(150)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_int,&(v_dStartDt),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_int,&(v_dEndDt),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_char,(v_dCatalog),(long)30,(long)1,(30)*sizeof(char), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
+	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
+	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
+#line 129 "doclib.pcg"
+
+ 
+  { ECPGtrans(__LINE__, NULL, "commit");}
+#line 131 "doclib.pcg"
+
+ 
+  { ECPGdisconnect(__LINE__, "CURRENT");}
+#line 133 "doclib.pcg"
+
+}
+
+
+
 
 
 
