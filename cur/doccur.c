@@ -274,7 +274,7 @@ void documentInsert()
   char parentSelected[9];
   //char parentSelected[1][9];
   int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
-  char docfFileName[30], docfRef[50], docfTitle[100], docfDesc[150], docfCat[30];
+  char docfFileName[30], docfRef[50], docfTitle[100], docfDesc[150], docfCat[30], updateCategory[30];;
   int fExist;
   int upID;
   
@@ -853,9 +853,9 @@ void documentInsert()
 	{
 	  set_field_buffer(docField[9],0,docfCat);
 	  docfOid = atoi(field_buffer(docField[2],0));	  
-	  char p[30];
-	  strcpy(p,field_buffer(docField[9],0));
-	  strcpy(docfCat,p);
+	  //char p[30];
+	  strcpy(updateCategory,field_buffer(docField[9],0));
+	  strcpy(docfCat,updateCategory);
 	}
       else
 	{
