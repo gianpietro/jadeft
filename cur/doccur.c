@@ -902,7 +902,7 @@ void documentInsert()
 		}
 	      if (cf == 'd')
 		{  
-		  //docDelete(upID);
+		  documentImportDelete(upID, docfOid);
 		  mvwprintw(docWin,34,5, "Record deleted");                
 		  break;
 		}	      
@@ -1000,3 +1000,26 @@ void documentImport(int dParentID, char f[], char e[], int dTypeID, char dRef[],
   
   PQfinish(conn);
 }
+
+void documentImportDelete(int upID, int objImportID)
+{
+  PGconn *conn = fdbcon();
+  PGresult *res;
+
+  /*This will delete the file from the pg_largeobject and
+    pg_largeobject_metadata tables. The binary document
+    will no longer be available. The enrty ro in the
+    documents table then needs to be deleted. */
+  res = PQexec(conn, "BEGIN");
+  PQclear(res);
+  res = PQexec(conn, "SELECT");
+  lo_unlink(conn, objImportID);
+  res = PQexec(conn, "END");
+  PQclear(res);
+
+  /* Delete corresponding row from documents table */
+  docImportDelete(upID);      
+  
+  PQfinish(conn);  
+}
+

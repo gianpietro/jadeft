@@ -44,8 +44,7 @@ void docTypeUpdate(int upID,char dtDesc[])
 void docTypeDelete(int upID)
 {
  EXEC SQL BEGIN DECLARE SECTION;
-   int v_upID;
-   char v_dtDesc[30];
+   int v_upID;  
   EXEC SQL END DECLARE SECTION;
 
   connectToDB();
@@ -130,6 +129,23 @@ void docImportUpdate(int upID, int dParentID, char e[], int objImportID, int dTy
  
   EXEC SQL COMMIT;
  
+  EXEC SQL DISCONNECT;
+}
+
+void docImportDelete(int upID)
+{
+ EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+
+  EXEC SQL
+   DELETE FROM documents WHERE document_id = :v_upID;
+  EXEC SQL COMMIT;
+
   EXEC SQL DISCONNECT;
 }
 
