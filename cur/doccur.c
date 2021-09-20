@@ -274,9 +274,13 @@ void documentInsert()
   char parentSelected[9];
   //char parentSelected[1][9];
   int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
-  char docfFileName[30], docfRef[50], docfTitle[100], docfDesc[150], docfCat[30], updateCategory[30];;
+  char docfFileName[30], docfRef[50], docfTitle[100], docfDesc[150], docfCat[30];
   int fExist;
   int upID;
+  char updateCatalog[30];                     /* variable to store catalog for update */
+  char f[] = "/tmp/";
+  char e[strlen(docfFileName)];
+  char fn[30];                                /* variable to store filename for update */
   
   PGconn *conn = fdbcon();
   PGresult *res;
@@ -854,8 +858,8 @@ void documentInsert()
 	  set_field_buffer(docField[9],0,docfCat);
 	  docfOid = atoi(field_buffer(docField[2],0));	  
 	  //char p[30];
-	  strcpy(updateCategory,field_buffer(docField[9],0));
-	  strcpy(docfCat,updateCategory);
+	  strcpy(updateCatalog,field_buffer(docField[9],0));
+	  strcpy(docfCat,updateCatalog);
 	}
       else
 	{
@@ -866,13 +870,22 @@ void documentInsert()
       if((form_driver(docForm,REQ_VALIDATION) == E_OK) && docfParentID >=1 && docfTypeID >=1)
 	{
 	  /* check to see if the file name entered exists */
-	  char f[] = "/tmp/";
-	  char e[strlen(docfFileName)]; 
-	  strcpy(e,docfFileName);
-	  strcat(f,e);
-	  fExist = checkFileExists(f);
-	  if (fExist == 2 && cfUpdate == 0)
-	    mvwprintw(docWin,30,5, "Error no file %s",f);
+	  //char f[] = "/tmp/";
+	  //char e[strlen(docfFileName)];
+	  if (cfUpdate == 0)
+	    {
+	      strcpy(e,docfFileName);
+	      strcat(f,e);
+	      fExist = checkFileExists(f);
+	      if (fExist == 2)
+		mvwprintw(docWin,30,5, "Error no file %s",f);
+	    }	      
+	  else
+	    {
+	      //char fn[30];
+	      strcpy(fn, trimWS(field_buffer(docField[1],0)));
+	      strcpy(e,fn);
+	    }  
 	  	    
 	  echo();   
 	  mvwprintw(docWin,32,5, "Save y/n: ");
