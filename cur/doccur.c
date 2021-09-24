@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <form.h>
 #include <panel.h>
-#include <unistd.h>      /* access() used to check file exists */
 #include <libpq-fe.h>
 #include <libpq/libpq-fs.h>
 #include <arpa/inet.h>
@@ -366,7 +365,6 @@ void documentInsert()
       waddstr(docTypeWin, "Document Type");
       waddstr(docUpdateWin, "Document");      
 
-
       if(docWin == NULL || proAcctWin == NULL  || supAcctWin == NULL || supInvWin == NULL || docTypeWin == NULL  || docUpdateWin == NULL)
 	{
 	  addstr("Unable to create window");
@@ -388,7 +386,7 @@ void documentInsert()
       mvwprintw(docWin, 27,5, "End Date:");
       mvwprintw(docWin, 29,5, "Catalog:");
       mvwprintw(docWin, 40,5, "ParentID: F2-Provider F3-Supplier F4-Invoice");
-      mvwprintw(docWin, docrow-2, 5, "Press F1 when form compkete (F9 for Update)");
+      mvwprintw(docWin, docrow-2, 5, "Press F1 when form complete (F9 for Update)");
       wmove(docWin,3,34);
       wrefresh(docWin);     
 
@@ -857,7 +855,6 @@ void documentInsert()
 	{
 	  set_field_buffer(docField[9],0,docfCat);
 	  docfOid = atoi(field_buffer(docField[2],0));	  
-	  //char p[30];
 	  strcpy(updateCatalog,field_buffer(docField[9],0));
 	  strcpy(docfCat,updateCatalog);
 	}
@@ -870,8 +867,6 @@ void documentInsert()
       if((form_driver(docForm,REQ_VALIDATION) == E_OK) && docfParentID >=1 && docfTypeID >=1)
 	{
 	  /* check to see if the file name entered exists */
-	  //char f[] = "/tmp/";
-	  //char e[strlen(docfFileName)];
 	  if (cfUpdate == 0)
 	    {
 	      strcpy(e,docfFileName);
@@ -882,7 +877,6 @@ void documentInsert()
 	    }	      
 	  else
 	    {
-	      //char fn[30];
 	      strcpy(fn, trimWS(field_buffer(docField[1],0)));
 	      strcpy(e,fn);
 	    }  
@@ -910,9 +904,8 @@ void documentInsert()
 	  if (cf == 'y')
 	    {
 	      if (cfUpdate == 1)
-		{
-		  //set_field_buffer(docField[9],0,docfCat);
-		  mvwprintw(docWin, 3,65,  "%d", docfParentID);
+		{		  
+		  /* mvwprintw(docWin, 3,65,  "%d", docfParentID);
 		  mvwprintw(docWin, 5,65,  "%s", e);
 		  mvwprintw(docWin, 7,65,  "%d", docfOid);
 		  mvwprintw(docWin, 9,65,  "%d", docfTypeID);
@@ -921,7 +914,7 @@ void documentInsert()
 		  mvwprintw(docWin, 19,65, "%s", docfDesc);
 		  mvwprintw(docWin, 25,65, "%d", docfStartDt);
 		  mvwprintw(docWin, 27,65, "%d", docfEndDt);
-		  mvwprintw(docWin, 29,65, "%s", docfCat); 
+		  mvwprintw(docWin, 29,65, "%s", docfCat); */
 		  docImportUpdate(upID, docfParentID, e, docfOid, docfTypeID, docfRef, docfTitle,docfDesc, docfStartDt, docfEndDt,docfCat);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(docWin,34,5, "Data updated");
@@ -1008,7 +1001,7 @@ void documentImportDelete(int upID, int objImportID)
 
   /*This will delete the file from the pg_largeobject and
     pg_largeobject_metadata tables. The binary document
-    will no longer be available. The enrty ro in the
+    will no longer be available. The entry in the
     documents table then needs to be deleted. */
   res = PQexec(conn, "BEGIN");
   PQclear(res);

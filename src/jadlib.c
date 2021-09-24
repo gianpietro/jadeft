@@ -64,12 +64,7 @@ char * trimWS(char *s)
 }
 
 int checkFileExists(char fName[])
-{
-  //char f[] = "/tmp";
-  //char e[strlen(fName)];
-  //strcpy(e,fName);
-  //strcat(f,e);
-  
+{  
   if(access(fName, F_OK) == 0)
     return 1;                 /* file exists */
   else

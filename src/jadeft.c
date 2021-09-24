@@ -8,6 +8,7 @@
 #include "../inc/supcur.h"
 #include "../inc/invcur.h"
 #include "../inc/doccur.h"
+#include "../inc/catcur.h"
 
 int main (void) {
   int x;
@@ -36,8 +37,10 @@ int main (void) {
 
    /*document schema */
   // documentTypeInsert();
-  documentInsert();
-   
+  // documentInsert();
+
+  /* statement schema */
+  categoryInsert();
   
   // system("clear");
    printf("Completed Enter 1 to exit: ");
