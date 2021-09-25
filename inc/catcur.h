@@ -2,5 +2,6 @@
 #define _CATCUR_H
 
 void categoryInsert();
+void statementLinkInsert();
 
 #endif

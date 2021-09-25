@@ -41,6 +41,7 @@ int main (void) {
 
   /* statement schema */
   categoryInsert();
+  statementLinkInsert();
   
   // system("clear");
    printf("Completed Enter 1 to exit: ");
