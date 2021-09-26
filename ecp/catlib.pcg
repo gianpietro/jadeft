@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <libpq-fe.h>
+#include "../inc/catlib.h"
+#include "../inc/fdbcon.h"
+
+void catInsert(char catDesc[])
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   char v_catDesc[50];
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  strcpy(v_catDesc, catDesc);
+
+  EXEC SQL
+   INSERT INTO category_type(category) VALUES(:v_catDesc);
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+void catUpdate(int upID,char catDesc[])
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;
+   char v_catDesc[50];
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+  strcpy(v_catDesc, catDesc);
+
+  EXEC SQL
+   UPDATE category_type SET category = :v_catDesc WHERE id = :v_upID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+void catDelete(int upID)
+{
+ EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;  
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+
+  EXEC SQL
+   DELETE FROM category_type WHERE id = :v_upID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+void stmtLinkInsert(char slfAlias[], int slfCatID, char slfCategory[])
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   char v_slfAlias[50];
+   int v_slfCatID;
+   char v_slfCategory[50];
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  strcpy(v_slfAlias, slfAlias);
+  v_slfCatID = slfCatID;
+  strcpy(v_slfCategory, slfCategory);
+
+  EXEC SQL
+   INSERT INTO statement_link(alias, category_id, category) VALUES(:v_slfAlias, :v_slfCatID, :v_slfCategory);
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+void stmtLinkUpdate(int upID, char slfAlias[], int slfCatID, char slfCategory[])
+{
+   EXEC SQL BEGIN DECLARE SECTION;   
+   int v_upID;
+   char v_slfAlias[50];
+   int v_slfCatID;
+   char v_slfCategory[50];
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+  strcpy(v_slfAlias, slfAlias);
+  v_slfCatID = slfCatID;
+  strcpy(v_slfCategory, slfCategory);
+
+  EXEC SQL
+   UPDATE statement_link SET alias = :v_slfAlias, category_id = :v_slfCatID, category = :v_slfCategory  WHERE id = :v_upID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
+void stmtLinkDelete(int upID)
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   int v_upID;  
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_upID = upID;
+
+  EXEC SQL
+   DELETE FROM statement_link WHERE id = :v_upID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}

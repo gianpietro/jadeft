@@ -6,6 +6,7 @@
 #include <libpq-fe.h>
 #include <arpa/inet.h>
 #include "../inc/catcur.h"
+#include "../inc/catlib.h"
 #include "../inc/jadlib.h"
 #include "../inc/jaddef.h"
 
@@ -63,8 +64,8 @@ void categoryInsert()
       getmaxyx(categoryUpdateWin, curow, cucol);
       box(categoryWin,0,0);      
       box(categoryUpdateWin,0,0);
-      waddstr(categoryWin,"Category Entry Form");
-      waddstr(categoryUpdateWin,"Category");
+      waddstr(categoryWin,"Category Type Form");
+      waddstr(categoryUpdateWin,"Category Type");
 
       if (categoryWin == NULL || categoryUpdateWin == NULL)
 	{
@@ -94,14 +95,14 @@ void categoryInsert()
 	      list = 2;
 	      wclear(categoryUpdateWin);
 	      box(categoryUpdateWin,0,0);
-	      waddstr(categoryUpdateWin, "Category");
+	      waddstr(categoryUpdateWin, "Category Type");
 	      wmove(categoryUpdateWin,1,1);	     
 	      show_panel(categoryUpdatePanel);
 	      update_panels();
 	      doupdate();
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
-	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY category_id");	  
+	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(categoryUpdateWin);
@@ -142,7 +143,7 @@ void categoryInsert()
 	      formats[0] = 1;
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
-	      res = PQexecParams(conn, "SELECT * FROM category_type WHERE category_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM category_type WHERE id = $1;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
@@ -194,7 +195,7 @@ void categoryInsert()
 		}
 	      if (cf == 'd')
 		{  
-		  //catDelete(upID);
+		  catDelete(upID);
 		  mvwprintw(categoryWin,16,5, "Record deleted");                
 		  break;
 		}	      
@@ -203,14 +204,14 @@ void categoryInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //catUpdate(upID, catDesc);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  catUpdate(upID, catDesc);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(categoryWin,16,5, "Data updated");
 		  mvwprintw(categoryWin,17,5, "cfUpdate %d, upID %d, catDesc %s", cfUpdate,upID,catDesc);  //DEBUG
 		}
       	      else
 		{
-		  //catInsert(catDesc);
+		  catInsert(catDesc);
 		  mvwprintw(categoryWin,17,5, "Data saved");
 		}
 	    }
@@ -355,7 +356,7 @@ void statementLinkInsert()
 	      doupdate();	
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
-	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY category_id");	  
+	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY id");	  
 	      rows = PQntuples(res);
 
 	      //wrefresh(catTypeWin);
@@ -400,7 +401,7 @@ void statementLinkInsert()
 	      formats[0] = 1;
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
-	      res = PQexecParams(conn, "SELECT * FROM category_type WHERE category_id = $1;"
+	      res = PQexecParams(conn, "SELECT * FROM category_type WHERE id = $1;"
 				 ,1
 				 ,NULL
 				 ,(const char *const *)params
@@ -538,7 +539,7 @@ void statementLinkInsert()
 		}
 	      if (cf == 'd')
 		{  
-		  //stmtLinkDelete(upID);
+		  stmtLinkDelete(upID);
 		  mvwprintw(stmtLinkWin,17,5, "Record deleted");                
 		  break;
 		}	      
@@ -547,14 +548,14 @@ void statementLinkInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //stmtLinkUpdate(upID, slfAlias, slfCatID, slfCategory);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  stmtLinkUpdate(upID, slfAlias, slfCatID, slfCategory);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
 		  mvwprintw(stmtLinkWin,17,5, "Data updated");
 		  mvwprintw(stmtLinkWin,18,5, "cfUpdate %d,upID %d, slfAlias %s", cfUpdate,upID, slfAlias);  //DEBUG
 		}
       	      else
 		{
-		  //stmtLinkInsert(slfAlias, slfCatID, slfCategory);
+		  stmtLinkInsert(slfAlias, slfCatID, slfCategory);
 		  mvwprintw(stmtLinkWin,17,5, "Data saved");
 		}
 	    }
