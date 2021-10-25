@@ -9,6 +9,7 @@
 #include "../inc/invcur.h"
 #include "../inc/doccur.h"
 #include "../inc/catcur.h"
+#include "../inc/stmuplf.h"
 
 int main (void) {
   int x;
@@ -40,8 +41,11 @@ int main (void) {
   // documentInsert();
 
   /* statement schema */
-  categoryInsert();
-  statementLinkInsert();
+  // categoryInsert();
+  // statementLinkInsert();
+
+  /* Upload Statment */
+  upLoadStatement();
   
   // system("clear");
    printf("Completed Enter 1 to exit: ");

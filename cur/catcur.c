@@ -156,7 +156,7 @@ void categoryInsert()
 		{
 		  mvwprintw(categoryUpdateWin,13,1, "no or rows %d ",rows);
 		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  mvwprintw(categoryUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  mvwprintw(categoryUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  set_field_buffer(categoryField[0],0,PQgetvalue(res,0,1));
 		  cfUpdate = 1;
 		}
