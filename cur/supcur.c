@@ -81,7 +81,6 @@ void suppInsert()
       post_form(supplierForm); 
       wrefresh(supWin);
 
-
       //mvwprintw(supWin,y+2,x+5,"Jade Finacial Tracker");
       mvwprintw(supWin,24, 5, "rows %d cols %d", rows, cols);
       mvwprintw(supWin,3,5, "Active Ind:");                           
