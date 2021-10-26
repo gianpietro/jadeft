@@ -46,6 +46,7 @@ void printStatement(struct statement *start)
     }
 }
 
+
 void freeStatement(struct statement *start)
 {
   struct statement *ptr;
@@ -58,3 +59,4 @@ void freeStatement(struct statement *start)
       ptr = tmp;
     }
 }
+    
