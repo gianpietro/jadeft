@@ -4,7 +4,7 @@
 #include "../inc/stmuplibf.h"
 
 void upLoadStatement();
-
+void addAlias(struct statement *, int);
 
 #endif
              
