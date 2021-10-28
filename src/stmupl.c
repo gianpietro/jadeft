@@ -32,9 +32,13 @@ void upLoadStatement()
   char **transDescription;      /* Description column on statement which can have a large number of characters */
   char **transValue;            /* Value column on statement */
   char **accountNumber;         /* Account Number on statement */
+  char **stmtAliasRtn;          /* alias value returned from statement_link table */
+  int w = 0;
+  int aliasPos;                 /* position where alias is found in statement description */ 
+  int resRow = 0;               /* number of rows returned from statment_link table */
 
-  cp = fopen("/tmp/bankstmtFull3.csv", "r");
-  np = fopen("/tmp/bankstmtFull3.csv", "r");
+  cp = fopen("/tmp/bankstmt1.csv", "r");
+  np = fopen("/tmp/bankstmt1.csv", "r");
 
   /* count how many rows there are in the statement file download 
      will also count number of characters although not really required */
@@ -105,7 +109,7 @@ void upLoadStatement()
 	    j2 = 0;
 	  if (qcount >= 5 && qcount < 6) /* third column of statement file which is the description */
 	    {	
-	      transDescription[i][j3] = c;
+	      transDescription[i][j3] = c;	     
 	      j3++;	      
 	    }
 	  if (qcount == 6)  /* if qcount is 6 the next column, value, does not have qm around the number so add 1 to qcount to indicate start of value column */
@@ -149,7 +153,32 @@ void upLoadStatement()
       transDate[q][6] = tmpDate[q][0];
       transDate[q][7] = tmpDate[q][1];
     }
-  
+
+
+  resRow = resultRows();  /* return number of rows in the statment_link table */
+   printf("result rows %d\n", resRow);  // DEBUG
+   stmtAliasRtn = addAlias();   /* string array of alias column in the statement_link table */
+
+   for (w = 0; w < resRow; w++)  // DEBUG
+     {
+       printf("SA: %s\n", stmtAliasRtn[w]);
+     }
+
+   printf("value of i %d\n", i); // DEBUD
+   for (x = 0; x < i; x++)
+     { 
+       for (w = 0; w < resRow; w++)
+	 {
+	   printf("%s %s\n", transDescription[x], stmtAliasRtn[w]);
+	   aliasPos = aliasMatch(transDescription[x], stmtAliasRtn[w]);
+	   if (aliasPos != -1)
+	     {
+	       printf("FOUND %s %s %d\n", transDescription[x], stmtAliasRtn[w], aliasPos);
+	       break;
+	     }
+	 }
+     }
+      
   /* assign value to the linked list */
   for (x = 0; x < i; x++)
     {
@@ -165,9 +194,8 @@ void upLoadStatement()
 	}
       l++;
     }
- 
-  addAlias(start, i);
-  printStatement(start);
+
+   //printStatement(start);
 
   fclose(cp);
   fclose(np);
@@ -194,33 +222,56 @@ void upLoadStatement()
 }
 
 
-void addAlias(struct statement *start, int i)
+char ** addAlias()
 {
   PGconn *conn = fdbcon();
   PGresult *res;
   int rows;
   int j;
   int k;
+  int h;
+  int d;
   struct statement *ptr;
-  /*
-  transDescription = malloc (i * sizeof(int *));
-  for (k = 0; k < i; k++)
-    transDescription[k] = (char*)malloc(150 * sizeof(char));  
-  */
-  ptr = start;
+  char **stmtAlias;
 
   res = PQexec(conn, "SELECT * FROM statement_link ORDER BY id");
   rows = PQntuples(res);
+  d = rows;
 
-  for (j=0; j<rows; j++)
-    printf("%s %s %s %s\n", PQgetvalue(res,j,0), PQgetvalue(res,j,1), PQgetvalue(res,j,2), PQgetvalue(res,j,3));
+  //  for (j=0; j<rows; j++)
+  // printf("%s %s %s %s\n", PQgetvalue(res,j,0), PQgetvalue(res,j,1), PQgetvalue(res,j,2), PQgetvalue(res,j,3));
 
-   while (ptr != NULL)
+  stmtAlias = malloc(rows * sizeof(int *));
+  for (h=0; h<rows; h++)
     {
-      printf("description %s\n", ptr->tDescription);
-      ptr = ptr->next;
-      }
+      stmtAlias[h] = (char *)(malloc)(150 * sizeof(char));
+      stmtAlias[h] = PQgetvalue(res, h, 1);
+    }
 
+  // for (h=0; h<rows; h++)
+  // printf("alias: %s\n", stmtAlias[h]);
+
+   return stmtAlias;
+   
   PQclear(res);
-  PQfinish(conn); 
+  PQfinish(conn);  
+
+  for (h=0; h<d; h++)
+    free(stmtAlias[h]);
+  free (stmtAlias);  
+}
+
+int resultRows()
+{
+  PGconn *conn = fdbcon();
+  PGresult *res;
+  int rows;
+
+  res = PQexec(conn, "SELECT * FROM statement_link ORDER BY id");
+  rows = PQntuples(res);
+  
+  PQclear(res);
+  PQfinish(conn);
+
+  return rows;
 }

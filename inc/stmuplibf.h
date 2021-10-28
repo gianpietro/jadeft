@@ -27,5 +27,6 @@ struct statement *importStmt(char *, char *, char *, char *, char *);
 struct statement *append(struct statement *, struct statement *);
 void printStatement(struct statement *);
 void freeStatement(struct statement *);
+int aliasMatch(char *, char *);
 
 #endif

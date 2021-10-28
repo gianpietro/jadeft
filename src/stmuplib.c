@@ -46,7 +46,6 @@ void printStatement(struct statement *start)
     }
 }
 
-
 void freeStatement(struct statement *start)
 {
   struct statement *ptr;
@@ -59,4 +58,36 @@ void freeStatement(struct statement *start)
       ptr = tmp;
     }
 }
-    
+
+int aliasMatch(char *a, char *b)
+{
+  int c;
+  int position = 0;
+  char *x, *y;
+   
+  x = a;
+  y = b;
+   
+  while(*a)
+    {
+      while(*x==*y)
+	{	
+	  x++;
+	  y++;
+	  if(*x=='\0'||*y=='\0')
+            break;        
+	}  
+      if(*y=='\0')
+	break;
+
+      a++;
+      position++;
+      x = a;
+      y = b;
+    }
+  if(*a)
+    return position;
+  else  
+    return -1;  
+}
+
