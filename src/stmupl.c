@@ -32,13 +32,14 @@ void upLoadStatement()
   char **transDescription;      /* Description column on statement which can have a large number of characters */
   char **transValue;            /* Value column on statement */
   char **accountNumber;         /* Account Number on statement */
-  char **stmtAliasRtn;          /* alias value returned from statement_link table */
+  char **transAlias;            /* Alias value matched from statement_link table */
+  char **stmtAliasRtn;          /* alias value returned from statement_link table */  
   int w = 0;
   int aliasPos;                 /* position where alias is found in statement description */ 
   int resRow = 0;               /* number of rows returned from statment_link table */
 
-  cp = fopen("/tmp/bankstmt1.csv", "r");
-  np = fopen("/tmp/bankstmt1.csv", "r");
+  cp = fopen("/tmp/bankstmtFull2.csv", "r");
+  np = fopen("/tmp/bankstmtFull2.csv", "r");
 
   /* count how many rows there are in the statement file download 
      will also count number of characters although not really required */
@@ -59,14 +60,16 @@ void upLoadStatement()
   transDescription = malloc (kr * sizeof(int *));
   transValue = malloc (kr * sizeof(int *));
   accountNumber = malloc (kr * sizeof(int *));
+  transAlias = malloc (kr * sizeof(int *));
   for (h = 0; h < kr; h++)
     {
       tmpDate[h] = (char *)malloc(TDATE * sizeof(char));
       transDate[h] = (char *)malloc(TDATE * sizeof(char));
       transType[h] = (char *)malloc(TTYPE * sizeof(char));
-      transDescription[h] = (char*)malloc(TDESC * sizeof(char));
+      transDescription[h] = (char *)malloc(TDESC * sizeof(char));
       transValue[h] = (char *)malloc(TVALUE * sizeof(char));
       accountNumber[h] = (char *)malloc(ANUM * sizeof(char));
+      transAlias[h] = (char *)malloc(ALIAS * sizeof(char));
       } 
 
   /* move cursor to the first quotation mark in the file and read this
@@ -85,7 +88,7 @@ void upLoadStatement()
       n = fgetc(np);
       if (c == QM)
 	{
-	  qcount++;
+	  qcount++;	  
 	  n = fgetc(np);  /*if qm check to see if next char is also a qm which means no value in column */
 	  if (n == QM)
 	    c = 'Z';  /* if next char is a qm then apply Z as a value to column */
@@ -154,48 +157,43 @@ void upLoadStatement()
       transDate[q][7] = tmpDate[q][1];
     }
 
-
-  resRow = resultRows();  /* return number of rows in the statment_link table */
+   resRow = resultRows();  /* return number of rows in the statment_link table */
    printf("result rows %d\n", resRow);  // DEBUG
    stmtAliasRtn = addAlias();   /* string array of alias column in the statement_link table */
-
-   for (w = 0; w < resRow; w++)  // DEBUG
-     {
-       printf("SA: %s\n", stmtAliasRtn[w]);
-     }
-
+  
    printf("value of i %d\n", i); // DEBUD
    for (x = 0; x < i; x++)
      { 
        for (w = 0; w < resRow; w++)
 	 {
-	   printf("%s %s\n", transDescription[x], stmtAliasRtn[w]);
 	   aliasPos = aliasMatch(transDescription[x], stmtAliasRtn[w]);
 	   if (aliasPos != -1)
 	     {
-	       printf("FOUND %s %s %d\n", transDescription[x], stmtAliasRtn[w], aliasPos);
+	       strcpy(transAlias[x], stmtAliasRtn[w]);	  
 	       break;
 	     }
+	    else	     
+	     strcpy(transAlias[x],"NA");	     
 	 }
      }
-      
+  
   /* assign value to the linked list */
   for (x = 0; x < i; x++)
     {
       if (l == 0)
 	{
-	  start = importStmt(transDate[x], transType[x], transDescription[x], transValue[x], accountNumber[x]);
+	  start = importStmt(transDate[x], transType[x], transDescription[x], transValue[x], accountNumber[x], transAlias[x]);
 	  end = start;
 	}
       else
 	{
-	  newStmtPtr = importStmt(transDate[x], transType[x], transDescription[x], transValue[x], accountNumber[x]);
+	  newStmtPtr = importStmt(transDate[x], transType[x], transDescription[x], transValue[x], accountNumber[x], transAlias[x]);
 	  end = append(end, newStmtPtr);
 	}
       l++;
     }
-
-   //printStatement(start);
+  
+  printStatement(start);
 
   fclose(cp);
   fclose(np);
@@ -212,6 +210,7 @@ void upLoadStatement()
       free(transDescription[g]);
       free(transValue[g]);
       free(accountNumber[g]);
+      free(transAlias[g]);
     }
   free(tmpDate);
   free(transDate);
@@ -219,6 +218,7 @@ void upLoadStatement()
   free(transDescription);  
   free(transValue);
   free(accountNumber);
+  free(transAlias);
 }
 
 
@@ -244,7 +244,7 @@ char ** addAlias()
   stmtAlias = malloc(rows * sizeof(int *));
   for (h=0; h<rows; h++)
     {
-      stmtAlias[h] = (char *)(malloc)(150 * sizeof(char));
+      stmtAlias[h] = (char *)(malloc)(ALIAS * sizeof(char));
       stmtAlias[h] = PQgetvalue(res, h, 1);
     }
 
@@ -260,6 +260,7 @@ char ** addAlias()
     free(stmtAlias[h]);
   free (stmtAlias);  
 }
+
 
 int resultRows()
 {

@@ -4,7 +4,7 @@
 
 #include "../inc/stmuplibf.h"
 
-struct statement *importStmt(char transactionDate[], char transactionType[], char transactionDescription[], char transactionValue[], char accountNumber[])
+struct statement *importStmt(char transactionDate[], char transactionType[], char transactionDescription[], char transactionValue[], char accountNumber[], char transactionAlias[])
 {
   struct statement *ptr;
   int i = 0;
@@ -21,6 +21,8 @@ struct statement *importStmt(char transactionDate[], char transactionType[], cha
     ptr->tValue[i] = transactionValue[i];
   for (i=0; i<ANUM; i++)
     ptr->actNumber[i] = accountNumber[i];
+  for (i=0; i<ALIAS; i++)
+    ptr->tAlias[i] = transactionAlias[i];
  
   return ptr;    
 }
@@ -40,7 +42,7 @@ void printStatement(struct statement *start)
   printf("Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     { 
-      printf("%s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber);
+      printf("%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
       ptr = ptr->next;
       count++;
     }

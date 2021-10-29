@@ -11,6 +11,7 @@
 #define TDESC 150 /* transaction description */
 #define TVALUE 10 /* transaction value */
 #define ANUM 16   /* account number */
+#define ALIAS 50  /* alias matched from statement_link table */ 
 
 struct statement{
   char tDate[TDATE];
@@ -18,12 +19,13 @@ struct statement{
   char tDescription[TDESC];
   char tValue[TVALUE];
   char actNumber[ANUM];
+  char tAlias[ALIAS];
   struct statement *next;
 };
 
 typedef struct statement statement;
 
-struct statement *importStmt(char *, char *, char *, char *, char *);
+struct statement *importStmt(char *, char *, char *, char *, char *, char *);
 struct statement *append(struct statement *, struct statement *);
 void printStatement(struct statement *);
 void freeStatement(struct statement *);
