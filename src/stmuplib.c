@@ -37,14 +37,14 @@ void printStatement(struct statement *start)
 {
   struct statement *ptr;
   ptr = start;
-  int count = 0;
+  //int count = 0;
 
   printf("Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     { 
       printf("%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
       ptr = ptr->next;
-      count++;
+      //count++;
     }
 }
 

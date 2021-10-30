@@ -6,6 +6,7 @@
 #include "../inc/jadlib.h"
 #include "../inc/stmuplibf.h"
 #include "../inc/stmuplf.h"
+#include "../inc/stmlib.h"
 
 void upLoadStatement()
 {
@@ -38,6 +39,10 @@ void upLoadStatement()
   int aliasPos;                 /* position where alias is found in statement description */ 
   int resRow = 0;               /* number of rows returned from statment_link table */
 
+  /*  char stmtFile[30];
+  char sd[] = "/tmp/";
+  char sf[strlen(stmtFile)]; */
+  
   cp = fopen("/tmp/bankstmtFull2.csv", "r");
   np = fopen("/tmp/bankstmtFull2.csv", "r");
 
@@ -195,6 +200,8 @@ void upLoadStatement()
   
   printStatement(start);
 
+  statementInsert(start);
+
   fclose(cp);
   fclose(np);
 
@@ -226,12 +233,12 @@ char ** addAlias()
 {
   PGconn *conn = fdbcon();
   PGresult *res;
-  int rows;
-  int j;
-  int k;
-  int h;
-  int d;
-  struct statement *ptr;
+  int rows = 0;
+  //int j;
+  //int k;
+  int h = 0;
+  int d = 0;
+  //struct statement *ptr;
   char **stmtAlias;
 
   res = PQexec(conn, "SELECT * FROM statement_link ORDER BY id");
@@ -276,3 +283,31 @@ int resultRows()
 
   return rows;
 }
+
+
+void statementInsert(struct statement *start)
+{
+  struct statement *ptr = start;
+  int stmtTranDate;
+  char stmtTranType[TTYPE];
+  char stmtTranDesc[TDESC]; 
+  float stmtValue;
+  char stmtAcctNo[ANUM];
+  char stmtTranAlias[ALIAS];
+  
+
+  while (ptr != NULL)
+    {
+      stmtTranDate = atoi(ptr->tDate);
+      strcpy(stmtTranType, ptr->tType);
+      strcpy(stmtTranDesc, ptr->tDescription);
+      stmtValue = atof(ptr->tValue);
+      strcpy(stmtAcctNo, ptr->actNumber);
+      strcpy(stmtTranAlias, ptr->tAlias);
+  
+      printf("%d %s %s %.2f %s %s\n", stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
+      stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
+      ptr = ptr->next;
+    }
+}
+

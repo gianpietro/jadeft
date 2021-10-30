@@ -6,6 +6,7 @@
 void upLoadStatement();
 char ** addAlias(); //struct statement *, int);
 int resultRows();
+void statementInsert(struct statement *);
 
 #endif
              
