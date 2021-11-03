@@ -238,12 +238,19 @@ void categoryInsert()
 	}
       noecho();
       hide_panel(categoryPanel);
-      update_panels();
+      //del_panel(categoryPanel); //+ 2/11/21
+      update_panels(); 
       doupdate();
-      delwin(categoryWin);	
+      //del_panel(categoryUpdatePanel); //new code 30/10/21 was comment out + 2/11/21
+      //update_panels();   // + 2/11/21
+      //doupdate();        // + 2/11/21
+      delwin(categoryWin);
+      delwin(categoryUpdateWin);
+      
     } //while newRec
   PQfinish(conn);
   endwin();
+  //touchwin(stdscr);
 }
 
 
@@ -282,7 +289,7 @@ void statementLinkInsert()
       stmtLinkField[2] = new_field(2,25,6,33,0,0);  /* category    */
       stmtLinkField[3] = NULL;
 
-      set_field_type(stmtLinkField[0],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(stmtLinkField[0],TYPE_REGEXP,"^[A-Za-z0-9 -&]+$");
       set_field_type(stmtLinkField[1],TYPE_INTEGER,0,1,99999);
       set_field_type(stmtLinkField[2],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
 
@@ -585,9 +592,12 @@ void statementLinkInsert()
       noecho();
       hide_panel(stmtLinkPanel);
       update_panels();
-      doupdate();
-      delwin(stmtLinkWin);	
+      doupdate();      
+      //del_panel(stmtLinkUpdatePanel);  // del_panel (3) added 30/10/21
+      //del_panel(catTypePanel);
+      //del_panel(stmtLinkPanel);  
+      delwin(stmtLinkWin);
     } //while newRec
-  PQfinish(conn);
-  endwin();
+  PQfinish(conn);    
+    endwin();
 }

@@ -12,7 +12,7 @@
 #define TVALUE 10 /* transaction value */
 #define ANUM 16   /* account number */
 #define ALIAS 50  /* alias matched from statement_link table */ 
-
+#include <ncurses.h>
 struct statement{
   char tDate[TDATE];
   char tType[TTYPE];
@@ -27,8 +27,9 @@ typedef struct statement statement;
 
 struct statement *importStmt(char *, char *, char *, char *, char *, char *);
 struct statement *append(struct statement *, struct statement *);
-void printStatement(struct statement *);
+void printStatement(struct statement *, WINDOW *);
 void freeStatement(struct statement *);
 int aliasMatch(char *, char *);
+void printStatement_new(struct statement *);
 
 #endif

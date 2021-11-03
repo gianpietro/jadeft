@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ncurses.h>
+//#include <ctype.h>
+//#include "../inc/jadlib.h"
 
 #include "../inc/stmuplibf.h"
 
@@ -33,33 +36,63 @@ struct statement *append(struct statement *end, struct statement *newpt)
   return (end->next);
 }
 
-void printStatement(struct statement *start)
+void printStatement(struct statement *start, WINDOW *win)
 {
+  int i= 0;
   struct statement *ptr;
-  ptr = start;
-  //int count = 0;
-
-  printf("Date, Type, Description, Value, Account Number\n");
+  ptr = start; 
+	
+  mvwprintw(win,3,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
-    { 
-      printf("%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+    {
+      i++;
+      mvwprintw(win, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
+       if (i == 20)
+	{
+	  wgetch(win);
+	  i = 0;
+	} 
       ptr = ptr->next;
-      //count++;
-    }
+      wclrtobot(win);     
+      //wnoutrefresh(win);
+      //doupdate();
+      wrefresh(win);
+    } 
 }
+
 
 void freeStatement(struct statement *start)
 {
   struct statement *ptr;
   struct statement *tmp;
   ptr = start;
+
   while (ptr !=  NULL)
     {
       tmp = ptr->next;
       free(ptr);
       ptr = tmp;
-    }
+    }    
 }
+
+
+/*
+void freeStatement(struct statement *statement)
+{
+  while (statement != 0)
+    {
+      struct statement *next = statement->next;
+      free(statement->tDate);
+      free(statement->tType);
+      free(statement->tDescription);
+      free(statement->tValue);
+      free(statement->actNumber);
+      free(statement->tAlias);
+      free(statement);
+      statement = next;
+    }	
+}
+*/
 
 int aliasMatch(char *a, char *b)
 {
