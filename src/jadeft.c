@@ -56,10 +56,10 @@ int main (void) {
   /* statement schema */
   
 
-  //categoryInsert();
+  //  categoryInsert();
 
   // statementLinkInsert();
- 
+  upLoadStatement();
     
   /* Upload Statment */
    upLoadStatement();

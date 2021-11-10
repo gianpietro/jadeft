@@ -41,12 +41,14 @@ void printStatement(struct statement *start, WINDOW *win)
   int i= 0;
   struct statement *ptr;
   ptr = start; 
-	
-  mvwprintw(win,3,2,"Date, Type, Description, Value, Account Number\n");
+ 
+ 
+  //  mvwprintw(win,3,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     {
       i++;
-      mvwprintw(win, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
+      mvwprintw(win, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+      //wprintw(win,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
        if (i == 20)
 	{
 	  wgetch(win);
@@ -57,7 +59,7 @@ void printStatement(struct statement *start, WINDOW *win)
       //wnoutrefresh(win);
       //doupdate();
       wrefresh(win);
-    } 
+    }
 }
 
 
@@ -96,7 +98,7 @@ void freeStatement(struct statement *statement)
 
 int aliasMatch(char *a, char *b)
 {
-  int c;
+  //int c;
   int position = 0;
   char *x, *y;
    

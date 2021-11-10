@@ -17,17 +17,17 @@ void categoryInsert()
   WINDOW *categoryWin, *categoryUpdateWin;
   PANEL *categoryPanel, *categoryUpdatePanel;
   int newRec = 'y';
-  int crow, ccol, curow, cucol;
+  int crow = 0, ccol = 0, curow = 0, cucol = 0;
   int list = 2, i = 0, j = 0;
-  char p;
-  int ch;
-  int rows;
-  int val, upID, *params[1], length[1], formats[1];
+  char p = 0;
+  int ch = 0;
+  int rows = 0;
+  int val = 0, upID = 0, *params[1], length[1], formats[1];
   char catIDStr[5];
-  int catID;
+  int catID = 0;
   char catDesc[50];
   int cfUpdate = 0;
-  int cf;
+  int cf = 0;
 
   PGconn *conn = fdbcon();
   PGresult *res;
@@ -241,11 +241,13 @@ void categoryInsert()
       //del_panel(categoryPanel); //+ 2/11/21
       update_panels(); 
       doupdate();
+      // wclear(categoryWin);
+      //wclear(categoryUpdateWin);
       //del_panel(categoryUpdatePanel); //new code 30/10/21 was comment out + 2/11/21
       //update_panels();   // + 2/11/21
       //doupdate();        // + 2/11/21
       delwin(categoryWin);
-      delwin(categoryUpdateWin);
+      //delwin(categoryUpdateWin);
       
     } //while newRec
   PQfinish(conn);
