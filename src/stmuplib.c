@@ -36,6 +36,7 @@ struct statement *append(struct statement *end, struct statement *newpt)
   return (end->next);
 }
 
+/*
 void printStatement(struct statement *start, WINDOW *win)
 {
   int i= 0;
@@ -65,9 +66,29 @@ void printStatement(struct statement *start, WINDOW *win)
       wrefresh(win);
     }
 }
+*/
+
+void printStatement(struct statement *start)
+{
+  int i= 0;
+  struct statement *ptr;
+  ptr = start; 
+
+  while(ptr != NULL)
+    {
+      //      i++;
+      printf("%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
+      // if (i == 20)
+      //	{
+      //  wgetch(win);
+      //  i = 0;
+      //	} 
+      ptr = ptr->next;     
+    }
+}
 
 
-void freeStatement(struct statement *start)
+/*void freeStatement(struct statement *start)
 {
   struct statement *ptr;
   struct statement *tmp;
@@ -75,12 +96,28 @@ void freeStatement(struct statement *start)
 
   while (ptr !=  NULL)
     {
-      tmp = ptr->next;
+      tmp = ptr->next;      
       free(ptr);
       ptr = tmp;
     }    
-}
+    }*/
 
+/*
+void freeStatement(struct statement *start)
+{
+  struct statement *ptr;
+  struct statement *tmp;
+  ptr = start;
+
+  while (ptr !=  NULL)
+   {
+     tmp = ptr;
+     ptr = ptr->next;
+     free(tmp);
+    }
+  start = NULL;
+}
+*/
 
 /*
 void freeStatement(struct statement *statement)

@@ -44,20 +44,23 @@ int main (void) {
   // suppAccountInsert();
   // provAccountInsert();
 
-   /* invoice schema */
+  /* invoice schema */
   // invInsert();
 
-   /*document schema */
+  /*document schema */
   //documentTypeInsert();
   // documentInsert();
 
   /* statement schema */
   
 
-  //  categoryInsert();
+  categoryInsert();
 
   // statementLinkInsert();
   upLoadStatement();
+
+  //  categoryInsert();
+  
 
     /* Upload Statment */
   //upLoadStatement();

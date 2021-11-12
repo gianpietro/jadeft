@@ -27,7 +27,8 @@ typedef struct statement statement;
 
 struct statement *importStmt(char *, char *, char *, char *, char *, char *);
 struct statement *append(struct statement *, struct statement *);
-void printStatement(struct statement *, WINDOW *);
+//void printStatement(struct statement *, WINDOW *);
+void printStatement(struct statement *);
 void freeStatement(struct statement *);
 int aliasMatch(char *, char *);
 void printStatement_new(struct statement *);
