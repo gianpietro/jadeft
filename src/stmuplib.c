@@ -71,14 +71,19 @@ void printStatement(struct statement *start, WINDOW *win)
 void printStatement(struct statement *start)
 {
   int i= 0;
+  int j;
   struct statement *ptr;
   ptr = start; 
 
   while(ptr != NULL)
     {
-      //      i++;
+      //i++;
       printf("%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
       // if (i == 20)
+      //	{
+	  //  scanf("%d", &j);
+      //  i = 0;
+      //	}
       //	{
       //  wgetch(win);
       //  i = 0;
@@ -88,7 +93,7 @@ void printStatement(struct statement *start)
 }
 
 
-/*void freeStatement(struct statement *start)
+void freeStatement(struct statement *start)
 {
   struct statement *ptr;
   struct statement *tmp;
@@ -100,7 +105,7 @@ void printStatement(struct statement *start)
       free(ptr);
       ptr = tmp;
     }    
-    }*/
+}
 
 /*
 void freeStatement(struct statement *start)

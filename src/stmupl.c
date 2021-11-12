@@ -13,7 +13,7 @@
 #include "../inc/stmlib.h"
 //#include "../inc/catcur.h"
 
-void upLoadStatement()
+struct statement *upLoadStatement()
 {
   //  WINDOW *upLoadStmtWindow;
   //PANEL *upLoadStmtPanel;
@@ -275,13 +275,13 @@ void upLoadStatement()
      // wgetch(upLoadStmtWindow);
       }
   */
-   printStatement_new(start);
+  // printStatement_new(start);
   //statementInsert(start, upLoadStmtWindow);
    // wgetch(upLoadStmtWindow);
 
   //  freeStatement(start);
 
-  /*
+  
  for (g = 0; g < rs; g++)
    {
      free(tmpDate[g]);
@@ -299,7 +299,7 @@ void upLoadStatement()
   free(transValue);
   free(accountNumber);
   free(transAlias);
-  */
+  
   
   fclose(cp);
   fclose(np);
@@ -309,6 +309,8 @@ void upLoadStatement()
   doupdate();
   delwin(upLoadStmtWindow);
   endwin(); */
+
+  return start;
 }
 
 
@@ -453,7 +455,7 @@ void printStatement_new(struct statement *start)
   scrollok(upLoadStmtWindow_x, TRUE);
 
   box(upLoadStmtWindow_x, 0,0);
-  waddstr(upLoadStmtWindow_x, "Statment Up Load");
+  waddstr(upLoadStmtWindow_x, "Statement Up Load");
 
   if(upLoadStmtWindow_x == NULL) // || prStmtWindow == NULL)
      {

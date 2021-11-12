@@ -13,9 +13,11 @@
 #include "../inc/doccur.h"
 #include "../inc/catcur.h"
 #include "../inc/stmuplf.h"
+#include "../inc/stmuplibf.h"
 
 int main (void) {
   int x;
+  struct statement *ptr;
   system("clear");   // stdlib.h
   //  connectToDB();
 
@@ -52,12 +54,19 @@ int main (void) {
   // documentInsert();
 
   /* statement schema */
-  
 
-  categoryInsert();
+  //categoryInsert();
+
+   ptr = upLoadStatement();
+   printStatement_new(ptr);
+
+   //printStatement(ptr);
+
+  //printStatement_new(ptr);
+  //categoryInsert();
 
   // statementLinkInsert();
-  upLoadStatement();
+  //upLoadStatement();
 
   //  categoryInsert();
   
@@ -69,7 +78,9 @@ int main (void) {
 
     
    // categoryInsert();
-    
+
+  freeStatement(ptr);
+  
   printf("Completed Enter 1 to exit: ");
   //refresh();
   scanf("%d", &x);

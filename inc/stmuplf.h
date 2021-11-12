@@ -3,7 +3,8 @@
 
 #include "../inc/stmuplibf.h"
 
-void upLoadStatement();
+//void upLoadStatement();
+struct statement * upLoadStatement();
 char ** addAlias(); //struct statement *, int);
 int resultRows();
 void statementInsert(struct statement *, WINDOW *);
