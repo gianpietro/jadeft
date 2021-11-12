@@ -46,16 +46,20 @@ void printStatement(struct statement *start, WINDOW *win)
   //  mvwprintw(win,3,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     {
+      // wmove(win,12,1);
+      //wrefresh(win);
       i++;
-      mvwprintw(win, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
-      //wprintw(win,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
+      //      mvwprintw(win, i+8, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+      //mvwprintw(win, i+8, 2,"%s\n", ptr->tDate);
+      //    wprintw(win,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+      wprintw(win,"%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
        if (i == 20)
 	{
 	  wgetch(win);
 	  i = 0;
 	} 
       ptr = ptr->next;
-      wclrtobot(win);     
+      //wclrtobot(win);     
       //wnoutrefresh(win);
       //doupdate();
       wrefresh(win);

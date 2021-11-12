@@ -16,8 +16,6 @@
 
 int main (void) {
   int x;
-
-
   system("clear");   // stdlib.h
   //  connectToDB();
 
@@ -60,9 +58,11 @@ int main (void) {
 
   // statementLinkInsert();
   upLoadStatement();
-    
-  /* Upload Statment */
-   upLoadStatement();
+
+    /* Upload Statment */
+  //upLoadStatement();
+
+  //  upLoadStatement();
 
     
    // categoryInsert();

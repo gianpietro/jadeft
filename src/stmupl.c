@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <locale.h>
+//#include <stdarg.h>
 //#include <ncurses.h>
 #include <panel.h>
 #include <libpq-fe.h>
@@ -13,8 +15,8 @@
 
 void upLoadStatement()
 {
-  WINDOW *upLoadStmtWindow, *stmtInsertWindow;//, *prStmtWindow;
-  PANEL *upLoadStmtPanel, *stmtInsertPanel;//, *prStmtPanel;
+  WINDOW *upLoadStmtWindow;
+  PANEL *upLoadStmtPanel;
   struct statement *start, *newStmtPtr, *end, *ptr;
   FILE *cp,*np;                 /* pointers to file */
   int i = 0;                    /* count of rows in the statement file download */
@@ -46,84 +48,78 @@ void upLoadStatement()
   int cr, cc;
   char *path = "/tmp/";
   int ft = 0; //DEBUB
-  //char upfStmt;
 
+  int tr = 0; //number or lines before first QM, top rows
+  int rs = 0; //number of statement rows excluding top rows before data.
+  long int pos = 0;
+  long int posn = 0;
+  //char upfStmt;
+  //setlocale(LC_ALL,"");
+  //  setlocale(LC_CTYPE,"");  
   initscr();
   cbreak();
+  //nonl();
   noecho();
-  //scrollok(stdscr,TRUE);
-  //scroll(stdscr);
   keypad(stdscr, TRUE);
 
-  upLoadStmtWindow = newwin(40, 200, 1, 1);
-  stmtInsertWindow = newwin(40, 200, 1, 1);
-
-  upLoadStmtPanel = new_panel(upLoadStmtWindow);
-  stmtInsertPanel = new_panel(stmtInsertWindow);
-  
+  upLoadStmtWindow = newwin(40, 200, 1, 1); 
+  upLoadStmtPanel = new_panel(upLoadStmtWindow);  
   update_panels();
-  doupdate();
-  
+  doupdate();  
   keypad(upLoadStmtWindow, TRUE);
-  keypad(stmtInsertWindow, TRUE);
-  
-  //  scrollok(upLoadStmtWindow, TRUE);
-  //idlok(upLoadStmtWindow, TRUE);
-  //scroll(upLoadStmtWindow);
-
+  scrollok(upLoadStmtWindow, TRUE);
   box(upLoadStmtWindow, 0,0);
-  box(stmtInsertWindow, 0,0);
+  //meta(upLoadStmtWindow, TRUE);
   waddstr(upLoadStmtWindow, "Statement Up Load");
-  waddstr(stmtInsertWindow, "Statment Insert");
+  wrefresh(upLoadStmtWindow);
   
 
-  if(upLoadStmtWindow == NULL || stmtInsertWindow == NULL)
-     {
+  if (upLoadStmtWindow == NULL)
+    {
       addstr("Unable to create window");
       refresh();
       getch();
-      }
+    }
 
-  hide_panel(stmtInsertPanel);
-  show_panel(upLoadStmtPanel);
-  update_panels();
-  doupdate();
-
-  // wrefresh(upLoadStmtWindow);
-
-  //hide_panel(prStmtPanel);
-
-  /*  char stmtFile[30];
-  char sd[] = "/tmp/";
-  char sf[strlen(stmtFile)]; */
-
-  //categoryInsert();
-  //statementLinkInsert();
-
-  cp = fopen("/tmp/bankstmtFull3.csv", "r");
-  np = fopen("/tmp/bankstmtFull3.csv", "r");
+  cp = fopen("/tmp/bankstmtFull2.csv", "r");
+  np = fopen("/tmp/bankstmtFull2.csv", "r");
 
   /* count how many rows there are in the statement file download 
      will also count number of characters although not really required */
   while (c != EOF)
     {
       kc++;  /* number of characters in the file */       
-      c = fgetc(cp);
-      if (c == '\n')
+      c = fgetc(cp);      
+      if (c == '\n')	
 	kr++; /* number of rows in the file */
     }
 
   rewind(cp);   /* return cursor to beginning of file */
 
-  /*  assign dynamic memory to the data pointers */
-  tmpDate = (char **) malloc(kr * sizeof(char *));
-  transDate = (char **) malloc (kr * sizeof(char *));
-  transType = (char **) malloc (kr * sizeof(char *));
-  transDescription = (char **) malloc (kr * sizeof(char *));
-  transValue = (char **) malloc (kr * sizeof(char *));
-  accountNumber = (char **) malloc (kr * sizeof(char *));
-  transAlias = (char **) malloc (kr * sizeof(char *));
-  for (h = 0; h < kr; h++)
+  while (c!= QM)
+    {
+      c = fgetc(cp);  
+      n = fgetc(np);
+      if (c == '\n')
+	tr++;	
+    }
+  scroll(upLoadStmtWindow);
+  wrefresh(upLoadStmtWindow);
+  fseek(cp, -1, SEEK_CUR);
+  fseek(np, -1, SEEK_CUR);
+  wprintw(upLoadStmtWindow, "c_cur %c %d   d_cur %c %d\n", c,c,n,n);
+   
+  // number of valid rows in statement
+  rs = kr - tr;
+
+  tmpDate = (char **) malloc(rs * sizeof(char *));
+  transDate = (char **) malloc (rs * sizeof(char *));
+  transType = (char **) malloc (rs * sizeof(char *));
+  transDescription = (char **) malloc (rs * sizeof(char *));
+  transValue = (char **) malloc (rs * sizeof(char *));
+  accountNumber = (char **) malloc (rs * sizeof(char *));
+  transAlias = (char **) malloc (rs * sizeof(char *));
+  for (h = 0; h < rs; h++)
     {
       tmpDate[h] = (char *)malloc(TDATE * sizeof(char));
       transDate[h] = (char *)malloc(TDATE * sizeof(char));
@@ -132,88 +128,155 @@ void upLoadStatement()
       transValue[h] = (char *)malloc(TVALUE * sizeof(char));
       accountNumber[h] = (char *)malloc(ANUM * sizeof(char));
       transAlias[h] = (char *)malloc(ALIAS * sizeof(char));
-      }
- 
-  
-  /* move cursor to the first quotation mark in the file and read this
-     then move one character back with fseek */
-  while (c!= QM)
-    {
-      c = fgetc(cp);
-      n = fgetc(np);
     }
-  fseek(cp, -1, SEEK_CUR);
-  fseek(np, -1, SEEK_CUR);
 
+  wprintw(upLoadStmtWindow, "rows in statement %d\n", rs);
+  wrefresh(upLoadStmtWindow);
+
+  int charCount = 0;
+  
   while (c != EOF)
     {
       c = fgetc(cp);
-      n = fgetc(np);
-      if (c == QM)
+      //wprintw(upLoadStmtWindow, "c at start %c\n", c);
+      pos = ftell(cp);      
+      // wprintw(upLoadStmtWindow, "c_cur %c %d pos %d\n", c, c, pos);
+      //wgetch(upLoadStmtWindow);
+      wprintw(upLoadStmtWindow, "value j %d\n", j);
+      if (c == '\n')
 	{
-	  qcount++;	  
-	  n = fgetc(np);  /*if qm check to see if next char is also a qm which means no value in column */
-	  if (n == QM)
-	    c = 'Z';  /* if next char is a qm then apply Z as a value to column */
-	  fseek(np, -1, SEEK_CUR);  /* move cursor back one character */
-	} 
-      if (c != QM && c != SP && c != CM && c != FS && c != AP)
+	  /* tmpDate[i][j+1] = '\0';
+	  transType[i][j2+1] = '\0';
+	  transDescription[i][j3+1] = '\0';
+	  transValue[i][j4+1] = '\0';
+	  accountNumber[i][j5+1] = '\0';*/
+	  j = 0;
+	  j2 = 0;
+	  j3 = 0;
+	  j4 = 0;
+	  j5 = 0;
+	  ++i;
+	  qcount = 0;
+	}
+
+      if ( c == QM || qcount == 6 || qcount == 8)
 	{
-	  if (qcount > 0 && qcount < 2)  /* first column of statment file which is the date */
-	    {
-	      tmpDate[i][j] = c;
-	      j++;
-	    }
-	  if (qcount == 3)
-	    j = 0;
-	  if (qcount >= 3 && qcount <= 4) /* second column of statment file which is the type */
-	    {
-	      if (c >=65 && c <=90)
+	  // wprintw(upLoadStmtWindow, "c: %c pos: %d n: %c qcount: %d\n",c,pos,n,qcount);
+	  // wgetch(upLoadStmtWindow);
+	  // if (qcount != 6)
+	  qcount++;
+	  //wprintw(upLoadStmtWindow, "qcount_top %d  char c %c %d\n", qcount,c,c);
+	  fseek(np, pos, SEEK_SET);
+	  do{
+	    n = fgetc(np);
+	    // wprintw(upLoadStmtWindow, "n at start %c\n",n);
+	    posn = ftell(np);
+	    //wprintw(upLoadStmtWindow, "value n %c  posn %d\n", n,posn);
+	    charCount++;
+	    //   wprintw(upLoadStmtWindow, "cur_n %c %d posn %d\n", n,n,posn);
+	    // wrefresh(upLoadStmtWindow);
+	    //wgetch(upLoadStmtWindow);
+	    if (n != SP && n != CM && n != FS && n != AP)
 	      {
-	      transType[i][j2] = c;
-	      j2++;
-	      
-	      wprintw(upLoadStmtWindow, "qcount %d js=%d char %c ascii %d\n", qcount,j2,transType[i][j2],transType[i][j2]);
-	      wgetch(upLoadStmtWindow);
-	      }
-	    
-	    }
-	  if (qcount == 5)
-	    j2 = 0;
-	  if (qcount >= 5 && qcount < 6) /* third column of statement file which is the description */
-	    {	
-	      transDescription[i][j3] = c;	     
-	      j3++;	      
-	    }
-	  if (qcount == 6)  /* if qcount is 6 the next column, value, does not have qm around the number so add 1 to qcount to indicate start of value column */
-	    qcount++;
-	  if (qcount == 7)	 
-	    j3 = 0;
-	  if (qcount >= 7 && qcount < 8)  /* fourth column of statement file which is the value */
-	    {
-	      transValue[i][j4] = c;
-	      j4++;	      
-	    }
-	  if (qcount == 8)  /* once value column has been assigned add 1 to qcount to indicate end of value column */
-	    {
-	      j4 = 0;
-	      qcount++;
-	    }
-	  if (qcount >= 13 && qcount < 14)
-	    {
-	      accountNumber[i][j5] = c;
-	      j5++;		
-	    }
-	  if (qcount == 14)  /* last qm in the current row */
-	    {
-	      j5 = 0;
-	      qcount = 0;
-	    }
-	  if (c == '\n')  /* end of row  */
-	    i++;
+		if (qcount == 1 && n != QM)
+		  {
+		    //wprintw(upLoadStmtWindow, "qcount at 1 %d\n", qcount);
+		    tmpDate[i][j] = n;
+		    //wprintw(upLoadStmtWindow, "tmpDate %c\n", tmpDate[i][j]);
+		    //wprintw(upLoadStmtWindow, "value j %d n  %c\n", j, n);
+		    ++j;
+		    //posn = ftell(np);
+		    // wprintw(upLoadStmtWindow, "posn %d\n", posn);
+		  }
+		if (qcount == 3)
+		  {
+		    if (charCount == 1 && n == QM)
+		      {
+			transType[i][j2] = 'Z';
+			//		wprintw(upLoadStmtWindow, "value_Z j2 %d n  %c\n", j2, n);
+			//++j2;
+		      }
+		    else if (n != QM)
+		      {
+			transType[i][j2] = n;
+			//	wprintw(upLoadStmtWindow, "value j2 %d n  %c\n", j2, n);
+			//++j2;
+		      }
+		    ++j2;		      
+		  }
+		if (qcount == 5 && n != QM)
+		  {
+		    transDescription[i][j3] = n;
+		    // wprintw(upLoadStmtWindow, "value j3 %d n  %c\n", j3, n);
+		    ++j3;
+		  }
+		if (qcount == 7 && n != QM)
+		  {
+		    transValue[i][j4] = n;
+		    // wprintw(upLoadStmtWindow, "value j4 %d n  %c\n", j4, n);
+		    ++j4;
+		  }
+		if (qcount == 13 && n != QM)
+		  {
+		    accountNumber[i][j5] = n;
+		    // wprintw(upLoadStmtWindow, "qcount at acctno %d\n", qcount);
+		    // wprintw(upLoadStmtWindow, "value j5 %d n  %c\n", j5, n);
+		    ++j5;
+		  }
+		
+	      }	    //end of if
+	  }while (n != QM);	  
+	  fseek(cp, posn, SEEK_SET);
+	  //wprintw(upLoadStmtWindow, "posn_end %d\n", posn);
+	  qcount++;
+	  // wprintw(upLoadStmtWindow, "qcount_low %d\n", qcount);
+	  pos = ftell(cp);
+	  //wgetch(upLoadStmtWindow);
+	  // wprintw(upLoadStmtWindow, "c_cur %c %d pos %d\n", c, c, pos);
+	}
+      // wprintw(upLoadStmtWindow, "char count %d\n", charCount);
+      charCount = 0;
+      // j = 0;
+    }
+  /*
+  wprintw(upLoadStmtWindow, "i %d j %d", i,j);
+
+  int a1 = 0;
+  int b1 = 0;
+  
+  for (a1=0; a1 < i; a1++)
+    {
+      for (b1=0; b1<12; b1++)
+	{
+	  wprintw(upLoadStmtWindow, "tmpdate %c", tmpDate[a1][b1]);
 	}
     }
-       
+  */
+
+  int r = 0;
+  /*  for (r=0; r<i; r++)
+    {
+      wprintw(upLoadStmtWindow, "tmpdate %s\n", tmpDate[r]);
+      wprintw(upLoadStmtWindow, "transType %s\n", transType[r]);
+      wprintw(upLoadStmtWindow, "transDesc %s\n", transDescription[r]);
+      wprintw(upLoadStmtWindow, "transValue %s\n", transValue[r]);
+      wprintw(upLoadStmtWindow, "accountNumber %s\n", accountNumber[r]);
+      wgetch(upLoadStmtWindow);
+      }*/
+
+ 
+  
+  /*int r = 0;
+    for (r = 0 ; r < j; r++)
+    {
+    wprintw(upLoadStmtWindow, "%d", tmpDate[0][r]);
+    }*/
+ 
+  //  wgetch(upLoadStmtWindow);
+  scroll(upLoadStmtWindow);
+  //  wrefresh(upLoadStmtWindow);
+  wgetch(upLoadStmtWindow);
+
   /* arrange date format to yyyymmdd */
   for (q = 0; q < i; q++)
     {
@@ -227,29 +290,36 @@ void upLoadStatement()
       transDate[q][7] = tmpDate[q][1];
     }
 
-   resRow = resultRows();  /* return number of rows in the statment_link table */
-   // mvwprintw(upLoadStmtWindow, 4,1, "result rows %d\n", resRow);  // DEBUG
-   //refresh();
-   stmtAliasRtn = addAlias();   /* string array of alias column in the statement_link table */
+ 
+  for (r=0; r<i; r++)
+    {
+     wprintw(upLoadStmtWindow, "%s  %s %s  %s  %s\n", transDate[r], transType[r], transDescription[r], transValue[r], accountNumber[r]);
+      wgetch(upLoadStmtWindow);
+      }
+ 
+  resRow = resultRows();  /* return number of rows in the statment_link table */
+  // mvwprintw(upLoadStmtWindow, 4,1, "result rows %d\n", resRow);  // DEBUG
+  //refresh();
+  stmtAliasRtn = addAlias();   /* string array of alias column in the statement_link table */
       
-   // mvwprintw(upLoadStmtWindow,5,1, "value of i %d\n", i); // DEBUD
-   //refresh();   
-   //wrefresh(upLoadStmtWindow);
+  // mvwprintw(upLoadStmtWindow,5,1, "value of i %d\n", i); // DEBUD
+  //refresh();   
+  //wrefresh(upLoadStmtWindow);
    
-   for (x = 0; x < i; x++)
-     { 
-       for (w = 0; w < resRow; w++)
-	 {
-	   aliasPos = aliasMatch(transDescription[x], stmtAliasRtn[w]);
-	   if (aliasPos != -1)
-	     {
-	       strcpy(transAlias[x], stmtAliasRtn[w]);	  
-	       break;
-	     }
-	    else	     
-	     strcpy(transAlias[x],"NA");	     
-	 }
-     }
+  for (x = 0; x < i; x++)
+    { 
+      for (w = 0; w < resRow; w++)
+	{
+	  aliasPos = aliasMatch(transDescription[x], stmtAliasRtn[w]);
+	  if (aliasPos != -1)
+	    {
+	      strcpy(transAlias[x], stmtAliasRtn[w]);	  
+	      break;
+	    }
+	  else	     
+	    strcpy(transAlias[x],"NA");	     
+	}
+    }
 
   /* assign value to the linked list */
   for (x = 0; x < i; x++)
@@ -267,109 +337,65 @@ void upLoadStatement()
       l++;
     }
 
-
-
-  //  hide_panel(upLoadStmtPanel);
-  //show_panel(prStmtPanel); 
-  //top_panel(upLoadStmtPanel);
-  //update_panels();
-  //doupdate();
-  //   show_panel(upLoadStmtPanel);
-  // update_panels();
-  // doupdate();
+  //wmove(upLoadStmtWindow,12,1);
   
-  // printStatement(start, upLoadStmtWindow);
-  // scroll(upLoadStmtWindow);
-  // wrefresh(upLoadStmtWindow);
-  // refresh();
-   
-  //wclear(upLoadStmtWindow);
+  printStatement(start, upLoadStmtWindow);
+  wgetch(upLoadStmtWindow);
 
-  // hide_panel(upLoadStmtPanel);
-  //update_panels();
-  //doupdate();
-  
-  /* wgetch(upLoadStmtWindow);
-  addstr("SECOND RUN");
-  wrefresh(upLoadStmtWindow);   */
-  
-  /* was used */
-  // wclear(upLoadStmtWindow);
-  //wgetch(upLoadStmtWindow);
-
-  
-  //wrefresh(upLoadStmtWindow);
-
-  // show_panel(upLoadStmtPanel);
-  // update_panels();
-  //doupdate();
-  
-
-  //ptr = start;
-
-  //int m = 0;
-  //while(ptr != NULL)
-	 //    for (m=0; m < 5; m++)
-  //{
-      //  mvwprintw(upLoadStmtWindow, m+3, 2, "DATE %s",transDate[m]);
-      // mvwprintw(upLoadStmtWindow,m+3,2, "DATE %s", ptr->tDate);
-      // wrefresh(upLoadStmtWindow);
-      //      mvwprintw(upLoadStmtWindow,m+6,4, "TEST PRINT");
-      // mvwprintw(upLoadStmtWindow,m+8,2, "%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
-  //   mvwprintw(upLoadStmtWindow, 10, 2, "%d", m);
-      //if (m == 20)
-      //{
-      //  wgetch(upLoadStmtWindow);
-      //  m = 0;
-	  //break;
-      //  }
-      // ptr = ptr->next;
-      //m++;
-      //wgetch(upLoadStmtWindow);
-    // refresh();
-    //  wrefresh(upLoadStmtWindow);
-      //}
-    //    scroll(upLoadStmtWindow);
-    //addstr("all looped");
-      //wrefresh(upLoadStmtWindow);
-      //wgetch(upLoadStmtWindow);
-  
-  /*    statementInsert(start, upLoadStmtWindow);
-    wgetch(upLoadStmtWindow);
-    wrefresh(upLoadStmtWindow); */
-    
-    // refresh();
-    
-  /*    wclear(upLoadStmtWindow);
-	printStatement(start, upLoadStmtWindow); */
-    
-  // scroll(upLoadStmtWindow);
-    
-  /*  wrefresh(upLoadStmtWindow); */
-    
-    // scroll(upLoadStmtWindow);  
-    //addstr("what is going on");
-    //wrefresh(upLoadStmtWindow);
-    
-    fclose(cp);
-    fclose(np);
-
-  /* free linked list memory allocation */
-     freeStatement(start); 
-
-  /* free dynamic memory allocation for pointers to pointers */
-
-      
-  for (g = 0; g < i; g++)
+   for (r=0; r<i; r++)
     {
-      free(tmpDate[g]);
-      free(transDate[g]);
-      free(transType[g]);
+     wprintw(upLoadStmtWindow, "%s  %s %s  %s  %s\n", transDate[r], transType[r], transDescription[r], transValue[r], accountNumber[r]);
+      wgetch(upLoadStmtWindow);
+      }
+
+   printStatement_new(start);
+   wgetch(upLoadStmtWindow);
+  freeStatement(start);
+
+  
+  /* tmpDate = (char **) realloc(tmpDate, rs);
+  transDate = (char **) realloc (transDate, rs);
+  transType = (char **) realloc (transType, rs);
+  transDescription = (char **) realloc (transDescription, rs);
+  transValue = (char **) realloc (transValue, rs);
+  accountNumber = (char **) realloc (accountNumber, rs);
+  transAlias = (char **) realloc (transAlias, rs);
+  for (h = 0; h < rs; h++)
+    {
+      tmpDate[h] = (char *)realloc(tmpDate,TDATE);
+      transDate[h] = (char *)realloc(transDate,TDATE);
+      transType[h] = (char *)realloc(transType, TTYPE);
+      transDescription[h] = (char *)realloc(transDescription, TDESC);
+      transValue[h] = (char *)realloc(transValue, TVALUE);
+      accountNumber[h] = (char *)realloc(accountNumber, ANUM);
+      transAlias[h] = (char *)realloc(transAlias, ALIAS);
+      }*/
+  
+  
+ for (g = 0; g < rs; g++)
+   {
+     /* tmpDate[g] = NULL;
+   transDate[g] = NULL;
+   transType[g] = NULL;
+   transDescription[g] = NULL;
+   transValue[g] = NULL;
+   accountNumber[g] = NULL;
+   transAlias[g] = NULL;*/
+     /*  tmpDate[g] = '\0';
+     transDate[g] = '\0';
+     transType[g] = '\0';
+   transDescription[g] = '\0';
+   transValue[g] = '\0';
+   accountNumber[g] = '\0';
+   transAlias[g] = '\0';*/
+   free(tmpDate[g]);
+     free(transDate[g]);
+     free(transType[g]);
       free(transDescription[g]);
       free(transValue[g]);
       free(accountNumber[g]);
       free(transAlias[g]);
-    }
+      }
   free(tmpDate);
   free(transDate);
   free(transType);
@@ -377,13 +403,22 @@ void upLoadStatement()
   free(transValue);
   free(accountNumber);
   free(transAlias);
-    
 
-  delwin(upLoadStmtWindow);
+  /*    for (r=0; r<i; r++)
+    {
+      wprintw(upLoadStmtWindow, "%s  %s %s  %s  %s\n", transDate[r], transType[r], transDescription[r], transValue[r], accountNumber[r]);
+      wgetch(upLoadStmtWindow);
+      }*/
+
+
+  fclose(cp);
+  fclose(np);
   
-  endwin();
- 
- 
+  hide_panel(upLoadStmtPanel);
+  update_panels();
+  doupdate();
+  delwin(upLoadStmtWindow);
+  endwin(); 
 }
 
 
@@ -540,7 +575,7 @@ void printStatement_new(struct statement *start)
   while(ptr != NULL)
     {
       i++;
-        mvwprintw(upLoadStmtWindow_x, i+4, 2,"%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+      mvwprintw(upLoadStmtWindow_x, i+4, 2,"%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
        if (i == 20)
 	{
 	  wgetch(upLoadStmtWindow_x);
@@ -550,6 +585,7 @@ void printStatement_new(struct statement *start)
       wclrtobot(upLoadStmtWindow_x);
       wrefresh(upLoadStmtWindow_x);
     }
+  wgetch(upLoadStmtWindow_x);
   del_panel(upLoadStmtPanel_x);
   update_panels();
   delwin(upLoadStmtWindow_x);
