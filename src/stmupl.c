@@ -77,10 +77,20 @@ struct statement *upLoadStatement()
       refresh();
       getch();
       } */
-  
-  cp = fopen("/tmp/bankstmtFull2.csv", "r");
-  np = fopen("/tmp/bankstmtFull2.csv", "r");
 
+  char * upf = fStmtName();
+
+  if(upf == NULL)
+    exit(1);
+  	      
+  
+  //  cp = fopen("/tmp/bankstmtFull2.csv", "r");
+  // np = fopen("/tmp/bankstmtFull2.csv", "r");
+  //cp = fopen("/tmp/november20211113.csv", "r");
+  //np = fopen("/tmp/november20211113.csv", "r");
+  cp = fopen(upf, "r");
+  np = fopen(upf, "r");
+  
   /* count how many rows there are in the statement file download 
      will also count number of characters although not really required */
   while (c != EOF)
@@ -282,7 +292,7 @@ struct statement *upLoadStatement()
   //  freeStatement(start);
 
   
- for (g = 0; g < rs; g++)
+   for (g = 0; g < rs; g++)
    {
      free(tmpDate[g]);
      free(transDate[g]);
@@ -311,6 +321,8 @@ struct statement *upLoadStatement()
   endwin(); */
 
   return start;
+
+  free(upf);
 }
 
 
@@ -465,21 +477,26 @@ void printStatement_new(struct statement *start)
       }
 
   wrefresh(upLoadStmtWindow_x);
- 
+
+  wclear(upLoadStmtWindow_x);
+  box(upLoadStmtWindow_x,0,0);
+  show_panel(upLoadStmtPanel_x);
+  update_panels();
+  doupdate();
   mvwprintw(upLoadStmtWindow_x,3,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     {
       i++;
-      mvwprintw(upLoadStmtWindow_x, i+4, 2,"%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+      mvwprintw(upLoadStmtWindow_x, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
        if (i == 20)
-	{
-	  wgetch(upLoadStmtWindow_x);
+	{	  
+	  wgetch(upLoadStmtWindow_x);	  
 	  i = 0;
 	} 
       ptr = ptr->next;
       wclrtobot(upLoadStmtWindow_x);
       wrefresh(upLoadStmtWindow_x);
-    }
+    } 
   wgetch(upLoadStmtWindow_x);
   del_panel(upLoadStmtPanel_x);
   update_panels();
@@ -487,3 +504,46 @@ void printStatement_new(struct statement *start)
   endwin();
 }
 
+char * fStmtName()
+{
+  char *str;
+  char ch;
+  int i;
+  char f[100] = "/tmp/";
+  char *e; 
+  int fExist = 0;
+
+  printf("Enter file name: ");
+
+  str = (char*)malloc(100 * sizeof(char));
+  e = (char*)malloc(100 * sizeof(char));  
+
+  i = 0;
+  ch =getchar();  //when press enter to start picking up new line
+  ch = getchar();
+  while(ch != '\n')
+    {
+      str[i] = ch;
+      i++;
+      ch = getchar();
+    }
+  str[i] = '\0'; 
+  strcat(f,str);
+  printf("file to upload %s\n", f);
+  fExist = checkFileExists(f);
+  printf("exists %d\n", fExist);  
+  if(fExist == 2)
+    {
+      printf("Error no file\n");
+      return NULL;
+    }
+  else
+    {
+      strcpy(e,f);
+      printf("File name %s\n", e);
+      return e;
+    }
+  
+  free(str);
+  free(e);
+}

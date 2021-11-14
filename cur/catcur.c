@@ -23,9 +23,10 @@ void categoryInsert()
   int ch = 0;
   int rows = 0;
   int val = 0, upID = 0, *params[1], length[1], formats[1];
-  char catIDStr[5];
+  //char catIDStr[5];
   int catID = 0;
-  char catDesc[50];
+  //char catDesc[50];  
+  char *catDesc;  // using a pinter instead of array
   int cfUpdate = 0;
   int cf = 0;
 
@@ -174,7 +175,8 @@ void categoryInsert()
       doupdate();
 
       form_driver(categoryForm,REQ_VALIDATION);
-
+      
+      catDesc = (char*)malloc(50 * sizeof(char)); //NEW CODE 14NOV21
       strcpy(catDesc,field_buffer(categoryField[0],0));
 
       if ((form_driver(categoryForm,REQ_VALIDATION) == E_OK) && (!isspace(*catDesc)))
@@ -237,8 +239,8 @@ void categoryInsert()
 	    break;
 	}
       noecho();
-      hide_panel(categoryPanel);
-      //del_panel(categoryPanel); //+ 2/11/21
+      //hide_panel(categoryPanel);
+      del_panel(categoryPanel); //+ 2/11/21
       update_panels(); 
       doupdate();
       // wclear(categoryWin);
@@ -246,13 +248,14 @@ void categoryInsert()
       //del_panel(categoryUpdatePanel); //new code 30/10/21 was comment out + 2/11/21
       //update_panels();   // + 2/11/21
       //doupdate();        // + 2/11/21
-      delwin(categoryWin);
+      delwin(categoryWin); 
       //delwin(categoryUpdateWin);
       
     } //while newRec
   PQfinish(conn);
-  endwin();
+  endwin(); 
   //touchwin(stdscr);
+  free(catDesc);
 }
 
 

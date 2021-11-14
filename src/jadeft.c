@@ -4,7 +4,7 @@
 #include <libpq-fe.h>
 //#include <form.h>
 //#include <ncurses.h>
-#include <panel.h>
+//#include <panel.h>
 #include "../inc/fdbcon.h"
 #include "../inc/prolib.h"
 #include "../inc/procur.h"
@@ -21,10 +21,10 @@ int main (void) {
   system("clear");   // stdlib.h
   //  connectToDB();
 
-  //  initscr();  
-  // cbreak();
- //noecho();
-  // keypad(stdscr, TRUE);
+  /*  initscr();  
+   cbreak();
+ noecho();
+ keypad(stdscr, TRUE);*/
 
 
   //printw("Lines %d Cols %d\n", LINES, COLS);
@@ -40,7 +40,7 @@ int main (void) {
 
   /* supplier schema */
   // suppInsert();
-  // suppTypeInsert();
+  //   suppTypeInsert();
   // propertyInsert();
   // paymentPeriodInsert();
   // suppAccountInsert();
@@ -55,14 +55,15 @@ int main (void) {
 
   /* statement schema */
 
-  //categoryInsert();
+  //  categoryInsert();
 
+  // fStmtName();
    ptr = upLoadStatement();
    printStatement_new(ptr);
 
    //printStatement(ptr);
 
-  //printStatement_new(ptr);
+   // printStatement_new(ptr);
   //categoryInsert();
 
   // statementLinkInsert();
