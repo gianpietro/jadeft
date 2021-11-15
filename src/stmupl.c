@@ -54,6 +54,7 @@ struct statement *upLoadStatement()
   long int pos = 0;
   long int posn = 0;
   int r = 0;
+  int cf = 0;
 
   /* initscr();
   cbreak();  
@@ -284,6 +285,8 @@ struct statement *upLoadStatement()
   // printStatement_new(start);
   //statementInsert(start, upLoadStmtWindow);
    // wgetch(upLoadStmtWindow);
+  
+  // statementInsert(start);
 
   //  freeStatement(start);
 
@@ -382,9 +385,11 @@ int resultRows()
 }
 
 
-void statementInsert(struct statement *start, WINDOW *win)
+void statementInsert(struct statement *start)
 {
-  struct statement *ptr = start;
+  WINDOW *stmtInsertWin;
+  PANEL *stmtInsertPanel;
+  struct statement *ptr;
   int stmtTranDate;
   char stmtTranType[TTYPE];
   char stmtTranDesc[TDESC]; 
@@ -392,49 +397,76 @@ void statementInsert(struct statement *start, WINDOW *win)
   char stmtAcctNo[ANUM];
   char stmtTranAlias[ALIAS];
   int i = 0;
+  int srow, scol;
+  int ch;
 
-  scrollok(win,TRUE);
-  //idlok(win, TRUE);
+  ptr = start;
+  // char * upf = fStmtName();
+  initscr();
+  cbreak();
 
-  //scrollok(stdscr,TRUE);
-  
-  while (ptr != NULL)
+  stmtInsertWin = newwin(40, 200, 1, 1);
+  stmtInsertPanel = new_panel(stmtInsertWin);
+  update_panels();
+  doupdate();
+
+  keypad(stmtInsertWin, TRUE);
+  getmaxyx(stmtInsertWin, srow, scol);
+  box(stmtInsertWin, 0, 0);
+  waddstr(stmtInsertWin, "Insert Statement To Database");
+
+  if(stmtInsertWin == NULL)
     {
-      stmtTranDate = atoi(ptr->tDate);
-      strcpy(stmtTranType, ptr->tType);
-      strcpy(stmtTranDesc, ptr->tDescription);
-      stmtValue = atof(ptr->tValue);
-      strcpy(stmtAcctNo, ptr->actNumber);
-      strcpy(stmtTranAlias, ptr->tAlias);
-  
-      //printw(win, "%d %s %s %.2f %s %s", stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
-      //   mvwprintw(win,i+4,2, "%d %s %s %.2f %s %s", stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
-         wprintw(win, "%d %s %s %.2f %s %s\n", stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
-       
-       //stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
-       //            if (i == 20)
-       //	{
-	  // getch();
-       // i = 0;
-	  //break;
-       // } 
-	 //napms(100);
-      ptr = ptr->next;
-      i++;
-      //scroll(win);
-      wrefresh(win);
-      //  scroll(win);
-      //wgetch(win);
-      
-          }
-//wgetch(win);  
-  scroll(win);
-  wrefresh(win);
-  //scroll(stdscr);
-  //refresh();
-  //wgetch(win);
-  
+      addstr("Unable to create window");
+      refresh();
+      getch();
+    }
 
+ 
+  mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement: ");
+  echo();
+  while ((ch = wgetch(stmtInsertWin)) != 'y')
+    {
+      wmove(stmtInsertWin, 31, 2);
+      if (ch == 'n')
+	{
+	  mvwprintw(stmtInsertWin, 4, 2, "Statement not saved");
+	  break;
+	}
+    }
+      if (ch == 'y')
+	{
+	  mvwprintw(stmtInsertWin,5,2, "ch value %d\n", ch);
+	  while (ptr != NULL)
+	    {
+	      stmtTranDate = atoi(ptr->tDate);
+	      strcpy(stmtTranType, ptr->tType);
+	      strcpy(stmtTranDesc, ptr->tDescription);
+	      stmtValue = atof(ptr->tValue);
+	      strcpy(stmtAcctNo, ptr->actNumber);
+	      strcpy(stmtTranAlias, ptr->tAlias);
+              //i++;
+	      /*mvwprintw(stmtInsertWin, i+4,2, "%d %s %s %.2f %s %s\n", stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
+	       if (i == 20)
+		 {
+		   wgetch(stmtInsertWin);
+		   i = 0;
+		   }*/
+		     
+       
+	       stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
+       
+	      ptr = ptr->next;
+	      //wclrtobot(stmtInsertWin);
+	      //wrefresh(stmtInsertWin);	     
+	    }
+	}
+  
+  wgetch(stmtInsertWin);
+  hide_panel(stmtInsertPanel);
+  update_panels();
+  doupdate();
+  endwin();
 }
 
 void printStatement_new(struct statement *start)
@@ -512,7 +544,7 @@ char * fStmtName()
   char *str;
   char ch;
   int i = 0;
-  char f[100] = "/tmp/";
+  char f[FNAME] = "/tmp/";
   char *e; 
   int fExist = 0;
 

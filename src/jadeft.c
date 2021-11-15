@@ -61,6 +61,8 @@ int main (void) {
    ptr = upLoadStatement();
    printStatement_new(ptr);
 
+   statementInsert(ptr);
+
       
    //printStatement(ptr);
 

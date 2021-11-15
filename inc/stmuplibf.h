@@ -11,8 +11,9 @@
 #define TDESC 150 /* transaction description */
 #define TVALUE 10 /* transaction value */
 #define ANUM 16   /* account number */
-#define ALIAS 50  /* alias matched from statement_link table */ 
-#include <ncurses.h>
+#define ALIAS 50  /* alias matched from statement_link table */
+#define FNAME 100 /* filename of statement file to upload */
+//#include <ncurses.h>
 struct statement{
   char tDate[TDATE];
   char tType[TTYPE];
