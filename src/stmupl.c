@@ -80,9 +80,9 @@ struct statement *upLoadStatement()
 
   char * upf = fStmtName();
 
-  if(upf == NULL)
-    exit(1);
-  	      
+  if(upf != NULL)
+    {
+    //exit(1);    	      
   
   //  cp = fopen("/tmp/bankstmtFull2.csv", "r");
   // np = fopen("/tmp/bankstmtFull2.csv", "r");
@@ -149,16 +149,12 @@ struct statement *upLoadStatement()
       //  wprintw(upLoadStmtWindow, "value j %d\n", j);
       if (c == '\n')
 	{
-	  /* tmpDate[i][j+1] = '\0';
+	  tmpDate[i][j+1] = '\0';
 	  transType[i][j2+1] = '\0';
 	  transDescription[i][j3+1] = '\0';
 	  transValue[i][j4+1] = '\0';
-	  accountNumber[i][j5+1] = '\0';*/
-	  j = 0;
-	  j2 = 0;
-	  j3 = 0;
-	  j4 = 0;
-	  j5 = 0;
+	  accountNumber[i][j5+1] = '\0';
+	  j = j2 = j3 = j4 = j5 = 0;
 	  ++i;
 	  qcount = 0;
 	}
@@ -323,6 +319,9 @@ struct statement *upLoadStatement()
   return start;
 
   free(upf);
+  
+    }  //if upf 
+
 }
 
 
@@ -454,8 +453,9 @@ void printStatement_new(struct statement *start)
   noecho();
   //scrollok(stdscr,TRUE);
   keypad(stdscr, TRUE);
+  //touchwin(stdscr);
 
-  upLoadStmtWindow_x = newwin(40, 170, 2, 1);
+  upLoadStmtWindow_x = newwin(40, 170, 1, 1);
 
   upLoadStmtPanel_x = new_panel(upLoadStmtWindow_x);
   update_panels();
@@ -466,7 +466,7 @@ void printStatement_new(struct statement *start)
 
   scrollok(upLoadStmtWindow_x, TRUE);
 
-  box(upLoadStmtWindow_x, 0,0);
+  box(upLoadStmtWindow_x, 0, 0);
   waddstr(upLoadStmtWindow_x, "Statement Up Load");
 
   if(upLoadStmtWindow_x == NULL) // || prStmtWindow == NULL)
@@ -478,11 +478,11 @@ void printStatement_new(struct statement *start)
 
   wrefresh(upLoadStmtWindow_x);
 
-  wclear(upLoadStmtWindow_x);
-  box(upLoadStmtWindow_x,0,0);
-  show_panel(upLoadStmtPanel_x);
-  update_panels();
-  doupdate();
+  //wclear(upLoadStmtWindow_x);
+  //box(upLoadStmtWindow_x,0,0);
+  //show_panel(upLoadStmtPanel_x);
+  //update_panels();
+  //doupdate();
   mvwprintw(upLoadStmtWindow_x,3,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     {
@@ -506,44 +506,89 @@ void printStatement_new(struct statement *start)
 
 char * fStmtName()
 {
+  WINDOW *fStmtUpWindow;
+  PANEL *fStmtUpPanel;
+  int frow, fcol;
   char *str;
   char ch;
-  int i;
+  int i = 0;
   char f[100] = "/tmp/";
   char *e; 
   int fExist = 0;
 
-  printf("Enter file name: ");
+  initscr();
+  cbreak();
+  //noecho(); 
+
+  fStmtUpWindow = newwin(10, 110, 1, 1);
+  fStmtUpPanel = new_panel(fStmtUpWindow);
+  update_panels();
+  doupdate();
+
+  keypad(fStmtUpWindow, TRUE);
+  getmaxyx(fStmtUpWindow, frow, fcol);
+  box(fStmtUpWindow, 0, 0);
+  waddstr(fStmtUpWindow, "Upload File");
+
+  if(fStmtUpWindow == NULL)
+    {
+      addstr("Unable to create window");
+      refresh();
+      getch();
+    }
+
+  // wrefresh(fStmtUpWindow);
+  
+  mvwprintw(fStmtUpWindow, 3, 2, "Enter file name: ");
+  //wrefresh(fStmtUpWindow);
 
   str = (char*)malloc(100 * sizeof(char));
   e = (char*)malloc(100 * sizeof(char));  
 
-  i = 0;
-  ch =getchar();  //when press enter to start picking up new line
-  ch = getchar();
+  //i = 0;
+  //ch = wgetch(fStmtUpWindow); // getchar();  //when press enter to start picking up new line
+  //wrefresh(fStmtUpWindow);
+  ch = wgetch(fStmtUpWindow); //getchar();
+  //  wrefresh(fStmtUpWindow);
   while(ch != '\n')
     {
       str[i] = ch;
       i++;
-      ch = getchar();
+      ch = wgetch(fStmtUpWindow); //getchar();
+      //  wrefresh(fStmtUpWindow);
     }
   str[i] = '\0'; 
   strcat(f,str);
-  printf("file to upload %s\n", f);
+  mvwprintw(fStmtUpWindow, 5, 2, "file to upload %s\n", f);
+  wrefresh(fStmtUpWindow);
   fExist = checkFileExists(f);
-  printf("exists %d\n", fExist);  
-  if(fExist == 2)
+  //printf("exists %d i %d\n", fExist, i);
+  //wgetch(fStmtUpWindow);
+  if(fExist == 2 || i == 0)
     {
-      printf("Error no file\n");
+      mvwprintw(fStmtUpWindow, 6, 3, "Error no file\n");
+      wgetch(fStmtUpWindow);
+      wrefresh(fStmtUpWindow);
       return NULL;
     }
   else
     {
       strcpy(e,f);
-      printf("File name %s\n", e);
+      //mvwprintw(fStmtUpWindow, 6, 3, "File name %s\n", e);
+      //wrefresh(fStmtUpWindow);
       return e;
     }
-  
+ 
   free(str);
   free(e);
+
+  wclear(fStmtUpWindow);
+
+  hide_panel(fStmtUpPanel);
+  //del_panel(fStmtUpPanel);
+  update_panels();
+  doupdate();
+  delwin(fStmtUpWindow);
+  endwin();  
+
 }
