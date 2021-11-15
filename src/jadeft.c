@@ -59,7 +59,7 @@ int main (void) {
 
   // fStmtName();
    ptr = upLoadStatement();
-   printStatement_new(ptr);
+   printStmtFile(ptr);
 
    statementInsert(ptr);
 

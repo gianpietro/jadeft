@@ -32,6 +32,6 @@ struct statement *append(struct statement *, struct statement *);
 void printStatement(struct statement *);
 void freeStatement(struct statement *);
 int aliasMatch(char *, char *);
-void printStatement_new(struct statement *);
+void printStmtFile(struct statement *);
 
 #endif
