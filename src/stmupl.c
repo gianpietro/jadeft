@@ -405,8 +405,8 @@ void printStmtFile(struct statement *start)
   while(ptr != NULL)
     {     
       i++;    
-      mvwprintw(upLoadStmtWindow, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
-      if (i == 20)                                                       /* check if rows being displayed are 20 */
+      mvwprintw(upLoadStmtWindow, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);      
+      if (i == 20)                                                       
 	{	  
 	  wgetch(upLoadStmtWindow);	                                 /* if 20 rows hit enter */
 	  i = 0;                                                         /* if 20 rows set i to 0 */
@@ -460,8 +460,8 @@ char * fStmtName()
 
   mvwprintw(fStmtUpWindow, 3, 2, "Enter file name: ");
 
-  str = (char*)malloc(100 * sizeof(char));
-  e = (char*)malloc(100 * sizeof(char));  
+  str = (char*)malloc(FNAME * sizeof(char));
+  e = (char*)malloc(FNAME * sizeof(char));  
 
   ch = wgetch(fStmtUpWindow); 
 

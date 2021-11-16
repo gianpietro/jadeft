@@ -55,7 +55,7 @@ int main (void) {
 
   /* statement schema */
 
-  categoryInsert();
+  //categoryInsert();
 
   // fStmtName();
    ptr = upLoadStatement();
