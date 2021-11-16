@@ -9,78 +9,73 @@
 #include "../inc/stmuplf.h"
 #include "../inc/stmlib.h"
 
+/* Function to read the downloaded bank statement file, selects required
+   columns for data import and uploads these to a linked list */
 struct statement *upLoadStatement()
 {
   struct statement *start, *newStmtPtr, *end, *ptr;
-  FILE *cp,*np;                 /* pointers to file */
-  int i = 0;                    /* count of rows in the statement file download */
-  int j = 0;                    /* count of characters in the date column */
-  int j2 = 0;                   /* count of characters in the type column */ 
-  int j3 = 0;                   /* count of characters in the description column */ 
-  int j4 = 0;                   /* count of character in the value column */
-  int j5 = 0;                   /* count of characters in the account number column */
-  int c = 0, n = 0;             /* character selected from file */
-  int h = 0;                    /* various counters for loops and array */
-  //int p = 0;
+  FILE *cp,*np;                                                          /* pointers to file */
+  int i = 0;                                                             /* count of rows in the statement file download */
+  int j = 0;                                                             /* count of characters in the date column */
+  int j2 = 0;                                                            /* count of characters in the type column */ 
+  int j3 = 0;                                                            /* count of characters in the description column */ 
+  int j4 = 0;                                                            /* count of character in the value column */
+  int j5 = 0;                                                            /* count of characters in the account number column */
+  int c = 0, n = 0;                                                      /* character selected from file */
+  int h = 0;                                                             /* various counters for loops and array */
   int q = 0;
   int x = 0;
   int l = 0;
-  int g = 0;                    /* count for free up of memory */ 
-  int qcount = 0;               /* count of quotation marks seperating columns in file */
-  int kr= 0, kc = 0;            /* count of rows kr and characters kc in the file */
-  char **tmpDate;               /* temporary store for date */
-  char **transDate;             /* transaction date on statement formatted yyyymmdd */
-  char **transType;             /* Type column contains up to 3 characters */
-  char **transDescription;      /* Description column on statement which can have a large number of characters */
-  char **transValue;            /* Value column on statement */
-  char **accountNumber;         /* Account Number on statement */
-  char **transAlias;            /* Alias value matched from statement_link table */
-  char **stmtAliasRtn;          /* alias value returned from statement_link table */  
+  int g = 0;                                                             /* count for free up of memory */ 
+  int qcount = 0;                                                        /* count of quotation marks seperating columns in file */
+  int kr= 0, kc = 0;                                                     /* count of rows kr and characters kc in the file */
+  char **tmpDate;                                                        /* temporary store for date */
+  char **transDate;                                                      /* transaction date on statement formatted yyyymmdd */
+  char **transType;                                                      /* Type column contains up to 3 characters */
+  char **transDescription;                                               /* Description column on statement */
+  char **transValue;                                                     /* Value column on statement */
+  char **accountNumber;                                                  /* Account Number on statement */
+  char **transAlias;                                                     /* Alias value matched from statement_link table */
+  char **stmtAliasRtn;                                                   /* alias value returned from statement_link table */  
   int w = 0;
-  int aliasPos = 0;             /* position where alias is found in statement description */ 
-  int resRow = 0;               /* number of rows returned from statment_link table */
-  int cr, cc;
-  char *path = "/tmp/";
-  int tr = 0; //number or lines before first QM, top rows
-  int rs = 0; //number of statement rows excluding top rows before data.
-  long int pos = 0;             /* position of file cursor c */
-  long int posn = 0;            /* position of file cursor n */
-  //int r = 0;
-  //int cf = 0;                    
-  int charCount = 0;            /* number of characters in each data column */
+  int aliasPos = 0;                                                      /* position where alias is found in description */ 
+  int resRow = 0;                                                        /* number of rows returned from statment_link table */
+  int cr, cc;  
+  int tr = 0;                                                            /* number or lines before first QM, top rows */
+  int rs = 0;                                                            /* number of statement rows excluding top rows before data. */
+  long int pos = 0;                                                      /* position of file cursor c */
+  long int posn = 0;                                                     /* position of file cursor n */  
+  int charCount = 0;                                                     /* number of characters in each data column */
 
-  char * upf = fStmtName();     /* function to obtain filename to load and if exists */
+  char * upf = fStmtName();                                              /* function to obtain filename to load and if exists */
 
   if(upf != NULL)
     {
       cp = fopen(upf, "r");
       np = fopen(upf, "r");
   
-      /* count how many rows there are in the statement file download 
-	 will also count number of characters although not really required */
-      while (c != EOF)
+      while (c != EOF) 
 	{
-	  kc++;  /* number of characters in the file */       
+	  kc++;                                                          /* number of characters in the file */       
 	  c = fgetc(cp);      
 	  if (c == '\n')	
-	    kr++; /* number of rows in the file */
+	    kr++;                                                        /* number of rows in the file */
 	}
 
-      rewind(cp);   /* return cursor to beginning of file */
+      rewind(cp);                                                        /* return cursor to beginning of file */
 
       while (c!= QM)
 	{
 	  c = fgetc(cp);  
 	  n = fgetc(np);
 	  if (c == '\n')
-	    tr++;	
+	    tr++;	                                                 /* number of rows before first qm */
 	}
 
       fseek(cp, -1, SEEK_CUR);
       fseek(np, -1, SEEK_CUR);
-   
-      /* number of valid rows in statement excludes top empty rows */
-      rs = kr - tr;
+       
+      rs = kr - tr;                                                      /* number of valid rows in statement excludes top empty rows */
 
       tmpDate = (char **) malloc(rs * sizeof(char *));
       transDate = (char **) malloc (rs * sizeof(char *));
@@ -106,7 +101,7 @@ struct statement *upLoadStatement()
 	  pos = ftell(cp);      
 	  if (c == '\n')
 	    {
-	      tmpDate[i][j+1] = '\0';
+	      tmpDate[i][j+1] = '\0';                                    /* add end of string char when reach end of row */
 	      transType[i][j2+1] = '\0';
 	      transDescription[i][j3+1] = '\0';
 	      transValue[i][j4+1] = '\0';
@@ -116,24 +111,24 @@ struct statement *upLoadStatement()
 	      qcount = 0;
 	    }
 
-	  if ( c == QM || qcount == 6 || qcount == 8)
+	  if ( c == QM || qcount == 6 || qcount == 8)                    /* 6 and 8 required for data Value with no qm */
 	    {
 	      qcount++;
-	      fseek(np, pos, SEEK_SET);
-	      do{
-		n = fgetc(np);
+	      fseek(np, pos, SEEK_SET);                                  /* cursor np at first qm */
+	      do{                            
+		n = fgetc(np);                                           /* move one char until next qm */ 
 		posn = ftell(np);
-		charCount++;
-		if (n != SP && n != CM && n != FS && n != AP)
+		charCount++;                                             /* count no. of characters between qms */
+		if (n != SP && n != CM && n != FS && n != AP)            /* not space, comma, forward slach, apostrophe */
 		  {
-		    if (qcount == 1 && n != QM)
+		    if (qcount == 1 && n != QM)                          /* Date column */ 
 		      {
 			tmpDate[i][j] = n;
 			++j;
 		      }
-		    if (qcount == 3)
+		    if (qcount == 3)                                     /* Type column */
 		      {
-			if (charCount == 1 && n == QM)
+			if (charCount == 1 && n == QM)                   /* If Type blank */
 			  {
 			    transType[i][j2] = 'Z';
 			  }
@@ -143,33 +138,31 @@ struct statement *upLoadStatement()
 			  }
 			++j2;		      
 		      }
-		    if (qcount == 5 && n != QM)
+		    if (qcount == 5 && n != QM)                          /* Description column */
 		      {
 			transDescription[i][j3] = n;
 			++j3;
 		      }
-		    if (qcount == 7 && n != QM)
+		    if (qcount == 7 && n != QM)                          /* Value column */ 
 		      {
 			transValue[i][j4] = n;
 			++j4;
 		      }
-		    if (qcount == 13 && n != QM)
+		    if (qcount == 13 && n != QM)                         /* Account number column */
 		      {
 			accountNumber[i][j5] = n;
 			++j5;
-		      }
-		
-		  }	    //end of if
+		      }		
+		  }	                                    
 	      }while (n != QM);	  
-	      fseek(cp, posn, SEEK_SET);
+	      fseek(cp, posn, SEEK_SET);                                 /* move cursor cp to current np pos */
 	      qcount++;
 	      pos = ftell(cp);
 	    }
 	  charCount = 0;
 	}
 
-      /* arrange date format to yyyymmdd */
-      for (q = 0; q < i; q++)
+      for (q = 0; q < i; q++)                                            /* arrange date format to yyyymmdd */
 	{
 	  transDate[q][0] = tmpDate[q][4];
 	  transDate[q][1] = tmpDate[q][5];
@@ -181,9 +174,11 @@ struct statement *upLoadStatement()
 	  transDate[q][7] = tmpDate[q][1];
 	}
  
-      resRow = resultRows();       /* return number of rows in the statment_link table */
-      stmtAliasRtn = addAlias();   /* string array of alias column in the statement_link table */
-      
+      resRow = resultRows();                                             /* return number of rows in the statement_link table */
+      stmtAliasRtn = addAlias();                                         /* string array of alias column in the statement_link table */
+
+      /* match the string patter in the Decription to the alias in the
+	 statement_link table */
       for (x = 0; x < i; x++)
 	{ 
 	  for (w = 0; w < resRow; w++)
@@ -191,16 +186,15 @@ struct statement *upLoadStatement()
 	      aliasPos = aliasMatch(transDescription[x], stmtAliasRtn[w]);
 	      if (aliasPos != -1)
 		{
-		  strcpy(transAlias[x], stmtAliasRtn[w]);	  
+		  strcpy(transAlias[x], stmtAliasRtn[w]);	         /* assign alias to array */
 		  break;
 		}
 	      else	     
-		strcpy(transAlias[x],"NA");	     
+		strcpy(transAlias[x],"NA");	                         /* if no alias match found assign NA */    
 	    }
 	}
 
-      /* assign value to the linked list */
-      for (x = 0; x < i; x++)
+      for (x = 0; x < i; x++)                                            /* assign statement data to the linked list */
 	{
 	  if (l == 0)
 	    {
@@ -242,7 +236,8 @@ struct statement *upLoadStatement()
     }  
 }
 
-
+/* Select values in the statement_link table and assign values to 
+   char pointer */
 char ** addAlias()
 {
   PGconn *conn = fdbcon();
@@ -273,7 +268,8 @@ char ** addAlias()
   free (stmtAlias);  
 }
 
-
+/* select values from the statement_link table and count
+   the number of rows returned. To use for string match loop */
 int resultRows()
 {
   PGconn *conn = fdbcon();
@@ -290,7 +286,8 @@ int resultRows()
   
 }
 
-
+/* Insert function which will insert the linked list statement
+   data into the statement table of database using ecpg function */
 void statementInsert(struct statement *start)
 {
   WINDOW *stmtInsertWin;
@@ -311,8 +308,9 @@ void statementInsert(struct statement *start)
   initscr();
   cbreak();
 
-  stmtInsertWin = newwin(40, 200, 1, 1);
+  stmtInsertWin = newwin(10, 110, 1, 1);
   stmtInsertPanel = new_panel(stmtInsertWin);
+  show_panel(stmtInsertPanel);
   update_panels();
   doupdate();
 
@@ -329,10 +327,11 @@ void statementInsert(struct statement *start)
     }
  
   mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement: ");
+  wmove(stmtInsertWin, 3, 31);
   echo();
   while ((ch = wgetch(stmtInsertWin)) != 'y')
     {
-      wmove(stmtInsertWin, 31, 2);
+      wmove(stmtInsertWin, 3, 31);
       if (ch == 'n')
 	{
 	  mvwprintw(stmtInsertWin, 4, 2, "Statement not saved");
@@ -341,7 +340,6 @@ void statementInsert(struct statement *start)
     }
   if (ch == 'y')
     {
-      mvwprintw(stmtInsertWin,5,2, "ch value %d\n", ch);
       while (ptr != NULL)
 	{
 	  stmtTranDate = atoi(ptr->tDate);
@@ -353,6 +351,7 @@ void statementInsert(struct statement *start)
 	  stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
 	  ptr = ptr->next;
 	}
+      mvwprintw(stmtInsertWin, 4, 2, "Statement saved");
     }
   
   wgetch(stmtInsertWin);
@@ -362,7 +361,7 @@ void statementInsert(struct statement *start)
   endwin();
 }
 
-
+/* Print link list to terminal */
 void printStmtFile(struct statement *start)
 {
   int i= 0;
@@ -393,7 +392,7 @@ void printStmtFile(struct statement *start)
   box(upLoadStmtWindow, 0, 0);
   waddstr(upLoadStmtWindow, "Statement Up Load");
 
-  if(upLoadStmtWindow == NULL) // || prStmtWindow == NULL)
+  if(upLoadStmtWindow == NULL) 
      {
       addstr("Unable to create window");
       refresh();
@@ -404,40 +403,43 @@ void printStmtFile(struct statement *start)
 
   mvwprintw(upLoadStmtWindow,3,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
-    {
-      i++;
+    {     
+      i++;    
       mvwprintw(upLoadStmtWindow, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
-       if (i == 20)
+      if (i == 20)                                                       /* check if rows being displayed are 20 */
 	{	  
-	  wgetch(upLoadStmtWindow);	  
-	  i = 0;
+	  wgetch(upLoadStmtWindow);	                                 /* if 20 rows hit enter */
+	  i = 0;                                                         /* if 20 rows set i to 0 */
 	} 
       ptr = ptr->next;
-      wclrtobot(upLoadStmtWindow);
+      wclrtobot(upLoadStmtWindow);  
       wrefresh(upLoadStmtWindow);
     } 
   wgetch(upLoadStmtWindow);
-  del_panel(upLoadStmtPanel);
+  hide_panel(upLoadStmtPanel);
   update_panels();
+  doupdate();
   delwin(upLoadStmtWindow);
   endwin();
 }
 
 
+/* Function to enter file name and check that it exists */
 char * fStmtName()
 {
   WINDOW *fStmtUpWindow;
   PANEL *fStmtUpPanel;
   int frow, fcol;
-  char *str;
-  char ch;
+  char *str;                                                             /* string array of entered characters */
+  char ch;                                                               /* char entered at keyboard */
   int i = 0;
-  char f[FNAME] = "/tmp/";
-  char *e; 
+  char f[FNAME] = "/tmp/";                                               /* directory where file saved */
+  char *e;                                                               /* full file name with path */
   int fExist = 0;
 
   initscr();
   cbreak();
+  echo();
 
   fStmtUpWindow = newwin(10, 110, 1, 1);
   fStmtUpPanel = new_panel(fStmtUpWindow);
@@ -463,19 +465,19 @@ char * fStmtName()
 
   ch = wgetch(fStmtUpWindow); 
 
-  while(ch != '\n')
+  while(ch != '\n')                                                      /* enter file name until new line feed */
     {
-      str[i] = ch;
+      str[i] = ch;                                                       /* assign typed char to char array */
       i++;
-      ch = wgetch(fStmtUpWindow); 
+      ch = wgetch(fStmtUpWindow);           
     }
-  str[i] = '\0'; 
-  strcat(f,str);
+  str[i] = '\0';                                                         /* if new line add the string terminate char */
+  strcat(f,str);                                                         /* concantenate f and str */
   mvwprintw(fStmtUpWindow, 5, 2, "file to upload %s\n", f);
   wrefresh(fStmtUpWindow);
-  fExist = checkFileExists(f);
+  fExist = checkFileExists(f);                                           /* use library function to check file exists */
 
-  if(fExist == 2 || i == 0)
+  if(fExist == 2 || i == 0)                                              /* if no file */
     {
       mvwprintw(fStmtUpWindow, 6, 3, "Error no file\n");
       wgetch(fStmtUpWindow);
@@ -484,8 +486,8 @@ char * fStmtName()
     }
   else
     {
-      strcpy(e,f);
-      return e;
+      strcpy(e,f);                                                       /* copy path and file name to char pointer */
+      return e;                                              
     }
  
   free(str);

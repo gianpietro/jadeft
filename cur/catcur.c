@@ -48,7 +48,7 @@ void categoryInsert()
       categoryForm = new_form(categoryField);
       scale_form(categoryForm, &crow, &ccol);
 
-      categoryWin = newwin(crow+20,ccol+10,1,1);
+      categoryWin = newwin(crow+20,ccol+10,1,1);      
       categoryUpdateWin = newwin(20,50,1,120);
 
       categoryPanel = new_panel(categoryWin);
@@ -239,23 +239,25 @@ void categoryInsert()
 	    break;
 	}
       noecho();
-      //hide_panel(categoryPanel);
-      del_panel(categoryPanel); //+ 2/11/21
+
+      hide_panel(categoryPanel);
+      //del_panel(categoryPanel); //+ 2/11/21
       update_panels(); 
       doupdate();
+
       // wclear(categoryWin);
       //wclear(categoryUpdateWin);
       //del_panel(categoryUpdatePanel); //new code 30/10/21 was comment out + 2/11/21
       //update_panels();   // + 2/11/21
       //doupdate();        // + 2/11/21
       delwin(categoryWin); 
-      //delwin(categoryUpdateWin);
-      
+      delwin(categoryUpdateWin);      
     } //while newRec
   PQfinish(conn);
+  free(catDesc);       
   endwin(); 
-  //touchwin(stdscr);
-  free(catDesc);
+  touchwin(stdscr);
+  //free(catDesc);
 }
 
 
