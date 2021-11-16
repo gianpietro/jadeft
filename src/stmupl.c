@@ -405,7 +405,7 @@ void printStmtFile(struct statement *start)
   while(ptr != NULL)
     {     
       i++;    
-      mvwprintw(upLoadStmtWindow, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);      
+        mvwprintw(upLoadStmtWindow, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);    
       if (i == 20)                                                       
 	{	  
 	  wgetch(upLoadStmtWindow);	                                 /* if 20 rows hit enter */

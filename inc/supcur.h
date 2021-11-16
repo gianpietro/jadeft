@@ -2,9 +2,13 @@
 #define _SUPCUR_H
 
 void suppInsert();
+
 void suppTypeInsert();
+
 void paymentPeriodInsert();
+
 void propertyInsert();
+
 int suppAccountInsert();
 
 #endif

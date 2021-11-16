@@ -2,6 +2,7 @@
 #define _FDBCON_H
 
 void print_sqlca();
+
 void connectToDB();
   
 #endif
