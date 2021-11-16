@@ -2,10 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <ncurses.h>
-//#include <ctype.h>
-//#include "../inc/jadlib.h"
-
 #include "../inc/stmuplibf.h"
+
 
 struct statement *importStmt(char transactionDate[], char transactionType[], char transactionDescription[], char transactionValue[], char accountNumber[], char transactionAlias[])
 {
@@ -30,43 +28,13 @@ struct statement *importStmt(char transactionDate[], char transactionType[], cha
   return ptr;    
 }
 
+
 struct statement *append(struct statement *end, struct statement *newpt)
 {
   end->next = newpt;
   return (end->next);
 }
 
-/*
-void printStatement(struct statement *start, WINDOW *win)
-{
-  int i= 0;
-  struct statement *ptr;
-  ptr = start; 
- 
- 
-  //  mvwprintw(win,3,2,"Date, Type, Description, Value, Account Number\n");
-  while(ptr != NULL)
-    {
-      // wmove(win,12,1);
-      //wrefresh(win);
-      i++;
-      //      mvwprintw(win, i+8, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
-      //mvwprintw(win, i+8, 2,"%s\n", ptr->tDate);
-      //    wprintw(win,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
-      wprintw(win,"%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
-       if (i == 20)
-	{
-	  wgetch(win);
-	  i = 0;
-	} 
-      ptr = ptr->next;
-      //wclrtobot(win);     
-      //wnoutrefresh(win);
-      //doupdate();
-      wrefresh(win);
-    }
-}
-*/
 
 void printStatement(struct statement *start)
 {
@@ -77,17 +45,7 @@ void printStatement(struct statement *start)
 
   while(ptr != NULL)
     {
-      //i++;
       printf("%s %s %s %s %s %s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);     
-      // if (i == 20)
-      //	{
-	  //  scanf("%d", &j);
-      //  i = 0;
-      //	}
-      //	{
-      //  wgetch(win);
-      //  i = 0;
-      //	} 
       ptr = ptr->next;     
     }
 }
@@ -107,44 +65,9 @@ void freeStatement(struct statement *start)
     }    
 }
 
-/*
-void freeStatement(struct statement *start)
-{
-  struct statement *ptr;
-  struct statement *tmp;
-  ptr = start;
-
-  while (ptr !=  NULL)
-   {
-     tmp = ptr;
-     ptr = ptr->next;
-     free(tmp);
-    }
-  start = NULL;
-}
-*/
-
-/*
-void freeStatement(struct statement *statement)
-{
-  while (statement != 0)
-    {
-      struct statement *next = statement->next;
-      free(statement->tDate);
-      free(statement->tType);
-      free(statement->tDescription);
-      free(statement->tValue);
-      free(statement->actNumber);
-      free(statement->tAlias);
-      free(statement);
-      statement = next;
-    }	
-}
-*/
 
 int aliasMatch(char *a, char *b)
 {
-  //int c;
   int position = 0;
   char *x, *y;
    

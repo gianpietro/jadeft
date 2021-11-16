@@ -3,11 +3,15 @@
 
 #include "../inc/stmuplibf.h"
 
-//void upLoadStatement();
+
 struct statement * upLoadStatement();
-char ** addAlias(); //struct statement *, int);
+
+char ** addAlias();
+
 int resultRows();
+
 void statementInsert(struct statement *);
+
 char * fStmtName();
 
 #endif

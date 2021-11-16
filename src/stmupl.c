@@ -119,7 +119,7 @@ struct statement *upLoadStatement()
 		n = fgetc(np);                                           /* move one char until next qm */ 
 		posn = ftell(np);
 		charCount++;                                             /* count no. of characters between qms */
-		if (n != SP && n != CM && n != FS && n != AP)            /* not space, comma, forward slach, apostrophe */
+		if (n != SP && n != CM && n != FS && n != AP)            /* not space, comma, forward slash, apostrophe */
 		  {
 		    if (qcount == 1 && n != QM)                          /* Date column */ 
 		      {
