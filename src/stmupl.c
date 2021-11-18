@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -326,12 +327,12 @@ void statementInsert(struct statement *start)
       getch();
     }
  
-  mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement: ");
-  wmove(stmtInsertWin, 3, 31);
+  mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement (y/n): ");
+  wmove(stmtInsertWin, 3, 35);
   echo();
   while ((ch = wgetch(stmtInsertWin)) != 'y')
     {
-      wmove(stmtInsertWin, 3, 31);
+      wmove(stmtInsertWin, 3, 35);
       if (ch == 'n')
 	{
 	  mvwprintw(stmtInsertWin, 4, 2, "Statement not saved");
@@ -416,7 +417,7 @@ void printStmtFile(struct statement *start)
       wrefresh(upLoadStmtWindow);
     } 
   wgetch(upLoadStmtWindow);
-  hide_panel(upLoadStmtPanel);
+  hide_panel(upLoadStmtPanel);  
   update_panels();
   doupdate();
   delwin(upLoadStmtWindow);
@@ -481,23 +482,29 @@ char * fStmtName()
     {
       mvwprintw(fStmtUpWindow, 6, 3, "Error no file\n");
       wgetch(fStmtUpWindow);
+      hide_panel(fStmtUpPanel);
       wrefresh(fStmtUpWindow);
+      free(str);
+      free(e);
+      endwin();
       return NULL;
     }
   else
     {
       strcpy(e,f);                                                       /* copy path and file name to char pointer */
-      return e;                                              
+      hide_panel(fStmtUpPanel);
+      free(str);
+      endwin();
+      return e;      
     }
  
-  free(str);
-  free(e);
+  /*  free(str);
+      free(e); */
 
-  wclear(fStmtUpWindow);
-
-  hide_panel(fStmtUpPanel);
+  //hide_panel(fStmtUpPanel);
+  /*( del_panel(fStmtUpPanel);
   update_panels();
   doupdate();
   delwin(fStmtUpWindow);
-  endwin();  
+  endwin(); */
 }

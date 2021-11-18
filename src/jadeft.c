@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -55,14 +56,15 @@ int main (void) {
 
   /* statement schema */
 
-  categoryInsert();
+     
+  //categoryInsert();
 
   // fStmtName();
    ptr = upLoadStatement();
    printStmtFile(ptr);
 
    statementInsert(ptr);
-
+   
       
    //printStatement(ptr);
 
