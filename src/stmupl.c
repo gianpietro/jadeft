@@ -212,7 +212,7 @@ struct statement *upLoadStatement()
   
       for (g = 0; g < rs; g++)
 	{
-	  free(tmpDate[g]);
+	  free(tmpDate[g]);	
 	  free(transDate[g]);
 	  free(transType[g]);
 	  free(transDescription[g]);
@@ -223,10 +223,10 @@ struct statement *upLoadStatement()
       free(tmpDate);
       free(transDate);
       free(transType);
-      free(transDescription);  
+      free(transDescription);
       free(transValue);
-      free(accountNumber);
-      free(transAlias);
+      free(accountNumber);     
+      free(transAlias);     
     
       fclose(cp);
       fclose(np);
@@ -378,7 +378,7 @@ void printStmtFile(struct statement *start)
   cbreak();
   noecho();
 
-  keypad(stdscr, TRUE);
+  //keypad(stdscr, TRUE);
 
   upLoadStmtWindow = newwin(40, 170, 1, 1);
   upLoadStmtPanel = new_panel(upLoadStmtWindow);
@@ -433,6 +433,7 @@ char * fStmtName()
   int frow, fcol;
   char *str;                                                             /* string array of entered characters */
   char ch;                                                               /* char entered at keyboard */
+ 
   int i = 0;
   char f[FNAME] = "/tmp/";                                               /* directory where file saved */
   char *e;                                                               /* full file name with path */
@@ -440,7 +441,7 @@ char * fStmtName()
 
   initscr();
   cbreak();
-  echo();
+  noecho();
 
   fStmtUpWindow = newwin(10, 110, 1, 1);
   fStmtUpPanel = new_panel(fStmtUpWindow);
@@ -455,22 +456,37 @@ char * fStmtName()
   if(fStmtUpWindow == NULL)
     {
       addstr("Unable to create window");
-      refresh();
-      getch();
+      refresh();      
+     getch();
     }
 
   mvwprintw(fStmtUpWindow, 3, 2, "Enter file name: ");
 
   str = (char*)malloc(FNAME * sizeof(char));
-  e = (char*)malloc(FNAME * sizeof(char));  
+  e = (char*)malloc(FNAME * sizeof(char));
 
-  ch = wgetch(fStmtUpWindow); 
-
-  while(ch != '\n')                                                      /* enter file name until new line feed */
+  for (i=0; (ch =wgetch(fStmtUpWindow))!= '\n';)
     {
-      str[i] = ch;                                                       /* assign typed char to char array */
-      i++;
-      ch = wgetch(fStmtUpWindow);           
+      if(ch != BACKSP)  //used showkey -a and then pressed ctrl G gave 7
+	{
+	  str[i] = ch;
+	  wprintw(fStmtUpWindow, "%c", ch);
+	  i++;
+	  if(i == FNAME)
+	    {	     
+	      i = 0;
+	      wmove(fStmtUpWindow, 3,19);
+	      wclrtoeol(fStmtUpWindow);
+	    }
+	}
+      else
+	{
+	  i--;
+	  if(i<0)
+	    i++;
+	  else
+	    wprintw(fStmtUpWindow, "\b \b");
+	}      
     }
   str[i] = '\0';                                                         /* if new line add the string terminate char */
   strcat(f,str);                                                         /* concantenate f and str */
@@ -497,14 +513,4 @@ char * fStmtName()
       endwin();
       return e;      
     }
- 
-  /*  free(str);
-      free(e); */
-
-  //hide_panel(fStmtUpPanel);
-  /*( del_panel(fStmtUpPanel);
-  update_panels();
-  doupdate();
-  delwin(fStmtUpWindow);
-  endwin(); */
 }

@@ -12,7 +12,8 @@
 #define TVALUE 10                                                        /* transaction value */
 #define ANUM 16                                                          /* account number */
 #define ALIAS 50                                                         /* alias matched from statement_link table */
-#define FNAME 100                                                        /* filename of statement file to upload */
+#define FNAME 70                                                        /* filename of statement file to upload */
+#define BACKSP 7
 
 
 struct statement{
