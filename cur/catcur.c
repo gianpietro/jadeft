@@ -37,7 +37,7 @@ void categoryInsert()
   initscr();
   cbreak();
   noecho();
-  keypad(stdscr, TRUE);
+  // keypad(stdscr, TRUE);
 
   while (newRec == 'y')
     {
@@ -47,11 +47,10 @@ void categoryInsert()
       set_field_type(categoryField[0],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       
       categoryForm = new_form(categoryField);
-      scale_form(categoryForm, &crow, &ccol);
+      scale_form(categoryForm, &crow, &ccol);      
 
-      categoryWin = newwin(crow+20,ccol+10,1,1);      
+      categoryWin = newwin(crow+20,ccol+10,1,1);
       categoryUpdateWin = newwin(20,50,1,120);
-
       categoryPanel = new_panel(categoryWin);
       categoryUpdatePanel = new_panel(categoryUpdateWin);
       update_panels();
@@ -252,12 +251,18 @@ void categoryInsert()
       //update_panels();   // + 2/11/21
       //doupdate();        // + 2/11/21
       delwin(categoryWin); 
-      delwin(categoryUpdateWin);      
+      delwin(categoryUpdateWin);
+      //categoryPanel = NULL;
+      //categoryWin = NULL;
+      //categoryUpdateWin = NULL;
+      //categoryForm = NULL;
+      //categoryField[0] = NULL;
     } //while newRec
   PQfinish(conn);
-  free(catDesc);       
+  free(catDesc);
+  catDesc = NULL;
   endwin(); 
-  touchwin(stdscr);
+  //touchwin(stdscr);
   //free(catDesc);
 }
 
