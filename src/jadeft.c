@@ -35,35 +35,35 @@ int main (void) {
   //refresh();
 
   /* provider schema */
-  // provInsert();  
-  // provTypeInsert();   
-  // provAccountInsert();
+  provInsert();  
+  provTypeInsert();   
+  provAccountInsert();
 
   /* supplier schema */
-  // suppInsert();
-  //   suppTypeInsert();
-  // propertyInsert();
-  // paymentPeriodInsert();
-  // suppAccountInsert();
-  // provAccountInsert();
+  suppInsert();
+  suppTypeInsert();
+  propertyInsert();
+  paymentPeriodInsert();
+  suppAccountInsert();
+  
 
   /* invoice schema */
-  // invInsert();
+  invInsert();
 
   /*document schema */
-  //documentTypeInsert();
-  // documentInsert();
+  documentTypeInsert();
+  documentInsert();
 
   /* statement schema */
 
      
-  categoryInsert();
+  //categoryInsert();
 
   // fStmtName();
-   ptr = upLoadStatement();
-   printStmtFile(ptr);
+  // ptr = upLoadStatement();
+  // printStmtFile(ptr);
 
-   statementInsert(ptr);
+   //statementInsert(ptr);
    
       
    //printStatement(ptr);
@@ -85,7 +85,7 @@ int main (void) {
     
    // categoryInsert();
 
-  freeStatement(ptr);
+   //freeStatement(ptr);
   
   printf("Completed Enter 1 to exit: ");
   //refresh();

@@ -9,7 +9,7 @@
 /* API database connection method */
 PGconn * fdbcon()
 {  
-  PGconn *connection = PQconnectdb("user=gianpietro dbname=jadedev");
+  PGconn *connection = PQconnectdb("user=gianpietro dbname=jadebld");
   if(PQstatus(connection) == CONNECTION_BAD)
     {
       PQfinish(connection);

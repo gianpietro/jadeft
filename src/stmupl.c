@@ -465,9 +465,9 @@ char * fStmtName()
   str = (char*)malloc(FNAME * sizeof(char));
   e = (char*)malloc(FNAME * sizeof(char));
 
-  for (i=0; (ch =wgetch(fStmtUpWindow))!= '\n';)
+  for (i=0; (ch = wgetch(fStmtUpWindow))!= '\n';)
     {
-      if(ch != BACKSP)  //used showkey -a and then pressed ctrl G gave 7
+      if(ch != BACKSP)                                                    /* used showkey -a  ctrl G = 7 */
 	{
 	  str[i] = ch;
 	  wprintw(fStmtUpWindow, "%c", ch);

@@ -283,7 +283,7 @@ void statementLinkInsert()
   char stlIDStr[5];
   int stlID;
   int slfCatID; 
-  char slfAlias[50], slfCategory[50];
+  char slfAlias[30], slfCategory[50];
   int cfUpdate = 0;
   int cf;
 

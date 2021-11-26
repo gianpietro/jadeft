@@ -18,7 +18,7 @@ void connectToDB(){
 
   EXEC SQL WHENEVER SQLERROR STOP;
   
-  EXEC SQL CONNECT TO jadedev USER gianpietro;
+  EXEC SQL CONNECT TO jadebld USER gianpietro;
      EXEC SQL WHENEVER SQLERROR CONTINUE;  
   EXEC SQL SELECT current_database() INTO :dbname;    
 

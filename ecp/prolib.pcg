@@ -187,7 +187,7 @@ void proAccountDelete(int upID)
   v_upID = upID;
 
  EXEC SQL
-   DELETE FROM provider_account WHERE provider-acct_id = :v_upID;
+   DELETE FROM provider_account WHERE provider_acct_id = :v_upID;
  EXEC SQL COMMIT;
 
  EXEC SQL DISCONNECT;

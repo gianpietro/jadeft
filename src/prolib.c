@@ -1,4 +1,4 @@
-/* Processed by ecpg (13.1) */
+/* Processed by ecpg (13.3) */
 /* These include files are added by the preprocessor */
 #include <ecpglib.h>
 #include <ecpgerrno.h>
@@ -6,6 +6,7 @@
 /* End of automatic include section */
 
 #line 1 "prolib.pcg"
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,13 +21,13 @@ void providerInsert(int activeInd, char proName[])
        
        
    
-#line 12 "prolib.pcg"
+#line 13 "prolib.pcg"
  int v_activeInd ;
  
-#line 13 "prolib.pcg"
+#line 14 "prolib.pcg"
  char v_proName [ 30 ] ;
 /* exec sql end declare section */
-#line 14 "prolib.pcg"
+#line 15 "prolib.pcg"
 
    
    connectToDB();
@@ -39,14 +40,14 @@ void providerInsert(int activeInd, char proName[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_proName),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 22 "prolib.pcg"
+#line 23 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 23 "prolib.pcg"
+#line 24 "prolib.pcg"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 25 "prolib.pcg"
+#line 26 "prolib.pcg"
 
 }
 
@@ -57,16 +58,16 @@ void providerUpdate(int upID, int activeInd, char proName[])
        
        
    
-#line 31 "prolib.pcg"
+#line 32 "prolib.pcg"
  int v_upID ;
  
-#line 32 "prolib.pcg"
+#line 33 "prolib.pcg"
  int v_activeInd ;
  
-#line 33 "prolib.pcg"
+#line 34 "prolib.pcg"
  char v_proName [ 30 ] ;
 /* exec sql end declare section */
-#line 34 "prolib.pcg"
+#line 35 "prolib.pcg"
 
    
    connectToDB();
@@ -82,14 +83,14 @@ void providerUpdate(int upID, int activeInd, char proName[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 43 "prolib.pcg"
+#line 44 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 44 "prolib.pcg"
+#line 45 "prolib.pcg"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 46 "prolib.pcg"
+#line 47 "prolib.pcg"
 
 }
 
@@ -98,10 +99,10 @@ void providerDelete(int upID)
    /* exec sql begin declare section */
              
    
-#line 52 "prolib.pcg"
+#line 53 "prolib.pcg"
  int v_upID ;
 /* exec sql end declare section */
-#line 53 "prolib.pcg"
+#line 54 "prolib.pcg"
 
    
    connectToDB();
@@ -111,14 +112,14 @@ void providerDelete(int upID)
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from provider where provider_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 60 "prolib.pcg"
+#line 61 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 61 "prolib.pcg"
+#line 62 "prolib.pcg"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 63 "prolib.pcg"
+#line 64 "prolib.pcg"
 
 }
 
@@ -127,10 +128,10 @@ void proTypeInsert(char proTypeDesc[])
    /* exec sql begin declare section */
       
    
-#line 69 "prolib.pcg"
+#line 70 "prolib.pcg"
  char v_proTypeDesc [ 30 ] ;
 /* exec sql end declare section */
-#line 70 "prolib.pcg"
+#line 71 "prolib.pcg"
 
   
    connectToDB();
@@ -140,14 +141,14 @@ void proTypeInsert(char proTypeDesc[])
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into provider_type ( description ) values ( $1  )", 
 	ECPGt_char,(v_proTypeDesc),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 77 "prolib.pcg"
+#line 78 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 78 "prolib.pcg"
+#line 79 "prolib.pcg"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 80 "prolib.pcg"
+#line 81 "prolib.pcg"
 
 }
 
@@ -157,13 +158,13 @@ void proTypeUpdate(int upID, char proTypeDesc[])
       
       
    
-#line 86 "prolib.pcg"
+#line 87 "prolib.pcg"
  int v_upID ;
  
-#line 87 "prolib.pcg"
+#line 88 "prolib.pcg"
  char v_proTypeDesc [ 30 ] ;
 /* exec sql end declare section */
-#line 88 "prolib.pcg"
+#line 89 "prolib.pcg"
 
   
    connectToDB();
@@ -176,14 +177,14 @@ void proTypeUpdate(int upID, char proTypeDesc[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 96 "prolib.pcg"
+#line 97 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 97 "prolib.pcg"
+#line 98 "prolib.pcg"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 99 "prolib.pcg"
+#line 100 "prolib.pcg"
 
 }
 
@@ -192,10 +193,10 @@ void proTypeDelete(int upID)
    /* exec sql begin declare section */
       
    
-#line 105 "prolib.pcg"
+#line 106 "prolib.pcg"
  int v_upID ;
 /* exec sql end declare section */
-#line 106 "prolib.pcg"
+#line 107 "prolib.pcg"
 
   
    connectToDB();
@@ -205,14 +206,14 @@ void proTypeDelete(int upID)
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from provider_type where provider_type_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 113 "prolib.pcg"
+#line 114 "prolib.pcg"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 114 "prolib.pcg"
+#line 115 "prolib.pcg"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 116 "prolib.pcg"
+#line 117 "prolib.pcg"
 
 }
 
@@ -226,25 +227,25 @@ void proAccountInsert(int pafActiveID, int pafID, char pafAccountNo[], int pafSo
      
      
   
-#line 122 "prolib.pcg"
+#line 123 "prolib.pcg"
  int v_pafActiveID ;
  
-#line 123 "prolib.pcg"
+#line 124 "prolib.pcg"
  int v_pafID ;
  
-#line 124 "prolib.pcg"
+#line 125 "prolib.pcg"
  char v_pafAccountNo [ 30 ] ;
  
-#line 125 "prolib.pcg"
+#line 126 "prolib.pcg"
  int v_pafSortCode ;
  
-#line 126 "prolib.pcg"
+#line 127 "prolib.pcg"
  char v_pafRef [ 30 ] ;
  
-#line 127 "prolib.pcg"
+#line 128 "prolib.pcg"
  int v_pafTypeID ;
 /* exec sql end declare section */
-#line 128 "prolib.pcg"
+#line 129 "prolib.pcg"
 
 
   connectToDB();
@@ -269,14 +270,14 @@ void proAccountInsert(int pafActiveID, int pafID, char pafAccountNo[], int pafSo
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_pafTypeID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 141 "prolib.pcg"
+#line 142 "prolib.pcg"
 
  { ECPGtrans(__LINE__, NULL, "commit");}
-#line 142 "prolib.pcg"
+#line 143 "prolib.pcg"
 
 
  { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 144 "prolib.pcg"
+#line 145 "prolib.pcg"
 
 }
 
@@ -291,28 +292,28 @@ void proAccountUpdate(int upID, int pafActiveID, int pafID, char pafAccountNo[],
      
      
   
-#line 150 "prolib.pcg"
+#line 151 "prolib.pcg"
  int v_upID ;
  
-#line 151 "prolib.pcg"
+#line 152 "prolib.pcg"
  int v_pafActiveID ;
  
-#line 152 "prolib.pcg"
+#line 153 "prolib.pcg"
  int v_pafID ;
  
-#line 153 "prolib.pcg"
+#line 154 "prolib.pcg"
  char v_pafAccountNo [ 30 ] ;
  
-#line 154 "prolib.pcg"
+#line 155 "prolib.pcg"
  int v_pafSortCode ;
  
-#line 155 "prolib.pcg"
+#line 156 "prolib.pcg"
  char v_pafRef [ 30 ] ;
  
-#line 156 "prolib.pcg"
+#line 157 "prolib.pcg"
  int v_pafTypeID ;
 /* exec sql end declare section */
-#line 157 "prolib.pcg"
+#line 158 "prolib.pcg"
 
 
   connectToDB();
@@ -340,14 +341,14 @@ void proAccountUpdate(int upID, int pafActiveID, int pafID, char pafAccountNo[],
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 170 "prolib.pcg"
+#line 173 "prolib.pcg"
 
  { ECPGtrans(__LINE__, NULL, "commit");}
-#line 171 "prolib.pcg"
+#line 174 "prolib.pcg"
 
 
  { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 173 "prolib.pcg"
+#line 176 "prolib.pcg"
 
 }
 
@@ -356,27 +357,27 @@ void proAccountDelete(int upID)
   /* exec sql begin declare section */
      
   
-#line 179 "prolib.pcg"
+#line 182 "prolib.pcg"
  int v_upID ;
 /* exec sql end declare section */
-#line 180 "prolib.pcg"
+#line 183 "prolib.pcg"
 
 
   connectToDB();
 
   v_upID = upID;
 
- { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from provider_account where provider - acct_id = $1 ", 
+ { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from provider_account where provider_acct_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 187 "prolib.pcg"
+#line 190 "prolib.pcg"
 
  { ECPGtrans(__LINE__, NULL, "commit");}
-#line 188 "prolib.pcg"
+#line 191 "prolib.pcg"
 
 
  { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 190 "prolib.pcg"
+#line 193 "prolib.pcg"
 
 }
 
