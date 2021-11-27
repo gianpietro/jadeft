@@ -95,6 +95,16 @@ struct statement *upLoadStatement()
 	  accountNumber[h] = (char *)malloc(ANUM * sizeof(char));
 	  transAlias[h] = (char *)malloc(ALIAS * sizeof(char));
 	}
+
+      if (tmpDate == NULL ||
+	  transDate == NULL ||
+	  transType == NULL ||
+	  transDescription == NULL ||
+	  transValue == NULL ||
+	  accountNumber == NULL ||
+	  transAlias == NULL)
+	  printf ("Memory not available");
+	  
   
       while (c != EOF)
 	{
@@ -227,13 +237,14 @@ struct statement *upLoadStatement()
       free(transValue);
       free(accountNumber);     
       free(transAlias);     
-    
-      fclose(cp);
-      fclose(np);
-  
-      return start;
 
       free(upf);
+      free(stmtAliasRtn);
+
+      fclose(cp);
+      fclose(np);
+      
+      return start;
     }  
 }
 
@@ -259,14 +270,10 @@ char ** addAlias()
       stmtAlias[h] = PQgetvalue(res, h, 1);
     }
 
-  return stmtAlias;
-   
   PQclear(res);
-  PQfinish(conn);  
+  PQfinish(conn); 
 
-  for (h=0; h<d; h++)
-    free(stmtAlias[h]);
-  free (stmtAlias);  
+  return stmtAlias;
 }
 
 /* select values from the statement_link table and count

@@ -35,62 +35,38 @@ int main (void) {
   //refresh();
 
   /* provider schema */
-  provInsert();  
-  provTypeInsert();   
-  provAccountInsert();
+  //provInsert();  
+  //provTypeInsert();   
+  //provAccountInsert();
 
   /* supplier schema */
-  suppInsert();
-  suppTypeInsert();
-  propertyInsert();
-  paymentPeriodInsert();
-  suppAccountInsert();
+  //suppInsert();
+  //suppTypeInsert();
+  //propertyInsert();
+  //paymentPeriodInsert();
+  //suppAccountInsert();
   
 
   /* invoice schema */
-  invInsert();
+  //invInsert();
 
   /*document schema */
-  documentTypeInsert();
-  documentInsert();
+  //documentTypeInsert();
+  //documentInsert();
 
-  /* statement schema */
-
-     
+  /* statement schema */     
   //categoryInsert();
-
-  // fStmtName();
-  // ptr = upLoadStatement();
-  // printStmtFile(ptr);
-
-   //statementInsert(ptr);
-   
-      
-   //printStatement(ptr);
-
-   // printStatement_new(ptr);
-  //categoryInsert();
-
-  // statementLinkInsert();
-  //upLoadStatement();
-
-  //  categoryInsert();
+  //statementLinkInsert();
   
-
-    /* Upload Statment */
-  //upLoadStatement();
-
-  //  upLoadStatement();
-
-    
-   // categoryInsert();
-
-   //freeStatement(ptr);
+    /*upload stmt functions */
+    ptr = upLoadStatement();
+    printStmtFile(ptr);
+    statementInsert(ptr); 
+    freeStatement(ptr);
   
   printf("Completed Enter 1 to exit: ");
   //refresh();
   scanf("%d", &x);
-
 
   //endwin();
   
