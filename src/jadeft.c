@@ -109,6 +109,10 @@ int main (void) {
 	  suppAccountInsert();
 	  selection = activateCDKMenu(menu, 0);
 	  break;
+	case 203:
+	  invInsert();
+	  selection = activateCDKMenu(menu, 0);
+	  break;
 	case 300:
 	  propertyInsert();
 	  selection = activateCDKMenu(menu, 0);
