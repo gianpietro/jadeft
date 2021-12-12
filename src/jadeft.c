@@ -130,11 +130,13 @@ int main (void) {
 	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 304:
+	  {
 	  ptr = upLoadStatement();
 	  printStmtFile(ptr);
 	  statementInsert(ptr); 
 	  freeStatement(ptr);
 	  selection = activateCDKMenu(menu, 0);
+	  }
 	case 400:
 	  documentTypeInsert();
 	  selection = activateCDKMenu(menu, 0);
