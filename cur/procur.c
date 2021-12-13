@@ -24,7 +24,7 @@ void provInsert()
   int newRec= 'y';   /* Add another new record */
   int rows, cols;
   int cfUpdate = 0;
-  int list = 2, i = 0, j = 0; 
+  int list = 3, i = 0, j = 0; 
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1], formats[1];
@@ -91,7 +91,7 @@ void provInsert()
       mvwprintw(proWin,rows-(rows-6),cols-(cols-5), "Active Ind:");                           
       mvwprintw(proWin,rows-(rows-8),cols-(cols-5), "Provider Name:");
       mvwprintw(proWin,rows-2,cols-(cols-5),"Press F1 when form complete");
-      wmove(proWin, rows-(rows-6),col-(col-46));     /* move cursor */
+      wmove(proWin, rows-(rows-6),cols-(cols-24));     /* move cursor */
       //mvwprintw(proWin,15,4,"rows %d, cols %d", rows, cols );
 
       while((ch = wgetch(proWin)) != KEY_F(1))
@@ -104,7 +104,7 @@ void provInsert()
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = trows = 0, cfUpdate = 0;
-	      list = 2;
+	      list = 3;
 	      wclear(proUpdateWin);
 	      box(proUpdateWin,0,0);
 	      waddstr(proUpdateWin, "Provider");
@@ -119,7 +119,7 @@ void provInsert()
 	      trows = PQntuples(res);
 
 	      wrefresh(proUpdateWin);
-	  
+	      mvwprintw(proUpdateWin, 1, 1, "ID    Provider");
 	      while((p = wgetch(proUpdateWin)) == '\n')
 		{
 		  if ( j + RANGE < trows)
@@ -129,11 +129,11 @@ void provInsert()
 		  for (i; i < j; i++)
 		    {
 		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
-		      mvwprintw(proUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      mvwprintw(proUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,2));
 		      list++;
 		      wclrtoeol(proUpdateWin);
 		    }
-		  list = 2;      
+		  list = 3;      
 		  if  (i == trows)
 		    {
 		      wclrtobot(proUpdateWin);  
@@ -167,10 +167,10 @@ void provInsert()
 	      trows = PQntuples(res);
 	      if (trows == 1)
 		{
-		  mvwprintw(proUpdateWin,13,1, "no or rows %d ",trows);
+		  //mvwprintw(proUpdateWin,13,1, "no or rows %d ",trows);
 		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
-		  mvwprintw(proUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
-		  wrefresh(proUpdateWin);
+		  //mvwprintw(proUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  //wrefresh(proUpdateWin);
 		  set_field_buffer(providerField[0],0,PQgetvalue(res,0,1));
 		  set_field_buffer(providerField[1],0,PQgetvalue(res,0,2));
 		  cfUpdate = 1;
