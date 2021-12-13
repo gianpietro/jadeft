@@ -87,13 +87,13 @@ struct statement *upLoadStatement()
       transAlias = (char **) malloc (rs * sizeof(char *));
       for (h = 0; h < rs; h++)
 	{
-	  tmpDate[h] = (char *)malloc(TDATE * sizeof(char));
-	  transDate[h] = (char *)malloc(TDATE * sizeof(char));
-	  transType[h] = (char *)malloc(TTYPE * sizeof(char));
-	  transDescription[h] = (char *)malloc(TDESC * sizeof(char));
-	  transValue[h] = (char *)malloc(TVALUE * sizeof(char));
-	  accountNumber[h] = (char *)malloc(ANUM * sizeof(char));
-	  transAlias[h] = (char *)malloc(ALIAS * sizeof(char));
+	  tmpDate[h] = (char *)malloc(TDATE+1 * sizeof(char));
+	  transDate[h] = (char *)malloc(TDATE+1 * sizeof(char));
+	  transType[h] = (char *)malloc(TTYPE+1 * sizeof(char));
+	  transDescription[h] = (char *)malloc(TDESC+1 * sizeof(char));
+	  transValue[h] = (char *)malloc(TVALUE+1 * sizeof(char));
+	  accountNumber[h] = (char *)malloc(ANUM+1 * sizeof(char));
+	  transAlias[h] = (char *)malloc(ALIAS+1 * sizeof(char));
 	}
 
       if (tmpDate == NULL ||
