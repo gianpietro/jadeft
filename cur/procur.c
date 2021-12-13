@@ -41,8 +41,8 @@ void provInsert()
     {
       /* Add the fields required in the form */
       /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
-      providerField[0] = new_field(1, 1, 2, 22, 0, 0);      
-      providerField[1] = new_field(1, 30, 4, 22, 0, 0);      
+      providerField[0] = new_field(1, 1, 4, 22, 0, 0);      
+      providerField[1] = new_field(1, 30, 6, 22, 0, 0);      
       providerField[2] = NULL;
 
       /* Field 1 digit allowed in RANGE from 1 to 2 */
@@ -54,8 +54,8 @@ void provInsert()
       scale_form(providerForm, &rows, &cols);
 
       /* Add window which will be associated to form */
-      proWin = newwin(rows+15, cols+20,1,1);
-      proUpdateWin = newwin(20,50,1,120);
+      proWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-2),COLS/2);             // (rows+15, cols+20,1,1);
+      proUpdateWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+3, COLS/2);       // (20,50,1,120);
 
       proPanel = new_panel(proUpdateWin);
       mainPanel = new_panel(proWin);
@@ -82,15 +82,16 @@ void provInsert()
 	}
 
       waddstr(proWin,"Provider Entry Form");
+      //wprintw(proWin,"row %d cols %d\n", rows, cols);   //DEBUG
 
       post_form(providerForm); 
       wrefresh(proWin);
 
       //mvwprintw(proWin,y+2,x+5,"Jade Finacial Tracker");
-      mvwprintw(proWin,rows-16,cols-65, "Active Ind:");                           
-      mvwprintw(proWin,rows-14,cols-65, "Provider Name:");
-      mvwprintw(proWin,rows-2,cols-65,"Press F1 when form complete");
-      wmove(proWin, rows-16,cols-48);     /* move cursor */
+      mvwprintw(proWin,rows-(rows-6),cols-(cols-5), "Active Ind:");                           
+      mvwprintw(proWin,rows-(rows-8),cols-(cols-5), "Provider Name:");
+      mvwprintw(proWin,rows-2,cols-(cols-5),"Press F1 when form complete");
+      wmove(proWin, rows-(rows-6),col-(col-46));     /* move cursor */
       //mvwprintw(proWin,15,4,"rows %d, cols %d", rows, cols );
 
       while((ch = wgetch(proWin)) != KEY_F(1))
@@ -690,7 +691,7 @@ int provAccountInsert()
 		{
 		  mvwprintw(proListWin,12,1,"Number invalied");
 		  wrefresh(proListWin);		
-		  wrefresh(proAcctWin);
+		  //wrefresh(proAcctWin);
 		}
 	      noecho();
 	      PQclear(res);
@@ -706,7 +707,7 @@ int provAccountInsert()
 	      show_panel(proTypePanel);
 	      update_panels();
 	      doupdate();
-	      //wrefresh(proTypeWin);
+	      wrefresh(proTypeWin);
 
 	      res = PQexec(conn,"SELECT * FROM provider_type ORDER BY provider_type_id");
 	      rows = PQntuples(res);
@@ -769,7 +770,7 @@ int provAccountInsert()
 		{
 		  mvwprintw(proTypeWin,12,1,"Number invalied");
 		  wrefresh(proTypeWin);		
-		  wrefresh(proAcctWin);
+		  // wrefresh(proAcctWin);
 		}
 	      noecho();
 	      PQclear(res);
