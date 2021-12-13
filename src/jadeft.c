@@ -20,45 +20,42 @@
 static const char *menulist[MAX_MENU_ITEMS][MAX_SUB_ITEMS];
 
 int main (void) {
-   //int x;
   struct statement *ptr;
-  //system("clear");
-  
   CDKSCREEN *cdkscreen = 0;
   CDKMENU *menu = 0;
   int submenusize[5], menuloc[5];
   int selection;
   char temp[256];
   const char *mesg[2];
-  initCDKColor();
  
   cdkscreen = initCDKScreen(NULL);
+  initCDKColor();                          /* needs to come after initCDKscreen */
 
-  menulist[0][0] = "</B>File         <!B>";
-  menulist[0][1] = "NOT IN USE       ";
-  menulist[0][2] = "Exit             ";
+  menulist[0][0] = "</07/B>File           <!07>";
+  menulist[0][1] = "</05>NOT IN USE       <!05>";
+  menulist[0][2] = "</05>Exit             <!05>";
 
-  menulist[1][0] = "Provider Admin   ";
-  menulist[1][1] = "Provider Type    ";
-  menulist[1][2] = "Provider Insert  ";
-  menulist[1][3] = "Provider Account ";
+  menulist[1][0] = "</07/B>Provider Admin <!07>";
+  menulist[1][1] = "</05>Provider Type    <!05>";
+  menulist[1][2] = "</05>Provider Insert  <!05>";
+  menulist[1][3] = "</05>Provider Account <!05>";
 
-  menulist[2][0] = "Supplier Admin   ";
-  menulist[2][1] = "Supplier         ";
-  menulist[2][2] = "Supplier Type    ";
-  menulist[2][3] = "Supplier Account ";
-  menulist[2][4] = "Invoice          ";
+  menulist[2][0] = "</07/B>Supplier Admin <!07>";
+  menulist[2][1] = "</05>Supplier         <!05>";
+  menulist[2][2] = "</05>Supplier Type    <!05>";
+  menulist[2][3] = "</05>Supplier Account <!05>";
+  menulist[2][4] = "</05>Invoice          <!05>";
 
-  menulist[3][0] = "Other Admin      ";
-  menulist[3][1] = "Property         ";
-  menulist[3][2] = "Payment period   ";
-  menulist[3][3] = "Category         ";
-  menulist[3][4] = "Statement Config ";
-  menulist[3][5] = "Statement Upload ";
+  menulist[3][0] = "</07/B>Other Admin    <!07>";
+  menulist[3][1] = "</05>Property         <!05>";
+  menulist[3][2] = "</05>Payment period   <!05>";
+  menulist[3][3] = "</05>Category         <!05>";
+  menulist[3][4] = "</05>Statement Config <!05>";
+  menulist[3][5] = "</05>Statement Upload <!05>";
 
-  menulist[4][0] = "Documents        ";
-  menulist[4][1] = "Document Type    ";
-  menulist[4][2] = "Document Insert  ";
+  menulist[4][0] = "</07/B>Documents      <!07>";
+  menulist[4][1] = "</05>Document Type    <!05>";
+  menulist[4][2] = "</05>Document Insert  <!05>";
   
   submenusize[0] = 3;
   submenusize[1] = 4;
@@ -79,133 +76,65 @@ int main (void) {
 
   refreshCDKScreen(cdkscreen);
 
-  selection = activateCDKMenu(menu, 0);
-
   while (selection != 1)
     {
+      selection = activateCDKMenu(menu,0);
       switch(selection)
 	{
 	case 100:
 	  provTypeInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 101:
 	  provInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 102:
 	  provAccountInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 200:
 	  suppInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 201:
 	  suppTypeInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 202:
 	  suppAccountInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 203:
 	  invInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 300:
 	  propertyInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 301:
 	  paymentPeriodInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 302:
 	  categoryInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 303:
 	  statementLinkInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 304:	 
 	  ptr = upLoadStatement();
 	  printStmtFile(ptr);
 	  statementInsert(ptr); 
 	  freeStatement(ptr);	  
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 400:
 	  documentTypeInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	case 401:
 	  documentInsert();
-	  selection = activateCDKMenu(menu, 0);
 	  break;
 	default:
 	  sprintf(temp,"No selection");
 	  break;
 	}
     } 
-  
-  /*  initscr();  
-   cbreak();
- noecho();
- keypad(stdscr, TRUE);*/
-
-
-  //printw("Lines %d Cols %d\n", LINES, COLS);
-  //  printf("Enter 1 to continue: ");
-  //refresh();
-  // scanf("%d",&x);
-  //refresh();
-
-  /* provider schema */
-  //provInsert();  
-  //provTypeInsert();   
-  //provAccountInsert();
-
-  /* supplier schema */
-  //suppInsert();
-  //suppTypeInsert();
-  //propertyInsert();
-  //paymentPeriodInsert();
-  //suppAccountInsert();
-  
-
-  /* invoice schema */
-  //invInsert();
-
-  /*document schema */
-  //documentTypeInsert();
-  //documentInsert();
-
-  /* statement schema */     
-  //categoryInsert();
-  //statementLinkInsert();
-  
-    /*upload stmt functions */
-  /*  ptr = upLoadStatement();
-    printStmtFile(ptr);
-    statementInsert(ptr); 
-    freeStatement(ptr); */
-
-  sprintf(temp,"selection %d", selection);
-  mesg[0] = temp;
-  popupLabel(cdkscreen, (CDK_CSTRING2) mesg, 1);
 
   destroyCDKMenu(menu);
   destroyCDKScreen(cdkscreen);
   endCDK();
-
-  
-    //  printf("Completed Enter 1 to exit: ");
-  //refresh();
-  //scanf("%d", &x);
-
-  //endwin();
   
   return 0;
 }
