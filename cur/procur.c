@@ -36,6 +36,12 @@ void provInsert()
   cbreak();
   noecho();
   keypad(stdscr,TRUE);
+  start_color();
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);
+  init_pair(2,COLOR_BLUE,COLOR_YELLOW);
+  init_pair(3,COLOR_YELLOW,COLOR_MAGENTA);
+  init_pair(4,COLOR_WHITE,COLOR_CYAN);
+  init_pair(5,COLOR_BLUE,COLOR_WHITE);
 
     while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
@@ -59,6 +65,7 @@ void provInsert()
 
       proPanel = new_panel(proUpdateWin);
       mainPanel = new_panel(proWin);
+      wbkgd(proWin, COLOR_PAIR(1));
       update_panels();
       doupdate();
       
@@ -80,9 +87,10 @@ void provInsert()
 	  refresh();
 	  getch();	  
 	}
-
-      waddstr(proWin,"Provider Entry Form");
+      wattron(proWin,A_BOLD | COLOR_PAIR(4));
+      waddstr(proWin,"Provider Entry Form");      
       //wprintw(proWin,"row %d cols %d\n", rows, cols);   //DEBUG
+      wattroff(proWin,A_BOLD | COLOR_PAIR(4));
 
       post_form(providerForm); 
       wrefresh(proWin);
@@ -214,7 +222,9 @@ void provInsert()
 	      if (cf == 'd')
 		{  
 		  providerDelete(upID);
-		  mvwprintw(proWin,rows-6,cols-65, "Record deleted");                
+		  wattron(proWin, A_BOLD | A_BLINK);
+		  mvwprintw(proWin,rows-6,cols-65, "Record deleted");
+		  wattroff(proWin, A_BOLD | A_BLINK);
 		  break;
 		}
 	    }	  
@@ -223,14 +233,18 @@ void provInsert()
 	      if (cfUpdate == 1)
 		{
 		  providerUpdate(upID,actInd,pname); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
-		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(proWin,19,5, "Data updated");
-		  mvwprintw(proWin,20,5, "cfUpdate %d,upID %d actInd %d pname %s", cfUpdate,upID,actInd, pname);  //DEBUG
+		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID
+		  wattron(proWin, A_BOLD | A_BLINK);
+		  mvwprintw(proWin,rows-6, cols-65, "Data updated");
+		  wattroff(proWin, A_BOLD | A_BLINK);
+		  //mvwprintw(proWin,20,5, "cfUpdate %d,upID %d actInd %d pname %s", cfUpdate,upID,actInd, pname);  //DEBUG
 		}
 	      else
 		{
 		  providerInsert(actInd,pname);   /* Save data to database */
+		  wattron(proWin, A_BOLD | A_BLINK);
 		  mvwprintw(proWin,rows-6,cols-65, "Data saved");
+		  wattroff(proWin, A_BOLD | A_BLINK);
 		}
 	    }
 	}
