@@ -10,6 +10,7 @@
 #include "../inc/prolib.h"
 #include "../inc/jadlib.h"
 
+
 /* Function to display Provider form for data entry */
 void provInsert()
 {
@@ -28,20 +29,29 @@ void provInsert()
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1], formats[1];
+  char *formTitle = "Provider Entry Form";
+  int titleLen = strlen(formTitle);
+  char *provTitle = "Provider";
+  int provLen = strlen(provTitle);
+    
 
   PGconn *conn =  fdbcon();
   PGresult *res;
      
   initscr();
+  start_color();
   cbreak();
   noecho();
   keypad(stdscr,TRUE);
-  start_color();
+  /* found issue when color pair number is the same as used in cdk menu widget
+     jadeft.c file. It makes menu lose its color i.e. 5 and 7 */ 
   init_pair(1,COLOR_WHITE,COLOR_BLUE);
   init_pair(2,COLOR_BLUE,COLOR_YELLOW);
   init_pair(3,COLOR_YELLOW,COLOR_MAGENTA);
-  init_pair(4,COLOR_WHITE,COLOR_CYAN);
-  init_pair(5,COLOR_BLUE,COLOR_WHITE);
+  init_pair(4,COLOR_WHITE,COLOR_CYAN);  
+  init_pair(6,COLOR_BLACK,COLOR_YELLOW);
+  init_pair(8,COLOR_BLACK,COLOR_WHITE); 
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);
 
     while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
@@ -50,6 +60,11 @@ void provInsert()
       providerField[0] = new_field(1, 1, 4, 22, 0, 0);      
       providerField[1] = new_field(1, 30, 6, 22, 0, 0);      
       providerField[2] = NULL;
+
+      set_field_fore(providerField[0], COLOR_PAIR(9));
+      set_field_back(providerField[0], COLOR_PAIR(9));
+      set_field_fore(providerField[1], COLOR_PAIR(9));
+      set_field_back(providerField[1], COLOR_PAIR(9));
 
       /* Field 1 digit allowed in RANGE from 1 to 2 */
       set_field_type(providerField[0],TYPE_INTEGER,1,1,2);
@@ -66,6 +81,7 @@ void provInsert()
       proPanel = new_panel(proUpdateWin);
       mainPanel = new_panel(proWin);
       wbkgd(proWin, COLOR_PAIR(1));
+     
       update_panels();
       doupdate();
       
@@ -80,17 +96,19 @@ void provInsert()
       
       box(proWin, 0,0);
       box(proUpdateWin,0,0);
-          
+
       if (proWin == NULL || proUpdateWin == NULL)
 	{
 	  addstr("Unable to create window");
 	  refresh();
 	  getch();	  
 	}
-      wattron(proWin,A_BOLD | COLOR_PAIR(4));
-      waddstr(proWin,"Provider Entry Form");      
+      
+      wattron(proWin,A_BOLD | COLOR_PAIR(1));
+      //waddstr(proWin,"Provider Entry Form");
+      mvwprintw(proWin,1,(cols-titleLen)/2, formTitle);     
       //wprintw(proWin,"row %d cols %d\n", rows, cols);   //DEBUG
-      wattroff(proWin,A_BOLD | COLOR_PAIR(4));
+      wattroff(proWin,A_BOLD | COLOR_PAIR(1));
 
       post_form(providerForm); 
       wrefresh(proWin);
@@ -98,7 +116,7 @@ void provInsert()
       //mvwprintw(proWin,y+2,x+5,"Jade Finacial Tracker");
       mvwprintw(proWin,rows-(rows-6),cols-(cols-5), "Active Ind:");                           
       mvwprintw(proWin,rows-(rows-8),cols-(cols-5), "Provider Name:");
-      mvwprintw(proWin,rows-2,cols-(cols-5),"Press F1 when form complete");
+      mvwprintw(proWin,rows-2,cols-(cols-5),"Press F1 when form complete (F9 for Update)");
       wmove(proWin, rows-(rows-6),cols-(cols-24));     /* move cursor */
       //mvwprintw(proWin,15,4,"rows %d, cols %d", rows, cols );
 
@@ -112,12 +130,16 @@ void provInsert()
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = trows = 0, cfUpdate = 0;
-	      list = 3;
+	      list = 6;    //+3  
 	      wclear(proUpdateWin);
 	      box(proUpdateWin,0,0);
-	      waddstr(proUpdateWin, "Provider");
+	      wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
+	      mvwprintw(proUpdateWin,1,(cols-provLen)/2, provTitle);     
+	      // waddstr(proUpdateWin, "Provider");
+	      wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 	      wmove(proUpdateWin,1,1);
 	      show_panel(proPanel);
+	      wbkgd(proUpdateWin, COLOR_PAIR(1));
 	      update_panels();
 	      doupdate();
 	      //wrefresh(proUpdateWin);
@@ -127,7 +149,9 @@ void provInsert()
 	      trows = PQntuples(res);
 
 	      wrefresh(proUpdateWin);
-	      mvwprintw(proUpdateWin, 1, 1, "ID    Provider");
+	      wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
+	      mvwprintw(proUpdateWin, 4, 1, "ID    Provider");  //+3
+	      wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 	      while((p = wgetch(proUpdateWin)) == '\n')
 		{
 		  if ( j + RANGE < trows)
@@ -138,23 +162,29 @@ void provInsert()
 		    {
 		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
 		      mvwprintw(proUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,2));
-		      list++;
+		      list++;		     
 		      wclrtoeol(proUpdateWin);
+		      box(proUpdateWin,0,0);
 		    }
-		  list = 3;      
+		  list = 6;      
 		  if  (i == trows)
 		    {
 		      wclrtobot(proUpdateWin);  
-		      mvwprintw(proUpdateWin,10,1,"End of list");
+		      mvwprintw(proUpdateWin,13,1,"End of list");   //+3
 		      box(proUpdateWin,0,0);
-		      mvwprintw(proUpdateWin,0,0, "Provider");
-		      wmove(proUpdateWin,10,1);
+		      wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
+		      mvwprintw(proUpdateWin,1,(cols-provLen)/2, provTitle);     
+		      //mvwprintw(proUpdateWin,0,0, "Provider");
+		      wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
+		      wmove(proUpdateWin,13,1);  //+3
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(proUpdateWin,11,1,"Select Option: ");
-	      mvwscanw(proUpdateWin,11,25, "%d", &upID);
+	      echo();
+	      wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
+	      mvwprintw(proUpdateWin,14,1,"Select Option: ");  //+3	      
+	      mvwscanw(proUpdateWin,14,25, "%d", &upID);  //+3
+	      wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 
 	      PQclear(res);
 	  
@@ -185,7 +215,9 @@ void provInsert()
 		}
 	      else
 		{
-		  mvwprintw(proUpdateWin,12,1,"Number invalied");
+		  wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
+		  mvwprintw(proUpdateWin,15,1,"Number invalied"); //+3
+		  wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 		  wrefresh(proUpdateWin);		
 		  //wrefresh(proWin);
 		}
@@ -207,9 +239,11 @@ void provInsert()
 	{
 	  strcpy(pname, trimWS(pname));  
 	  echo();
+	  wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 	  mvwprintw(proWin,rows-8,cols-65,"Save: y/n: ");
+	  wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 	  mvwprintw(proWin,rows-7,cols-65,"(d = delete record)");
-	  wmove(proWin,rows-8,cols-55);
+	  wmove(proWin,rows-8,cols-54);
 
 	  while((cf = wgetch(proWin)) != 'y')
 	    {
@@ -278,7 +312,6 @@ void provInsert()
     }
     PQfinish(conn);    
   endwin();
-
 }
 
 /* Function to display Provider Type form for data entry */
