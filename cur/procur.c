@@ -46,12 +46,14 @@ void provInsert()
   /* found issue when color pair number is the same as used in cdk menu widget
      jadeft.c file. It makes menu lose its color i.e. 5 and 7 */ 
   init_pair(1,COLOR_WHITE,COLOR_BLUE);
-  init_pair(2,COLOR_BLUE,COLOR_YELLOW);
+  init_pair(2,COLOR_BLUE,COLOR_WHITE);
   init_pair(3,COLOR_YELLOW,COLOR_MAGENTA);
   init_pair(4,COLOR_WHITE,COLOR_CYAN);  
   init_pair(6,COLOR_BLACK,COLOR_YELLOW);
   init_pair(8,COLOR_BLACK,COLOR_WHITE); 
   init_pair(9,COLOR_WHITE,COLOR_BLACK);
+  init_pair(10,COLOR_BLACK,COLOR_CYAN);
+  
 
     while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
@@ -80,8 +82,7 @@ void provInsert()
 
       proPanel = new_panel(proUpdateWin);
       mainPanel = new_panel(proWin);
-      wbkgd(proWin, COLOR_PAIR(1));
-     
+      wbkgd(proWin, COLOR_PAIR(1));     
       update_panels();
       doupdate();
       
@@ -176,14 +177,14 @@ void provInsert()
 		      mvwprintw(proUpdateWin,1,(cols-provLen)/2, provTitle);     
 		      //mvwprintw(proUpdateWin,0,0, "Provider");
 		      wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
-		      wmove(proUpdateWin,13,1);  //+3
+		      wmove(proUpdateWin,urows-8,1);  //+3  13,1
 		      break;
 		    }
 		}	  
 	      echo();
 	      wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
-	      mvwprintw(proUpdateWin,14,1,"Select Option: ");  //+3	      
-	      mvwscanw(proUpdateWin,14,25, "%d", &upID);  //+3
+	      mvwprintw(proUpdateWin,urows-7,1,"Select Option: ");  //+3 14,1	      
+	      mvwscanw(proUpdateWin,urows-7,ucols-45, "%d", &upID);  //+3  14,25
 	      wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 
 	      PQclear(res);
@@ -216,7 +217,7 @@ void provInsert()
 	      else
 		{
 		  wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
-		  mvwprintw(proUpdateWin,15,1,"Number invalied"); //+3
+		  mvwprintw(proUpdateWin,urows-6,1,"Number invalied"); //+3 15,1
 		  wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 		  wrefresh(proUpdateWin);		
 		  //wrefresh(proWin);
