@@ -25,22 +25,35 @@ void suppInsert()
   int rows, cols, urows, ucols;
   char p;
   int trows, val, upID, *params[1], length[1],  formats[1];
+  char *titleOne = "Supplier Type Form";
+  char *titleTwo = "Supplier Type";
+  int lenOne = strlen(titleOne);
+  int lenTwo = strlen(titleTwo);
  
   PGconn *conn =  fdbcon();
   PGresult *res;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
   keypad(stdscr,TRUE);
+
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);        /* INIT_PAIR_FOR_WIN_COLOR */
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);      /* INIT_PAIR_FOR_FIELD_COLOR */
 
     while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
       /* Add the fields required in the form */
       /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
-      supplierField[0] = new_field(1, 1, 2, 22, 0, 0);      
-      supplierField[1] = new_field(1, 30, 4, 22, 0, 0);      
+      supplierField[0] = new_field(1, 1, 4, 22, 0, 0);      
+      supplierField[1] = new_field(1, 30, 6, 22, 0, 0);      
       supplierField[2] = NULL;
+
+      set_field_fore(supplierField[0], COLOR_PAIR(9));    /* SET_FIELD_FOREGROUND */
+      set_field_back(supplierField[0], COLOR_PAIR(9));    /* SET_FIELD_BACKGROUND */
+      set_field_fore(supplierField[1], COLOR_PAIR(9));
+      set_field_back(supplierField[1], COLOR_PAIR(9));
 
       /* Field 1 digit allowed in range from 1 to 2 */
       set_field_type(supplierField[0],TYPE_INTEGER,1,1,2);
@@ -51,11 +64,12 @@ void suppInsert()
       scale_form(supplierForm, &rows, &cols);
 
       /* Add window which will be associated to form */
-      supWin = newwin(rows+20, cols+10,1,1);
-      supUpdateWin = newwin(20,50,1,120);
+      supWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/4);
+      supUpdateWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+5, COLS/4);
 
       supPanel = new_panel(supUpdateWin);
       mainPanel = new_panel(supWin);
+      wbkgd(supWin, COLOR_PAIR(1));        /* MAIN_WINDOW_BACKGROUND_COLOR */    
       update_panels();
       doupdate();
       
@@ -64,7 +78,7 @@ void suppInsert()
        
       /* Set main and sub windows */
       set_form_win(supplierForm, supWin);
-      set_form_sub(supplierForm, derwin(supWin,rows,cols,1,1));
+      set_form_sub(supplierForm, derwin(supWin,rows,cols,2,2));
       getmaxyx(supWin,rows,cols);
       getmaxyx(supUpdateWin, urows, ucols);
       box(supWin, 0,0);
@@ -77,17 +91,20 @@ void suppInsert()
 	  getch();	  
 	}
 
-      waddstr(supWin,"Supplier Entry Form");
+      // waddstr(supWin,"Supplier Entry Form");
+      wattron(supWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(supWin,1,(cols-lenOne)/2, titleOne);   /* SET_MAIN_WIND_TITLE */  
+      wattroff(supWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
 
       post_form(supplierForm); 
       wrefresh(supWin);
 
       //mvwprintw(supWin,y+2,x+5,"Jade Finacial Tracker");
-      mvwprintw(supWin,24, 5, "rows %d cols %d", rows, cols);
-      mvwprintw(supWin,3,5, "Active Ind:");                           
-      mvwprintw(supWin,5,5, "Supplier Name:");
-      mvwprintw(supWin,23,5,"Press F1 when form complete");
-      wmove(supWin,3,23);     /* move cursor */
+      //mvwprintw(supWin,24, 5, "rows %d cols %d", rows, cols);
+      mvwprintw(supWin,rows-(rows-6),cols-(cols-5), "Active Ind:");                           
+      mvwprintw(supWin,rows-(rows-8),cols-(cols-5), "Supplier Name:");
+      mvwprintw(supWin,rows-2,cols-(cols-5),"Press F1 when form complete (F9 for Update)");
+      wmove(supWin,rows-(rows-6),cols-(cols-24));     /* move cursor */
 
       while((ch = wgetch(supWin)) != KEY_F(1))	
 	{
@@ -99,12 +116,16 @@ void suppInsert()
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = trows = 0, cfUpdate = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(supUpdateWin);
 	      box(supUpdateWin,0,0);
-	      waddstr(supUpdateWin, "Supplier");
+	      //waddstr(supUpdateWin, "Supplier");
+	      wattron(supUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(supUpdateWin,1,(cols-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
+	      wattroff(supUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(supUpdateWin,1,1);
 	      show_panel(supPanel);
+	      wbkgd(supUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 	      //wrefresh(supUpdateWin);
@@ -114,7 +135,9 @@ void suppInsert()
 	      trows = PQntuples(res);
 
 	      wrefresh(supUpdateWin);
-	  
+	      wattron(supUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(supUpdateWin, 4, 1, "ID    Supplier");  //+3
+	      wattroff(supUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 	      while((p = wgetch(supUpdateWin)) == '\n')
 		{		 
 		  if ( j + range < trows)  
@@ -124,26 +147,32 @@ void suppInsert()
 		  for (i; i < j; i++)
 		    {
 		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
-		      mvwprintw(supUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      mvwprintw(supUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,2));
 		      list++;
 		      wclrtoeol(supUpdateWin);
-		      // box(supUpdateWin,0,0);		     
+		      box(supUpdateWin,0,0);		     
 		    }
-		  list = 2;      
+		  list = 6;      
 		  //wclrtoeol(supUpdateWin);  
 		  if  (i == trows)
 		    {
 		      wclrtobot(supUpdateWin);  
-		      mvwprintw(supUpdateWin,10,1,"End of list");
+		      mvwprintw(supUpdateWin,urows-8,1,"End of list");
 		      box(supUpdateWin,0,0);
-		      mvwprintw(supUpdateWin,0,0, "Supplier");
-		      wmove(supUpdateWin,10,1);
+		      // mvwprintw(supUpdateWin,0,0, "Supplier");
+		      wattron(supUpdateWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(supUpdateWin,1,(cols-lenTwo)/2,titleTwo);    /* SET_SUB_WIN_TITLE */ 
+		      //mvwprintw(proUpdateWin,0,0, "Provider");
+		      wattroff(supUpdateWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
+		      wmove(supUpdateWin,urows-8,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(supUpdateWin,11,1,"Select Supplier: ");
-	      mvwscanw(supUpdateWin,11,25, "%d", &upID);
+	      echo();
+	      wattron(supUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */
+	      mvwprintw(supUpdateWin,urows-7,1,"Select Option: ");
+	      mvwscanw(supUpdateWin,urows-7,ucols-45, "%d", &upID);
+	      wattroff(supUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 	      //mvwscanw(supUpdateWin,11,25, "%5s", &supIDstr);
 	      //set_field_buffer(supplierField[2],0, supIDstr);
 
@@ -168,19 +197,21 @@ void suppInsert()
 	      trows = PQntuples(res);
 	      if (trows == 1)
 		{
-		  mvwprintw(supUpdateWin,13,1, "no or rows %d ",trows);
+		  // mvwprintw(supUpdateWin,13,1, "no or rows %d ",trows);
 		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
-		  mvwprintw(supUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
-		  wrefresh(supUpdateWin);
+		  // mvwprintw(supUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  //wrefresh(supUpdateWin);
 		  set_field_buffer(supplierField[0],0,PQgetvalue(res,0,1));
 		  set_field_buffer(supplierField[1],0,PQgetvalue(res,0,2));
 		  cfUpdate = 1;
 		}
 	      else
 		{
-		  mvwprintw(supUpdateWin,12,1,"Number invalied");
+		  wattron(supUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(supUpdateWin,urows-6,1,"Number invalid");
+		  wattroff(supUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
 		  wrefresh(supUpdateWin);		
-		  wrefresh(supWin);
+		  //wrefresh(supWin);
 		}
 	      noecho();
 	      PQclear(res);
@@ -200,22 +231,26 @@ void suppInsert()
 	{
 	  strcpy(sname, trimWS(sname));  
 	  echo();
-	  mvwprintw(supWin,17,5,"Save: y/n: ");     
-          mvwprintw(supWin,18,5,"(d = delete record)");
-          wmove(supWin,17,16);
+	  wattron(supWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SAVE_YN */
+	  mvwprintw(supWin,rows-8,cols-65,"Save: y/n: ");
+	  wattroff(supWin,A_BOLD | COLOR_PAIR(1));     /* ATTOFF_SAVE_YN */
+          mvwprintw(supWin,rows-7,cols-65,"(d = delete record)");
+          wmove(supWin,rows-8,cols-54);
 	  while((cf = wgetch(supWin)) != 'y')
 	    {
-	      wmove(supWin,17,16);
+	      wmove(supWin,rows-8,cols-54);
 	      if (cf == 'n')
 		{
-	 	  mvwprintw(supWin,19,5, "Data not saved");
+	 	  mvwprintw(supWin,rows-6,cols-65, "Data not saved");
 		  break;
 		}
 	      /* NEW CODE FOR DELETE */
 	      if (cf == 'd')
 		{  
 		      supplierDelete(upID);
-		      mvwprintw(supWin,19,5, "Record deleted");                
+		      wattron(supWin, A_BOLD | A_BLINK);             /* ATTON_DELETED */
+		      mvwprintw(supWin,rows-6,cols-65, "Record deleted");
+		      wattroff(supWin, A_BOLD | A_BLINK);            /* ATTOFF_DELETED */
 		      break;
 		 }		 
 	      /* END OF NEW CODE FOR DELETE */
@@ -225,19 +260,23 @@ void suppInsert()
 	      if (cfUpdate == 1)
 		{
 		  supplierUpdate(upID,actInd,sname);
-		  mvwprintw(supWin,19,5, "Data updated");
-		  mvwprintw(supWin,20,5, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, sname);
+		  wattron(supWin, A_BOLD | A_BLINK);
+		  mvwprintw(supWin,rows-6,cols-65, "Data updated");
+		  wattroff(supWin, A_BOLD | A_BLINK);
+		  //mvwprintw(supWin,20,5, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, sname);
 		}
 	      else
 		{
 		  supplierInsert(actInd,sname);   /* Save data to database */
-	          mvwprintw(supWin,19,5, "Data saved");
+		  wattron(supWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
+	          mvwprintw(supWin,rows-6,cols-65, "Data saved");
+		  wattroff(supWin, A_BOLD | A_BLINK);    /* ATTOFF_SAVED */
 		}
 	    }
 	}
       else
 	{
-	  mvwprintw(supWin,19,5, "Data invalid");
+	  mvwprintw(supWin,rows-6,cols-65, "Data invalid");
 	}
       noecho();
       
@@ -248,11 +287,11 @@ void suppInsert()
       free_field(supplierField[2]);
 
       cfUpdate = 0;
-      mvwprintw(supWin,22,5,"Do you want to add a new record y/n: ");
+      mvwprintw(supWin,rows-4,cols-65,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(supWin)) != 'y')
 	{
-	  wmove(supWin,22,44);	  
+	  wmove(supWin,rows-4,cols-28);	  
 	  if(newRec == 'n')
 	    break;
 	}
@@ -390,7 +429,7 @@ void suppTypeInsert()
 		  for (i; i < j; i++)
 		    {
 		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
-		      mvwprintw(supTypeUpdateWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      mvwprintw(supTypeUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(supTypeUpdateWin);
 		    }
@@ -398,7 +437,7 @@ void suppTypeInsert()
 		  if  (i == trows)
 		    {
 		      wclrtobot(supTypeUpdateWin);  
-		      mvwprintw(supTypeUpdateWin,13,1,"End of list");
+		      mvwprintw(supTypeUpdateWin,urows-8,1,"End of list");
 		      box(supTypeUpdateWin,0,0);
 		      //mvwprintw(supTypeUpdateWin,0,0, "Supplier Type");
      	              wattron(supTypeUpdateWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
@@ -410,7 +449,7 @@ void suppTypeInsert()
 		}	  
 	      echo();
 	      wattron(supTypeUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */
-	      mvwprintw(supTypeUpdateWin,urows-7,1,"Select Supplier: ");
+	      mvwprintw(supTypeUpdateWin,urows-7,1,"Select Option: ");
 	      mvwscanw(supTypeUpdateWin,urows-7,ucols-45, "%d", &upID);
 	      wattroff(supTypeUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 
@@ -443,7 +482,7 @@ void suppTypeInsert()
 	      else
 		{
 		  wattron(supTypeUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
-		  mvwprintw(supTypeUpdateWin,urows-6,1,"Number invalied");
+		  mvwprintw(supTypeUpdateWin,urows-6,1,"Number invalid");
 		  wattroff(supTypeUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
 		  wrefresh(supTypeUpdateWin);		
 		  //wrefresh(supTypeWin);
@@ -686,7 +725,7 @@ void paymentPeriodInsert()
 		}
 	      else
 		{
-		  mvwprintw(payPerUpdateWin,12,1,"Number invalied");
+		  mvwprintw(payPerUpdateWin,12,1,"Number invalid");
 		  wrefresh(payPerUpdateWin);		
 		  wrefresh(payPerWin);
 		}
@@ -943,7 +982,7 @@ void propertyInsert()
 		}
 	      else
 		{
-		  mvwprintw(prtUpdateWin,12,1,"Number invalied");
+		  mvwprintw(prtUpdateWin,12,1,"Number invalid");
 		  wrefresh(prtUpdateWin);		
 		  wrefresh(prtWin);
 		}
@@ -1272,7 +1311,7 @@ int suppAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(supWin,12,1,"Number invalied");
+		  mvwprintw(supWin,12,1,"Number invalid");
 		  wrefresh(supWin);		
 		  //wrefresh(supAcctWin);
 		}
@@ -1359,7 +1398,7 @@ int suppAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(prtWin,12,1,"Number invalied");
+		  mvwprintw(prtWin,12,1,"Number invalid");
 		  wrefresh(prtWin);		
 		  //wrefresh(supAcctWin);
 		}
@@ -1443,7 +1482,7 @@ int suppAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(supTypeWin,12,1,"Number invalied");
+		  mvwprintw(supTypeWin,12,1,"Number invalid");
 		  wrefresh(supTypeWin);		
 		  //wrefresh(supAcctWin);
 		}
@@ -1527,7 +1566,7 @@ int suppAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(payWin,12,1,"Number invalied");
+		  mvwprintw(payWin,12,1,"Number invalid");
 		  wrefresh(payWin);		
 		  wrefresh(supAcctWin);
 		}
@@ -1611,7 +1650,7 @@ int suppAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(paWin,12,1,"Number invalied");
+		  mvwprintw(paWin,12,1,"Number invalid");
 		  wrefresh(paWin);		
 		  //wrefresh(supAcctWin);
 		}
@@ -1705,7 +1744,7 @@ int suppAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(supUpdateWin,12,1,"Number invalied");
+		  mvwprintw(supUpdateWin,12,1,"Number invalid");
 		  wrefresh(supUpdateWin);		
 		  //wrefresh(supAcctWin);		  
 		}

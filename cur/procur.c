@@ -217,7 +217,7 @@ void provInsert()
 	      else
 		{
 		  wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
-		  mvwprintw(proUpdateWin,urows-6,1,"Number invalied"); //+3 15,1
+		  mvwprintw(proUpdateWin,urows-6,1,"Number invalid"); //+3 15,1
 		  wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
 		  wrefresh(proUpdateWin);		
 		  //wrefresh(proWin);
@@ -240,9 +240,9 @@ void provInsert()
 	{
 	  strcpy(pname, trimWS(pname));  
 	  echo();
-	  wattron(proUpdateWin,A_BOLD | COLOR_PAIR(1));
+	  wattron(proWin,A_BOLD | COLOR_PAIR(1));
 	  mvwprintw(proWin,rows-8,cols-65,"Save: y/n: ");
-	  wattroff(proUpdateWin,A_BOLD | COLOR_PAIR(1));
+	  wattroff(proWin,A_BOLD | COLOR_PAIR(1));
 	  mvwprintw(proWin,rows-7,cols-65,"(d = delete record)");
 	  wmove(proWin,rows-8,cols-54);
 
@@ -439,7 +439,7 @@ void provTypeInsert()
 		  for (i; i < j; i++)
 		    {
 		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
-		      mvwprintw(proTypeUpdateWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      mvwprintw(proTypeUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(proTypeUpdateWin);
 		      box(proTypeUpdateWin,0,0);     /* REAPPLY_BOX */
@@ -495,7 +495,7 @@ void provTypeInsert()
 	      else
 		{
 		  wattron(proTypeUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
-		  mvwprintw(proTypeUpdateWin,urows-6,1,"Number invalied");
+		  mvwprintw(proTypeUpdateWin,urows-6,1,"Number invalid");
 		  wattroff(proTypeUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
 		  wrefresh(proTypeUpdateWin);		
 		  //wrefresh(proTypeWin);
@@ -775,7 +775,7 @@ int provAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(proListWin,12,1,"Number invalied");
+		  mvwprintw(proListWin,12,1,"Number invalid");
 		  wrefresh(proListWin);		
 		  //wrefresh(proAcctWin);
 		}
@@ -854,7 +854,7 @@ int provAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(proTypeWin,12,1,"Number invalied");
+		  mvwprintw(proTypeWin,12,1,"Number invalid");
 		  wrefresh(proTypeWin);		
 		  // wrefresh(proAcctWin);
 		}
@@ -941,7 +941,7 @@ int provAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(proAccountUpdateWin,12,1,"Number invalied");
+		  mvwprintw(proAccountUpdateWin,12,1,"Number invalid");
 		  wrefresh(proAccountUpdateWin);		
 		  //wrefresh(proAcctWin);
 		}
