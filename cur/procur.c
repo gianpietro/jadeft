@@ -337,7 +337,6 @@ void provTypeInsert()
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   
-
   PGconn *conn =  fdbcon();
   PGresult *res;
 
