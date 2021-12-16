@@ -77,8 +77,8 @@ void provInsert()
       scale_form(providerForm, &rows, &cols);
 
       /* Add window which will be associated to form */
-      proWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-2),COLS/2);             // (rows+15, cols+20,1,1);
-      proUpdateWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+3, COLS/2);       // (20,50,1,120);
+      proWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);             // (rows+15, cols+20,1,1);
+      proUpdateWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+5, COLS/2);       // (20,50,1,120);
 
       proPanel = new_panel(proUpdateWin);
       mainPanel = new_panel(proWin);
