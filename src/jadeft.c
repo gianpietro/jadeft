@@ -41,8 +41,8 @@ int main (void) {
   menulist[1][3] = "</05>Provider Account <!05>";
 
   menulist[2][0] = "</07/B>Supplier Admin <!07>";
-  menulist[2][1] = "</05>Supplier         <!05>";
-  menulist[2][2] = "</05>Supplier Type    <!05>";
+  menulist[2][1] = "</05>Supplier Type    <!05>";
+  menulist[2][2] = "</05>Supplier Insert   <!05>";
   menulist[2][3] = "</05>Supplier Account <!05>";
   menulist[2][4] = "</05>Invoice          <!05>";
 
@@ -90,14 +90,14 @@ int main (void) {
 	case 102:
 	  provAccountInsert();
 	  break;
-	case 200:
-	  suppInsert();
-	  break;
-	case 201:
+	case 200:	
 	  suppTypeInsert();
 	  break;
+	case 201:	 
+	  suppInsert();
+	  break;
 	case 202:
-	  suppAccountInsert();
+	  suppAccountInsert();	  
 	  break;
 	case 203:
 	  invInsert();
