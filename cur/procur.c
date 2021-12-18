@@ -614,14 +614,27 @@ int provAccountInsert()
   int cf; // confirm save to DB
   int newRec = 'y';
   int cfUpdate = 'y';
+  char *titleOne = "Provider Account Form";
+  char *titleTwo = "Provider List";
+  char *titleThree = "Provider Type";
+  char *titleFour = "Provider Account";  
+  int lenOne = strlen(titleOne);
+  int lenTwo = strlen(titleTwo);
+  int lenThree = strlen(titleThree);
+  int lenFour = strlen(titleFour); 
 
   PGconn *conn =  fdbcon();
   PGresult *res;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
   keypad(stdscr,TRUE);
+
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);
+  init_pair(2,COLOR_BLUE,COLOR_WHITE);
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);  
   
   while (newRec == 'y')
     {
@@ -644,9 +657,9 @@ int provAccountInsert()
       scale_form(proAcctForm, &parow, &pacol);   
 
       proAcctWin = newwin(parow+20,pacol+10,1,1);
-      proListWin = newwin(20,50,1,120);
-      proTypeWin = newwin(20,50,23,120);
-      proAccountUpdateWin = newwin(parow+20,pacol+10,1,120);
+      proListWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
+      proTypeWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
+      proAccountUpdateWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
 
       proPanel = new_panel(proListWin);
       proTypePanel = new_panel(proTypeWin);
@@ -671,8 +684,8 @@ int provAccountInsert()
       box(proTypeWin,0,0);
       box(proAccountUpdateWin,0,0);
       waddstr(proAcctWin, "Provider Account Form");
-      waddstr(proListWin, "Provider List");
-      waddstr(proTypeWin, "Provider Type");
+      //waddstr(proListWin, "Provider List");
+      //waddstr(proTypeWin, "Provider Type");
 
       if(proListWin == NULL || proAcctWin == NULL || proTypeWin == NULL)
 	{
@@ -680,6 +693,13 @@ int provAccountInsert()
 	  puts("Unable to create window");
 	  return(1);
 	}
+
+      wattron(proListWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(proListWin,1,(ncol-lenTwo)/2,titleTwo);   /* SET_MAIN_WIND_TITLE */
+      wattroff(proListWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      wattron(proTypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(proTypeWin,1,(ncol-lenThree)/2,titleThree);   /* SET_MAIN_WIND_TITLE */
+      wattroff(proTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
   
       post_form(proAcctForm);  
       wrefresh(proAcctWin);
@@ -706,13 +726,17 @@ int provAccountInsert()
 	  if(ch == KEY_F(2))
 	    {
 	      i = j = rows = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(proListWin);
 	      box(proListWin,0,0);
-	      waddstr(proListWin, "Provider List");
+	      //waddstr(proListWin, "Provider List");
+	      wattron(proListWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(proListWin,1,(ncol-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
+	      wattroff(proListWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(proListWin,1,1);
 	      //wrefresh(proListWin);
 	      show_panel(proPanel);
+	      wbkgd(proListWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 	  
@@ -720,7 +744,9 @@ int provAccountInsert()
 	      rows = PQntuples(res);
 
 	      wrefresh(proListWin);
-	  
+	      wattron(proListWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(proListWin, 4, 1, "ID    Name");  //+3
+	      wattroff(proListWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 	      while((p = wgetch(proListWin)) == '\n')
 		{
 		  if ( j + RANGE < rows)
@@ -729,27 +755,32 @@ int provAccountInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {	 
-		      mvwprintw(proListWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      mvwprintw(proListWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,2));
 		      list++;
 		      wclrtoeol(proListWin);
+		      box(proListWin,0,0);     /* REAPPLY_BOX */
 		    }
-		  list = 2;      
+		  list = 6;      
 		  // wclrtoeol(proListWin);  //clear current line to right of cursor
 		  if  (i == rows)
 		    {
 		      wclrtobot(proListWin);  // clear current line right of cursor and all lines below
-		      mvwprintw(proListWin,10,1,"End of list");
+		      mvwprintw(proListWin,13,1,"End of list");
 		      box(proListWin,0,0);
-		      mvwprintw(proListWin,0,0, "Provider List");
+		      //mvwprintw(proListWin,0,0, "Provider List");
+		      wattron(proListWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(proListWin,1,(ncol-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */
+		      wattroff(proListWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(proListWin,10,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(proListWin,11,1,"Select Provider: ");
-	      mvwscanw(proListWin,11,25, "%5s", &proIDstr);
+	      echo();
+	      wattron(proListWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      mvwprintw(proListWin,nrow-7,1,"Select Option: ");
+	      mvwscanw(proListWin,nrow-7,ncol-45, "%5s", &proIDstr);
 	      set_field_buffer(proAcctField[1],0, proIDstr);
-
+              wattroff(proListWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 	      proID = atoi(field_buffer(proAcctField[1],0));
 	      PQclear(res);
 	  
@@ -769,13 +800,17 @@ int provAccountInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  mvwprintw(proListWin,13,1, "no or rows %d ",rows);
-		  mvwprintw(proListWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  //mvwprintw(proListWin,13,1, "no or rows %d ",rows);
+		  //mvwprintw(proListWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  set_field_buffer(proAcctField[1],0,PQgetvalue(res,0,0));
 		  wrefresh(proListWin);
 		}
 	      else
 		{
-		  mvwprintw(proListWin,12,1,"Number invalid");
+		  set_field_buffer(proAcctField[1],0, "");
+		  wattron(proListWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(proListWin,nrow-6,1,"Number invalid");
+		  wattroff(proListWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
 		  wrefresh(proListWin);		
 		  //wrefresh(proAcctWin);
 		}
@@ -785,12 +820,16 @@ int provAccountInsert()
 	  if(ch == KEY_F(3))
 	    {
 	      i = j = rows = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(proTypeWin);
 	      box(proTypeWin,0,0);
-	      waddstr(proTypeWin, "Provider Type");
+	      //waddstr(proTypeWin, "Provider Type");
+	      wattron(proTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(proTypeWin,1,(ncol-lenThree)/2, titleThree);     /*SET_SUB_WIM_TITLE */
+	      wattroff(proTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(proTypeWin,1,1);
 	      show_panel(proTypePanel);
+	      wbkgd(proTypeWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 	      wrefresh(proTypeWin);
@@ -799,6 +838,9 @@ int provAccountInsert()
 	      rows = PQntuples(res);
 
 	      wrefresh(proTypeWin);
+	      wattron(proTypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(proTypeWin, 4, 1, "ID    Description");  //+3
+	      wattroff(proTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 
 	      while((p = wgetch(proTypeWin)) == '\n')
 		{
@@ -808,26 +850,32 @@ int provAccountInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {	 
-		      mvwprintw(proTypeWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      mvwprintw(proTypeWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(proTypeWin);
+		      box(proTypeWin,0,0);     /* REAPPLY_BOX */
 		    }
-		  list = 2;      
+		  list = 6;      
 		  //wclrtoeol(proTypeWin);  //clear current line to right of cursor
 		  if  (i == rows)
 		    {
 		      wclrtobot(proTypeWin);  // clear current line right of cursor and all lines below
-		      mvwprintw(proTypeWin,10,1,"End of list");
+		      mvwprintw(proTypeWin,13,1,"End of list");
 		      box(proTypeWin,0,0);
-		      mvwprintw(proTypeWin,0,0, "Provider Type");
+		      //mvwprintw(proTypeWin,0,0, "Provider Type");
+		      wattron(proTypeWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(proTypeWin,1,(ncol-lenThree)/2, titleThree);    /* SET_SUB_WIN_TITLE */
+		      wattroff(proTypeWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(proTypeWin,10,1);
 		      break;
 		    }
 		}
-	      echo();  
-	      mvwprintw(proTypeWin,11,1,"Select Provider: ");
-	      mvwscanw(proTypeWin,11,25, "%5s", &proTypestr);
+	      echo();
+	      wattron(proTypeWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      mvwprintw(proTypeWin,ptrow-7,1,"Select Provider: ");
+	      mvwscanw(proTypeWin,ptrow-7,ptcol-45, "%5s", &proTypestr);
 	      set_field_buffer(proAcctField[5],0, proTypestr);
+	      wattroff(proTypeWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 
 	      proTypeID = atoi(field_buffer(proAcctField[5],0));
 	      PQclear(res);
@@ -848,13 +896,17 @@ int provAccountInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  mvwprintw(proTypeWin,13,1, "no or rows %d ",rows);
-		  mvwprintw(proTypeWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  set_field_buffer(proAcctField[5],0,PQgetvalue(res,0,0));
+		  // mvwprintw(proTypeWin,13,1, "no or rows %d ",rows);
+		  //mvwprintw(proTypeWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  wrefresh(proTypeWin);
 		}
 	      else
 		{
-		  mvwprintw(proTypeWin,12,1,"Number invalid");
+		  set_field_buffer(proAcctField[5],0,"");
+		  wattron(proTypeWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(proTypeWin,ptrow-6,1,"Number invalid");
+		  wattroff(proTypeWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
 		  wrefresh(proTypeWin);		
 		  // wrefresh(proAcctWin);
 		}
@@ -864,12 +916,16 @@ int provAccountInsert()
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = rows = 0, cfUpdate = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(proAccountUpdateWin);
 	      box(proAccountUpdateWin,0,0);
-	      waddstr(proAccountUpdateWin, "Provider Account");
+	      //waddstr(proAccountUpdateWin, "Provider Account");
+	      wattron(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(proAccountUpdateWin,1,(ncol-lenFour)/2, titleFour);     /*SET_SUB_WIM_TITLE */
+	      wattroff(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(proAccountUpdateWin,1,1);
 	      show_panel(proAccountUpdatePanel);
+	      wbkgd(proAccountUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 	      //wrefresh(proAccountUpdateWin);
@@ -879,6 +935,9 @@ int provAccountInsert()
 	      rows = PQntuples(res);
 
 	      wrefresh(proAccountUpdateWin);
+	      wattron(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(proAccountUpdateWin, 4, 1, "ID    Provider_ID     Account Number");  //+3
+	      wattroff(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 	  
 	      while((p = wgetch(proAccountUpdateWin)) == '\n')
 		{
@@ -889,24 +948,30 @@ int provAccountInsert()
 		  for (i; i < j; i++)
 		    {
 		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
-		      mvwprintw(proAccountUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      mvwprintw(proAccountUpdateWin,list,1,"%-5s %-15s %-15s", PQgetvalue(res,i,0),PQgetvalue(res,i,2),PQgetvalue(res,i,3));
 		      list++;
 		      wclrtoeol(proAccountUpdateWin);
+		      box(proAccountUpdateWin,0,0);     /* REAPPLY_BOX */
 		    }
-		  list = 2;      
+		  list = 6;      
 		  if  (i == rows)
 		    {
 		      wclrtobot(proAccountUpdateWin);  
-		      mvwprintw(proAccountUpdateWin,10,1,"End of list");
+		      mvwprintw(proAccountUpdateWin,13,1,"End of list");
 		      box(proAccountUpdateWin,0,0);
-		      mvwprintw(proAccountUpdateWin,0,0, "provider Account");
+		      //mvwprintw(proAccountUpdateWin,0,0, "provider Account");
+		      wattron(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	              mvwprintw(proAccountUpdateWin,1,(ncol-lenFour)/2, titleFour);     /*SET_SUB_WIM_TITLE */
+	              wattroff(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 		      wmove(proAccountUpdateWin,10,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(proAccountUpdateWin,11,1,"Select Option: ");
-	      mvwscanw(proAccountUpdateWin,11,25, "%d", &upID);
+	      echo();
+	       wattron(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      mvwprintw(proAccountUpdateWin,urows-7,1,"Select Option: ");
+	      mvwscanw(proAccountUpdateWin,urows-7, ucols-45, "%d", &upID);
+	      wattroff(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 
 	      PQclear(res);
 	  
@@ -927,10 +992,10 @@ int provAccountInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  mvwprintw(proAccountUpdateWin,13,1, "no or rows %d ",rows);
+		  //mvwprintw(proAccountUpdateWin,13,1, "no or rows %d ",rows);
 		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
-		  mvwprintw(proAccountUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
-		  wrefresh(proAccountUpdateWin);
+		  //mvwprintw(proAccountUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  //wrefresh(proAccountUpdateWin);
 		  set_field_buffer(proAcctField[0],0,PQgetvalue(res,0,1));
 		  set_field_buffer(proAcctField[1],0,PQgetvalue(res,0,2));
 		  set_field_buffer(proAcctField[2],0,PQgetvalue(res,0,3));
@@ -941,8 +1006,10 @@ int provAccountInsert()
 		}
 	      else
 		{
-		  mvwprintw(proAccountUpdateWin,12,1,"Number invalid");
-		  wrefresh(proAccountUpdateWin);		
+		  wattron(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(proAccountUpdateWin,urows-6,1,"Number invalid");
+		  wrefresh(proAccountUpdateWin);
+		  wattroff(proAccountUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
 		  //wrefresh(proAcctWin);
 		}
 	      noecho();
