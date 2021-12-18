@@ -432,6 +432,7 @@ void suppTypeInsert()
 		      mvwprintw(supTypeUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(supTypeUpdateWin);
+		      box(supTypeUpdateWin,0,0);     /* REAPPLY_BOX */
 		    }
 		  list = 6;      
 		  if  (i == trows)
@@ -592,27 +593,42 @@ void paymentPeriodInsert()
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1],  formats[1];
+  char *titleOne = "Payment Period Form";
+  char *titleTwo = "Pay Period";
+  int lenOne = strlen(titleOne);
+  int lenTwo = strlen(titleTwo);
+  
   PGconn *conn =  fdbcon();
   PGresult *res;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
   keypad(stdscr,TRUE);
 
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);
+  init_pair(2,COLOR_BLUE,COLOR_WHITE);
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);  
+
   while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
-      payPerField[0] = new_field(1,30,2,18,0,0);
+      payPerField[0] = new_field(1,30,6,22,0,0);
       payPerField[1] = NULL;
+
+      set_field_fore(payPerField[0], COLOR_PAIR(9));
+      set_field_back(payPerField[0], COLOR_PAIR(9));
+      
       set_field_type(payPerField[0],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
 
       payPerForm = new_form(payPerField);
       scale_form(payPerForm, &rows, &cols);
-      payPerWin = newwin(rows+15,cols+5,1,120);
-      payPerUpdateWin = newwin(20,50,30,120);
+      payPerWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/4);
+      payPerUpdateWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+5, COLS/4);
 
       payPerPanel = new_panel(payPerUpdateWin);
       mainPanel = new_panel(payPerWin);
+      wbkgd(payPerWin, COLOR_PAIR(1));     
       update_panels();
       doupdate();
       
@@ -634,13 +650,16 @@ void paymentPeriodInsert()
 	  getch();	  
 	}
 
-      waddstr(payPerWin,"Payment Period Form");
+      //waddstr(payPerWin,"Payment Period Form");
+      wattron(payPerWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(payPerWin,1,(cols-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+      wattroff(payPerWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
       post_form(payPerForm); 
       wrefresh(payPerWin);
 
-      mvwprintw(payPerWin,rows-14,cols-46, "Pay Period:");
-      mvwprintw(payPerWin,rows-2,cols-46,"Press F1 when form complete");
-      wmove(payPerWin,rows-14,cols-33);     /* move cursor */
+      mvwprintw(payPerWin,rows-(rows-8),cols-(cols-5), "Pay Period:");
+      mvwprintw(payPerWin,rows-2,cols-(cols-5),"Press F1 when form complete (F9 for Update)");
+      wmove(payPerWin,rows-(rows-8),cols-(cols-24));     /* move cursor */
 
       while((ch = wgetch(payPerWin)) != KEY_F(1))
 	{
@@ -652,12 +671,16 @@ void paymentPeriodInsert()
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = trows = 0, cfUpdate = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(payPerUpdateWin);
 	      box(payPerUpdateWin,0,0);
-	      waddstr(payPerUpdateWin, "Pay Period");
+	      //waddstr(payPerUpdateWin, "Pay Period");
+	      wattron(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(payPerUpdateWin,1,(cols-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
+	      wattroff(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(payPerUpdateWin,1,1);
 	      show_panel(payPerPanel);
+	      wbkgd(payPerUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 	      //wrefresh(payPerUpdateWin);
@@ -667,6 +690,9 @@ void paymentPeriodInsert()
 	      trows = PQntuples(res);
 
 	      wrefresh(payPerUpdateWin);
+	      wattron(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(payPerUpdateWin, 4, 1, "ID    Period");  //+3
+	      wattroff(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 	  
 	      while((p = wgetch(payPerUpdateWin)) == '\n')
 		{
@@ -677,24 +703,31 @@ void paymentPeriodInsert()
 		  for (i; i < j; i++)
 		    {
 		      /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */ 
-		      mvwprintw(payPerUpdateWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      mvwprintw(payPerUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(payPerUpdateWin);
+		      box(payPerUpdateWin,0,0);
 		    }
-		  list = 2;      
+		  list = 6;      
 		  if  (i == trows)
 		    {
 		      wclrtobot(payPerUpdateWin);  
-		      mvwprintw(payPerUpdateWin,10,1,"End of list");
+		      mvwprintw(payPerUpdateWin,13,1,"End of list");
 		      box(payPerUpdateWin,0,0);
-		      mvwprintw(payPerUpdateWin,0,0, "Pay Period");
+		      // mvwprintw(payPerUpdateWin,0,0, "Pay Period");
+		      wattron(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(payPerUpdateWin,1,(ucols-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */ 
+		      //mvwprintw(proUpdateWin,0,0, "Provider");
+		      wattroff(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(payPerUpdateWin,10,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(payPerUpdateWin,11,1,"Select Option: ");
-	      mvwscanw(payPerUpdateWin,11,25, "%d", &upID);
+	      echo();
+	      wattron(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */
+	      mvwprintw(payPerUpdateWin,urows-7,1,"Select Option: ");
+	      mvwscanw(payPerUpdateWin,urows-7,ucols-45, "%d", &upID);
+	      wattroff(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 
 	      PQclear(res);
 	  
@@ -715,19 +748,21 @@ void paymentPeriodInsert()
 	      trows = PQntuples(res);
 	      if (trows == 1)
 		{
-		  mvwprintw(payPerUpdateWin,13,1, "no or rows %d ",trows);  //DEBUG
+		  //mvwprintw(payPerUpdateWin,13,1, "no or rows %d ",trows);  //DEBUG
 		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
-		  mvwprintw(payPerUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
-		  wrefresh(payPerUpdateWin);
+		  //mvwprintw(payPerUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  //wrefresh(payPerUpdateWin);
 		  set_field_buffer(payPerField[0],0,PQgetvalue(res,0,1));
 		  //set_field_buffer(payPerField[1],0,PQgetvalue(res,0,2));
 		  cfUpdate = 1;
 		}
 	      else
 		{
-		  mvwprintw(payPerUpdateWin,12,1,"Number invalid");
+		  wattron(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(payPerUpdateWin,urows-6,1,"Number invalid");
+		  wattroff(payPerUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
 		  wrefresh(payPerUpdateWin);		
-		  wrefresh(payPerWin);
+		  //wrefresh(payPerWin);
 		}
 	      noecho();
 	      PQclear(res);
@@ -745,21 +780,25 @@ void paymentPeriodInsert()
 	{
 	  strcpy(payPer, trimWS(payPer));
 	  echo();
-	  mvwprintw(payPerWin,rows-8,cols-46, "Save y/n: ");
-	  mvwprintw(payPerWin,rows-7,cols-46,"(d = delete record)");
-	  wmove(payPerWin,rows-8,cols-36);
+	  wattron(payPerWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SAVE_YN */
+	  mvwprintw(payPerWin,rows-8,cols-65, "Save y/n: ");
+	  wattroff(payPerWin,A_BOLD | COLOR_PAIR(1));     /* ATTOFF_SAVE_YN */
+	  mvwprintw(payPerWin,rows-7,cols-65,"(d = delete record)");
+	  wmove(payPerWin,rows-8,cols-54);
 	  while((cf = wgetch(payPerWin)) != 'y')
 	    {
-	      wmove(payPerWin,rows-8,cols-36);
+	      wmove(payPerWin,rows-8,cols-54);
 	      if (cf == 'n')
 		{
-		  mvwprintw(payPerWin,rows-6,cols-46, "Data not saved");
+		  mvwprintw(payPerWin,rows-6,cols-65, "Data not saved");
 		  break;
 		}
 	      if (cf == 'd')
 		{  
-		  //payPerDelete(upID);
-		  mvwprintw(payPerWin,rows-6,cols-46, "Record deleted");                
+		  payPerDelete(upID);
+		  wattron(payPerWin, A_BOLD | A_BLINK);             /* ATTON_DELETED */
+		  mvwprintw(payPerWin,rows-6,cols-65, "Record deleted");
+		  wattroff(payPerWin, A_BOLD | A_BLINK);            /* ATTOFF_DELETED */
 		  break;
 		}
 	    }
@@ -767,21 +806,25 @@ void paymentPeriodInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  payPerUpdate(upID,payPer); 
+		  payPerUpdate(upID,payPer);
+		  wattron(payPerWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(payPerWin,rows-6,cols-46, "Data updated");
-		  mvwprintw(payPerWin,rows-5,cols-46, "cfUpdate %d,upID %d payPer %s", cfUpdate,upID,payPer);  //DEBUG
+		  mvwprintw(payPerWin,rows-6,cols-65, "Data updated");
+		  wattroff(payPerWin, A_BOLD | A_BLINK);
+		  //mvwprintw(payPerWin,rows-5,cols-46, "cfUpdate %d,upID %d payPer %s", cfUpdate,upID,payPer);  //DEBUG
 		}
 	      else
 		{
 		  payPeriodInsert(payPer);
-		  mvwprintw(payPerWin,rows-6,cols-46, "Data saved");	
+		  wattron(payPerWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
+		  mvwprintw(payPerWin,rows-6,cols-65, "Data saved");
+		  wattroff(payPerWin, A_BOLD | A_BLINK);    /* ATTOFF_SAVED */
 		}
 	    }
 	}
       else
 	{
-	  mvwprintw(payPerWin,rows-6,cols-46, "Data invalid");
+	  mvwprintw(payPerWin,rows-6,cols-65, "Data invalid");
 	}
       noecho();
 
@@ -792,11 +835,11 @@ void paymentPeriodInsert()
 
       cfUpdate = 0;
 
-      mvwprintw(payPerWin,rows-4,cols-46,"Do you want to add a new record y/n: ");
+      mvwprintw(payPerWin,rows-4,cols-65,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(payPerWin)) != 'y')
 	{
-	  wmove(payPerWin,rows-4,cols-9);
+	  wmove(payPerWin,rows-4,cols-28);
 	  if(newRec == 'n')
 	    break;
 	}
@@ -1543,7 +1586,7 @@ int suppAccountInsert()
 		}
 	      else
 		{
-		  set_field_buffer(supAcctField[1],0,"");
+		  set_field_buffer(supAcctField[4],0,"");
 		  wattron(supTypeWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
 		  mvwprintw(supTypeWin,strow-6,1,"Number invalid");
 		  wattroff(supTypeWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
