@@ -3,6 +3,7 @@
 
 #include <form.h>
 #include <libpq-fe.h>
+#include "jaddef.h"
 
 PGconn * fdbcon();
 

@@ -1,7 +1,7 @@
 #ifndef _PROLIB_H
 #define _PROLIB_H
 
-#include "jaddef.h"
+
 
 void providerInsert(int, char *);
 
