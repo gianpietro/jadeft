@@ -613,7 +613,7 @@ int provAccountInsert()
   char pafAccountNo[30], pafRef[30];
   int cf; // confirm save to DB
   int newRec = 'y';
-  int cfUpdate = 'y';
+  int cfUpdate = 0; //'y';
   char *titleOne = "Provider Account Form";
   char *titleTwo = "Provider List";
   char *titleThree = "Provider Type";
