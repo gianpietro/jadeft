@@ -18,7 +18,7 @@ void categoryInsert()
   WINDOW *categoryWin, *categoryUpdateWin;
   PANEL *categoryPanel, *categoryUpdatePanel;
   int newRec = 'y';
-  int crow = 0, ccol = 0, curow = 0, cucol = 0;
+  int row = 0, col = 0, urow = 0, ucol = 0;
   int list = 2, i = 0, j = 0;
   char p = 0;
   int ch = 0;
@@ -30,29 +30,41 @@ void categoryInsert()
   char *catDesc;  // using a pinter instead of array
   int cfUpdate = 0;
   int cf = 0;
+  char *titleOne = "Category Type Form";
+  char *titleTwo = "Category Type";
+  int lenOne = strlen(titleOne);
+  int lenTwo = strlen(titleTwo);
 
   PGconn *conn = fdbcon();
   PGresult *res;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
-  // keypad(stdscr, TRUE);
+  keypad(stdscr, TRUE);
+
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);  
 
   while (newRec == 'y')
     {
-      categoryField[0] = new_field(2,25,2,24,0,0);  /* category */
+      categoryField[0] = new_field(1,30,6,22,0,0);  /* category */
       categoryField[1] = NULL;
+
+      set_field_fore(categoryField[0], COLOR_PAIR(9));    /* SET_FIELD_FOREGROUND */
+      set_field_back(categoryField[0], COLOR_PAIR(9));    /* SET_FIELD_BACKGROUND */
 
       set_field_type(categoryField[0],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       
       categoryForm = new_form(categoryField);
-      scale_form(categoryForm, &crow, &ccol);      
-
-      categoryWin = newwin(crow+20,ccol+10,1,1);
-      categoryUpdateWin = newwin(20,50,1,120);
+      scale_form(categoryForm, &row, &col);
+      categoryWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/4);
+      categoryUpdateWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+5, COLS/4);
+      
       categoryPanel = new_panel(categoryWin);
       categoryUpdatePanel = new_panel(categoryUpdateWin);
+      wbkgd(categoryWin, COLOR_PAIR(1));        /* MAIN_WINDOW_BACKGROUND_COLOR */    
       update_panels();
       doupdate();
       
@@ -60,13 +72,13 @@ void categoryInsert()
       keypad(categoryUpdateWin, TRUE);
 
       set_form_win(categoryForm, categoryWin);
-      set_form_sub(categoryForm, derwin(categoryWin, crow, ccol, 1, 1));
-      getmaxyx(categoryWin,crow,ccol);
-      getmaxyx(categoryUpdateWin, curow, cucol);
+      set_form_sub(categoryForm, derwin(categoryWin, row, col, 2, 2));
+      getmaxyx(categoryWin,row,col);
+      getmaxyx(categoryUpdateWin, urow, ucol);
       box(categoryWin,0,0);      
       box(categoryUpdateWin,0,0);
-      waddstr(categoryWin,"Category Type Form");
-      waddstr(categoryUpdateWin,"Category Type");
+      //waddstr(categoryWin,"Category Type Form");
+      //waddstr(categoryUpdateWin,"Category Type");
 
       if (categoryWin == NULL || categoryUpdateWin == NULL)
 	{
@@ -75,12 +87,16 @@ void categoryInsert()
 	  getch();
 	}
 
+      wattron(categoryWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(categoryWin,1,(col-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+      wattroff(categoryWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+
       post_form(categoryForm);
       wrefresh(categoryWin);
 
-      mvwprintw(categoryWin,3,5, "Category:");
-      mvwprintw(categoryWin,21,5,"Press F1 when form complete (F9 for Update)");
-      wmove(categoryWin,3,25);    
+      mvwprintw(categoryWin,row-(row-8),col-(col-5), "Category:");
+      mvwprintw(categoryWin,row-2,col-(col-5),"Press F1 when form complete (F9 for Update)");
+      wmove(categoryWin,row-(row-8),col-(col-24));    
       //wrefresh(categoryWin);
       
       while((ch = wgetch(categoryWin)) != KEY_F(1))
@@ -93,12 +109,16 @@ void categoryInsert()
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = rows = 0, cfUpdate = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(categoryUpdateWin);
 	      box(categoryUpdateWin,0,0);
-	      waddstr(categoryUpdateWin, "Category Type");
+	      //waddstr(categoryUpdateWin, "Category Type");
+	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(categoryUpdateWin,1,(col-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
+	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(categoryUpdateWin,1,1);	     
 	      show_panel(categoryUpdatePanel);
+	      wbkgd(categoryUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 
@@ -107,6 +127,9 @@ void categoryInsert()
 	      rows = PQntuples(res);
 
 	      wrefresh(categoryUpdateWin);
+	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(categoryUpdateWin, 4, 1, "ID    Category");  //+3
+	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 	  
 	      while((p = wgetch(categoryUpdateWin)) == '\n')
 		{
@@ -117,24 +140,31 @@ void categoryInsert()
 		  for (i; i < j; i++)
 		    {
 		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		      mvwprintw(categoryUpdateWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      mvwprintw(categoryUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(categoryUpdateWin);
+		      box(categoryUpdateWin,0,0);
 		    }
-		  list = 2;      
+		  list = 6;      
 		  if  (i == rows)
 		    {
 		      wclrtobot(categoryUpdateWin);  
-		      mvwprintw(categoryUpdateWin,10,1,"End of list");
+		      mvwprintw(categoryUpdateWin,13,1,"End of list");
 		      box(categoryUpdateWin,0,0);
-		      mvwprintw(categoryUpdateWin,0,0, "Category");
-		      wmove(categoryUpdateWin,10,1);
+		      //mvwprintw(categoryUpdateWin,0,0, "Category");
+		      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(categoryUpdateWin,1,(col-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */ 
+		      //mvwprintw(proUpdateWin,0,0, "Provider");
+		      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
+		      wmove(categoryUpdateWin,urow-8,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(categoryUpdateWin,11,1,"Select Option: ");
-	      mvwscanw(categoryUpdateWin,11,25, "%d", &upID);
+	      echo();
+	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */
+	      mvwprintw(categoryUpdateWin,row-7,1,"Select Option: ");
+	      mvwscanw(categoryUpdateWin,row-7,col-45, "%d", &upID);
+	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 
 	      PQclear(res);
 	  
@@ -155,15 +185,17 @@ void categoryInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  mvwprintw(categoryUpdateWin,13,1, "no or rows %d ",rows);
+		  // mvwprintw(categoryUpdateWin,13,1, "no or rows %d ",rows);
 		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  mvwprintw(categoryUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  // mvwprintw(categoryUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  set_field_buffer(categoryField[0],0,PQgetvalue(res,0,1));
 		  cfUpdate = 1;
 		}
 	      else
 		{
-		  mvwprintw(categoryUpdateWin,12,1,"Number invalied");
+		  wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(categoryUpdateWin,row-6,1,"Number invalid");
+		  wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
 		  wrefresh(categoryUpdateWin);		
 		}
 	      noecho();
@@ -183,22 +215,26 @@ void categoryInsert()
 	{
 	  strcpy(catDesc, trimWS(catDesc));
 	  echo();
-	  mvwprintw(categoryWin,14,5,"Save y/n: ");
-	  mvwprintw(categoryWin,15,5,"(d = delete record)");
-	  wmove(categoryWin,14,16);
+	  wattron(categoryWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SAVE_YN */
+	  mvwprintw(categoryWin,row-8,col-65,"Save y/n: ");
+	  wattroff(categoryWin,A_BOLD | COLOR_PAIR(1));     /* ATTOFF_SAVE_YN */
+	  mvwprintw(categoryWin,row-7,col-65,"(d = delete record)");
+	  wmove(categoryWin,row-8,col-54);
 
 	  while((cf = wgetch(categoryWin)) != 'y')
 	    {
-	      wmove(categoryWin,14,16);
+	      wmove(categoryWin,row-8,col-54);
 	      if (cf == 'n')
 		{
-		  mvwprintw(categoryWin,16,5, "Data not saved");
+		  mvwprintw(categoryWin,row-6,col-65, "Data not saved");
 		  break;
 		}
 	      if (cf == 'd')
 		{  
 		  catDelete(upID);
-		  mvwprintw(categoryWin,16,5, "Record deleted");                
+		  wattron(categoryWin, A_BOLD | A_BLINK);             /* ATTON_DELETED */
+		  mvwprintw(categoryWin,row-6,col-65, "Record deleted");
+		  wattroff(categoryWin, A_BOLD | A_BLINK);            /* ATTOFF_DELETED */
 		  break;
 		}	      
 	    }
@@ -207,20 +243,24 @@ void categoryInsert()
 	      if (cfUpdate == 1)
 		{
 		  catUpdate(upID, catDesc);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  wattron(categoryWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(categoryWin,16,5, "Data updated");
-		  mvwprintw(categoryWin,17,5, "cfUpdate %d, upID %d, catDesc %s", cfUpdate,upID,catDesc);  //DEBUG
+		  mvwprintw(categoryWin,row-6,col-65, "Data updated");
+		  wattroff(categoryWin, A_BOLD | A_BLINK);
+		  //mvwprintw(categoryWin,17,5, "cfUpdate %d, upID %d, catDesc %s", cfUpdate,upID,catDesc);  //DEBUG
 		}
       	      else
 		{
 		  catInsert(catDesc);
-		  mvwprintw(categoryWin,17,5, "Data saved");
+		  wattron(categoryWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
+		  mvwprintw(categoryWin,row-6,col-65, "Data saved");
+		  wattroff(categoryWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
 		}
 	    }
 	}
       else
 	{
-	  mvwprintw(categoryWin,17,5, "Data invalid");	
+	  mvwprintw(categoryWin,row-6,col-65, "Data invalid");	
 	}
       noecho();
 
@@ -230,40 +270,26 @@ void categoryInsert()
 
       cfUpdate = 0;
 
-      mvwprintw(categoryWin,19,5,"Do you want to add a new record y/n: ");
+      mvwprintw(categoryWin,row-4,col-65,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(categoryWin)) != 'y')
 	{
-	  wmove(categoryWin,19,44);
+	  wmove(categoryWin,row-4,col-28);
 	  if(newRec == 'n')
 	    break;
 	}
       noecho();
 
-      hide_panel(categoryPanel);
-      //del_panel(categoryPanel); //+ 2/11/21
+      hide_panel(categoryPanel);     
       update_panels(); 
       doupdate();
-
-      // wclear(categoryWin);
-      //wclear(categoryUpdateWin);
-      //del_panel(categoryUpdatePanel); //new code 30/10/21 was comment out + 2/11/21
-      //update_panels();   // + 2/11/21
-      //doupdate();        // + 2/11/21
       delwin(categoryWin); 
-      delwin(categoryUpdateWin);
-      //categoryPanel = NULL;
-      //categoryWin = NULL;
-      //categoryUpdateWin = NULL;
-      //categoryForm = NULL;
-      //categoryField[0] = NULL;
+      
     } //while newRec
   PQfinish(conn);
   free(catDesc);
   catDesc = NULL;
-  endwin(); 
-  //touchwin(stdscr);
-  //free(catDesc);
+  endwin();   
 }
 
 
