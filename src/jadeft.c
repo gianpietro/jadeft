@@ -42,7 +42,7 @@ int main (void) {
 
   menulist[2][0] = "</07/B>Supplier Admin <!07>";
   menulist[2][1] = "</05>Supplier Type    <!05>";
-  menulist[2][2] = "</05>Supplier Insert   <!05>";
+  menulist[2][2] = "</05>Supplier Insert  <!05>";
   menulist[2][3] = "</05>Supplier Account <!05>";
   menulist[2][4] = "</05>Invoice          <!05>";
 
@@ -69,7 +69,7 @@ int main (void) {
   menuloc[3] = LEFT;
   menuloc[4] = LEFT;
 
-  mesg[0]= "                         ";
+  //  mesg[0]= "                         ";
 
   menu = newCDKMenu(cdkscreen, menulist, 5, submenusize, menuloc,
 		    TOP, A_UNDERLINE, A_REVERSE);
@@ -130,7 +130,22 @@ int main (void) {
 	  sprintf(temp,"No selection");
 	  break;
 	}
-    } 
+    }
+
+  /*  if (menu->exitType == vEARLY_EXIT)
+    {
+      mesg[0] = "<C>You hit escape. No menu item was selected.";
+      mesg[1] = "";
+      mesg[2] = "<C>Press any key to continue.";
+      popupLabel (cdkscreen, (CDK_CSTRING2) mesg, 3);
+      }*/
+  if (menu->exitType == vNORMAL)
+    {     
+      mesg[0] = "<C>Exit application.";
+      mesg[1] = "";
+      mesg[2] = "<C>Press any key to continue.";
+      popupLabel (cdkscreen, (CDK_CSTRING2) mesg, 3);
+    }
 
   destroyCDKMenu(menu);
   destroyCDKScreen(cdkscreen);
