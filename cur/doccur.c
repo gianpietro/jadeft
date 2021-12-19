@@ -29,30 +29,42 @@ void documentTypeInsert()
   char dtDesc[30];
   int cfUpdate = 0;
   int cf;
+  char *titleOne = "Document Type Form";
+  char *titleTwo = "Document Type";
+  int lenOne = strlen(titleOne);
+  int lenTwo = strlen(titleTwo);
 
   PGconn *conn = fdbcon();
   PGresult *res;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
   keypad(stdscr, TRUE);
 
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);  
+
   while (newRec == 'y')
     {
-      doctypeField[0] = new_field(1,30,2,24,0,0);  /* description */
+      doctypeField[0] = new_field(1,30,6,22,0,0);  /* description */
       doctypeField[1] = NULL;
+
+      set_field_fore(doctypeField[0], COLOR_PAIR(9));    /* SET_FIELD_FOREGROUND */
+      set_field_back(doctypeField[0], COLOR_PAIR(9));    /* SET_FIELD_BACKGROUND */
 
       set_field_type(doctypeField[0],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
 
       doctypeForm = new_form(doctypeField);
       scale_form(doctypeForm, &drow, &dcol);
 
-      doctypeWin = newwin(drow+20,dcol+10,1,1);
-      doctypeUpdateWin = newwin(20,50,1,120);
+      doctypeWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/4);
+      doctypeUpdateWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+5, COLS/4);
 
       doctypePanel = new_panel(doctypeWin);
       doctypeUpdatePanel = new_panel(doctypeUpdateWin);
+      wbkgd(doctypeWin, COLOR_PAIR(1));        /* MAIN_WINDOW_BACKGROUND_COLOR */    
       update_panels();
       doupdate();
       
@@ -60,13 +72,13 @@ void documentTypeInsert()
       keypad(doctypeUpdateWin, TRUE);
 
       set_form_win(doctypeForm, doctypeWin);
-      set_form_sub(doctypeForm, derwin(doctypeWin, drow, dcol, 1, 1));
+      set_form_sub(doctypeForm, derwin(doctypeWin, drow, dcol, 2, 2));
       getmaxyx(doctypeWin,drow,dcol);
       getmaxyx(doctypeUpdateWin, urow, ucol);
       box(doctypeWin,0,0);
       box(doctypeUpdateWin,0,0);
-      waddstr(doctypeWin,"Document Type Form");
-      waddstr(doctypeUpdateWin,"Document Type");
+      //waddstr(doctypeWin,"Document Type Form");
+      //waddstr(doctypeUpdateWin,"Document Type");
 
       if (doctypeWin == NULL || doctypeUpdateWin == NULL)
 	{
@@ -75,12 +87,16 @@ void documentTypeInsert()
 	  getch();
 	}
 
+      wattron(doctypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(doctypeWin,1,(dcol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+      wattroff(doctypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+
       post_form(doctypeForm);
       wrefresh(doctypeWin);
 
-      mvwprintw(doctypeWin,3,5, "Description:");
-      mvwprintw(doctypeWin,21,5,"Press F1 when form complete");
-      wmove(doctypeWin,3,25);
+      mvwprintw(doctypeWin,drow-(drow-8),dcol-(dcol-5), "Description:");
+      mvwprintw(doctypeWin,drow-2,dcol-(dcol-5),"Press F1 when form complete (F9 for Update)");
+      wmove(doctypeWin,drow-(drow-8),dcol-(dcol-24));
       //mvwprintw(doctypeWin,8,5,"rows %d cols %d", drow, dcol);
       //wrefresh(doctypeWin);
       
@@ -94,13 +110,17 @@ void documentTypeInsert()
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = rows = 0, cfUpdate = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(doctypeUpdateWin);
 	      box(doctypeUpdateWin,0,0);
-	      waddstr(doctypeUpdateWin, "Document Type");
+	      //waddstr(doctypeUpdateWin, "Document Type");
+	      wattron(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(doctypeUpdateWin,1,(dcol-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
+	      wattroff(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(doctypeUpdateWin,1,1);
 	      //wrefresh(doctypeUpdateWin);
 	      show_panel(doctypeUpdatePanel);
+	      wbkgd(doctypeUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 
@@ -109,6 +129,9 @@ void documentTypeInsert()
 	      rows = PQntuples(res);
 
 	      wrefresh(doctypeUpdateWin);
+	      wattron(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(doctypeUpdateWin, 4, 1, "ID    Decscription");  //+3
+	      wattroff(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS*/
 	  
 	      while((p = wgetch(doctypeUpdateWin)) == '\n')
 		{
@@ -119,24 +142,31 @@ void documentTypeInsert()
 		  for (i; i < j; i++)
 		    {
 		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		      mvwprintw(doctypeUpdateWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      mvwprintw(doctypeUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(doctypeUpdateWin);
+		      box(doctypeUpdateWin,0,0);
 		    }
-		  list = 2;      
+		  list = 6;      
 		  if  (i == rows)
 		    {
 		      wclrtobot(doctypeUpdateWin);  
-		      mvwprintw(doctypeUpdateWin,10,1,"End of list");
+		      mvwprintw(doctypeUpdateWin,13,1,"End of list");
 		      box(doctypeUpdateWin,0,0);
-		      mvwprintw(doctypeUpdateWin,0,0, "Document Type");
+		      //mvwprintw(doctypeUpdateWin,0,0, "Document Type");
+		      wattron(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(doctypeUpdateWin,1,(dcol-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */ 
+		      //mvwprintw(proUpdateWin,0,0, "Provider");
+		      wattroff(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(doctypeUpdateWin,10,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(doctypeUpdateWin,11,1,"Select Option: ");
-	      mvwscanw(doctypeUpdateWin,11,25, "%d", &upID);
+	      echo();
+	      wattron(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */
+	      mvwprintw(doctypeUpdateWin,drow-7,1,"Select Option: ");
+	      mvwscanw(doctypeUpdateWin,drow-7,dcol-45, "%d", &upID);
+	      wattroff(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 
 	      PQclear(res);
 	  
@@ -157,9 +187,9 @@ void documentTypeInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  mvwprintw(doctypeUpdateWin,13,1, "no or rows %d ",rows);
+		  //mvwprintw(doctypeUpdateWin,13,1, "no or rows %d ",rows);
 		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  mvwprintw(doctypeUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  //mvwprintw(doctypeUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  //wrefresh(doctypeUpdateWin);
 		  set_field_buffer(doctypeField[0],0,PQgetvalue(res,0,1));
 		  //set_field_buffer(doctypeField[1],0,PQgetvalue(res,0,2));
@@ -167,7 +197,9 @@ void documentTypeInsert()
 		}
 	      else
 		{
-		  mvwprintw(doctypeUpdateWin,12,1,"Number invalied");
+		  wattron(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(doctypeUpdateWin,drow-6,1,"Number invalid");
+		  wattroff(doctypeUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
 		  wrefresh(doctypeUpdateWin);		
 		  //wrefresh(PARENT_WIN);
 		}
@@ -187,22 +219,26 @@ void documentTypeInsert()
 	{
 	  strcpy(dtDesc, trimWS(dtDesc));
 	  echo();
-	  mvwprintw(doctypeWin,14,5,"Save y/n: ");
-	  mvwprintw(doctypeWin,15,5,"(d = delete record)");
-	  wmove(doctypeWin,14,16);
+	  wattron(doctypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SAVE_YN */
+	  mvwprintw(doctypeWin,drow-8,dcol-65,"Save y/n: ");
+	  wattroff(doctypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTOFF_SAVE_YN */
+	  mvwprintw(doctypeWin,drow-7,dcol-65,"(d = delete record)");	  
+	  wmove(doctypeWin,drow-8,dcol-54);
 
 	  while((cf = wgetch(doctypeWin)) != 'y')
 	    {
-	      wmove(doctypeWin,14,16);
+	      wmove(doctypeWin,drow-8,dcol-54);
 	      if (cf == 'n')
 		{
-		  mvwprintw(doctypeWin,16,5, "Data not saved");
+		  mvwprintw(doctypeWin,drow-6,dcol-65, "Data not saved");
 		  break;
 		}
 	      if (cf == 'd')
 		{  
 		  docTypeDelete(upID);
-		  mvwprintw(doctypeWin,16,5, "Record deleted");                
+		  wattron(doctypeWin, A_BOLD | A_BLINK);             /* ATTON_DELETED */
+		  mvwprintw(doctypeWin,drow-6,dcol-65, "Record deleted");
+		  wattroff(doctypeWin, A_BOLD | A_BLINK);            /* ATTOFF_DELETED */
 		  break;
 		}	      
 	    }
@@ -211,20 +247,24 @@ void documentTypeInsert()
 	      if (cfUpdate == 1)
 		{
 		  docTypeUpdate(upID, dtDesc);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  wattron(doctypeWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(doctypeWin,16,5, "Data updated");
-		  mvwprintw(doctypeWin,17,5, "cfUpdate %d,upID %d, dtDesc %s", cfUpdate,upID, dtDesc);  //DEBUG
+		  mvwprintw(doctypeWin,drow-6,dcol-65, "Data updated");
+		  wattroff(doctypeWin, A_BOLD | A_BLINK);
+		  //mvwprintw(doctypeWin,17,5, "cfUpdate %d,upID %d, dtDesc %s", cfUpdate,upID, dtDesc);  //DEBUG
 		}
       	      else
 		{
 		  docTypeInsert(dtDesc);
-		  mvwprintw(doctypeWin,17,5, "Data saved");
+		  wattron(doctypeWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
+		  mvwprintw(doctypeWin,drow-6,dcol-65, "Data saved");
+		  wattroff(doctypeWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
 		}
 	    }
 	}
       else
 	{
-	  mvwprintw(doctypeWin,17,5, "Data invalid");	
+	  mvwprintw(doctypeWin,drow-6,dcol-65, "Data invalid");	
 	}
       noecho();
 
@@ -234,11 +274,11 @@ void documentTypeInsert()
 
       cfUpdate = 0;
 
-      mvwprintw(doctypeWin,19,5,"Do you want to add a new record y/n: ");
+      mvwprintw(doctypeWin,drow-4,dcol-65,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(doctypeWin)) != 'y')
 	{
-	  wmove(doctypeWin,19,44);
+	  wmove(doctypeWin,drow-4,dcol-28);
 	  if(newRec == 'n')
 	    break;
 	}
