@@ -638,13 +638,26 @@ int provAccountInsert()
   
   while (newRec == 'y')
     {
-      proAcctField[0] = new_field(1,1,1,35,0,0);    /* active_ind */
-      proAcctField[1] = new_field(1,5,3,35,0,0);    /* provider_id (fk) */
-      proAcctField[2] = new_field(1,30,5,35,0,0);   /* provider_account_no */
-      proAcctField[3] = new_field(1,9,7,35,0,0);    /* sort_code */
-      proAcctField[4] = new_field(1,30,9,35,0,0);   /* reference */
-      proAcctField[5] = new_field(1,5,11,35,0,0);   /* provider_type_id */
+      proAcctField[0] = new_field(1,1,4,28,0,0);    /* active_ind */
+      proAcctField[1] = new_field(1,5,6,28,0,0);    /* provider_id (fk) */
+      proAcctField[2] = new_field(1,30,8,28,0,0);   /* provider_account_no */
+      proAcctField[3] = new_field(1,9,10,28,0,0);    /* sort_code */
+      proAcctField[4] = new_field(1,30,12,28,0,0);   /* reference */
+      proAcctField[5] = new_field(1,5,14,28,0,0);   /* provider_type_id */
       proAcctField[6] = NULL;
+
+      set_field_fore(proAcctField[0], COLOR_PAIR(9));
+      set_field_back(proAcctField[0], COLOR_PAIR(9));
+      set_field_fore(proAcctField[1], COLOR_PAIR(9));
+      set_field_back(proAcctField[1], COLOR_PAIR(9));
+      set_field_fore(proAcctField[2], COLOR_PAIR(9));
+      set_field_back(proAcctField[2], COLOR_PAIR(9));
+      set_field_fore(proAcctField[3], COLOR_PAIR(9));
+      set_field_back(proAcctField[3], COLOR_PAIR(9));
+      set_field_fore(proAcctField[4], COLOR_PAIR(9));
+      set_field_back(proAcctField[4], COLOR_PAIR(9));
+      set_field_fore(proAcctField[5], COLOR_PAIR(9));
+      set_field_back(proAcctField[5], COLOR_PAIR(9));
 
       set_field_type(proAcctField[0],TYPE_INTEGER,1,1,2);
       set_field_type(proAcctField[1],TYPE_INTEGER,0,1,99999);
@@ -656,15 +669,16 @@ int provAccountInsert()
       proAcctForm = new_form(proAcctField);
       scale_form(proAcctForm, &parow, &pacol);   
 
-      proAcctWin = newwin(parow+20,pacol+10,1,1);
+      proAcctWin = newwin(LINES-15, COLS/3,LINES-(LINES-4),COLS/15);
       proListWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
       proTypeWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
       proAccountUpdateWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
 
-      proPanel = new_panel(proListWin);
+      proPanel = new_panel(proListWin);      
       proTypePanel = new_panel(proTypeWin);
       proAccountUpdatePanel = new_panel(proAccountUpdateWin);
       mainPanel = new_panel(proAcctWin);
+      wbkgd(proAcctWin, COLOR_PAIR(1));     
       update_panels();
       doupdate();
       
@@ -674,7 +688,7 @@ int provAccountInsert()
       keypad(proAccountUpdateWin, TRUE);
 
       set_form_win(proAcctForm,proAcctWin);
-      set_form_sub(proAcctForm, derwin(proAcctWin,parow,pacol,1,1));
+      set_form_sub(proAcctForm, derwin(proAcctWin,parow,pacol,2,2));
       getmaxyx(proAcctWin, parow, pacol);
       getmaxyx(proListWin, nrow, ncol);
       getmaxyx(proTypeWin, ptrow, ptcol);
@@ -683,7 +697,11 @@ int provAccountInsert()
       box(proListWin,0,0);
       box(proTypeWin,0,0);
       box(proAccountUpdateWin,0,0);
-      waddstr(proAcctWin, "Provider Account Form");
+      wattron(proAcctWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(proAcctWin,1,(pacol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+      wattroff(proAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      
+      //waddstr(proAcctWin, "Provider Account Form");
       //waddstr(proListWin, "Provider List");
       //waddstr(proTypeWin, "Provider Type");
 
@@ -694,24 +712,26 @@ int provAccountInsert()
 	  return(1);
 	}
 
-      wattron(proListWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
-      mvwprintw(proListWin,1,(ncol-lenTwo)/2,titleTwo);   /* SET_MAIN_WIND_TITLE */
-      wattroff(proListWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
-      wattron(proTypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
-      mvwprintw(proTypeWin,1,(ncol-lenThree)/2,titleThree);   /* SET_MAIN_WIND_TITLE */
-      wattroff(proTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
-  
+      // wattron(proListWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      //mvwprintw(proListWin,1,(ncol-lenTwo)/2,titleTwo);   /* SET_MAIN_WIND_TITLE */
+      //wattroff(proListWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      //wattron(proTypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      //mvwprintw(proTypeWin,1,(ncol-lenThree)/2,titleThree);   /* SET_MAIN_WIND_TITLE */
+      //wattroff(proTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      
+      
       post_form(proAcctForm);  
       wrefresh(proAcctWin);
 
       // mvwprintw(proAcctWin, parow-3,pacol-3, "rows %d cols %d",parow,pacol);
-      mvwprintw(proAcctWin, parow-30,pacol-64, "Active Ind:");
-      mvwprintw(proAcctWin, parow-28,pacol-64, "Provider ID(F2):");
-      mvwprintw(proAcctWin, parow-26,pacol-64, "Account Number:");
-      mvwprintw(proAcctWin, parow-24,pacol-64, "Sort Code:");
-      mvwprintw(proAcctWin, parow-22,pacol-64, "Reference:");
-      mvwprintw(proAcctWin, parow-20,pacol-64, "Provider Type ID(F3):");
-      wmove(proAcctWin,parow-30,pacol-39);
+      mvwprintw(proAcctWin, parow-(parow-6),pacol-(pacol-5), "Active Ind:");
+      mvwprintw(proAcctWin, parow-(parow-8),pacol-(pacol-5), "Provider ID(F2):");
+      mvwprintw(proAcctWin, parow-(parow-10),pacol-(pacol-5), "Account Number:");
+      mvwprintw(proAcctWin, parow-(parow-12),pacol-(pacol-5), "Sort Code:");
+      mvwprintw(proAcctWin, parow-(parow-14),pacol-(pacol-5), "Reference:");
+      mvwprintw(proAcctWin, parow-(parow-16),pacol-(pacol-5), "Provider Type ID(F3):");
+      mvwprintw(proAcctWin, parow-2,pacol-(pacol-5),"Press F1 when form complete (F9 for Update)");
+      wmove(proAcctWin, parow-(parow-6),pacol-(pacol-30));     /* move cursor */
       wrefresh(proAcctWin);
   
       while((ch = wgetch(proAcctWin)) != KEY_F(1))
@@ -1035,9 +1055,11 @@ int provAccountInsert()
       if ((form_driver(proAcctForm,REQ_VALIDATION) == E_OK) && (pafActiveID >= 1))
 	{
 	  echo();
+	  wattron(proAcctWin,A_BOLD | COLOR_PAIR(1));
 	  mvwprintw(proAcctWin,parow-10,pacol-64,"Save: y/n: ");
+	  wattroff(proAcctWin,A_BOLD | COLOR_PAIR(1));
 	  mvwprintw(proAcctWin,parow-9,pacol-64,"(d = delete record)");
-	  wmove(proAcctWin,parow-10,pacol-54);
+	  wmove(proAcctWin,parow-10,pacol-53);
 
 	  while((cf = wgetch(proAcctWin)) != 'y')
 	    {
@@ -1050,7 +1072,9 @@ int provAccountInsert()
 	      if (cf == 'd')
 		{  
 		  proAccountDelete(upID);
-		  mvwprintw(proAcctWin,parow-8,pacol-64, "Record deleted");                
+		  wattron(proAcctWin,A_BOLD | A_BLINK);
+		  mvwprintw(proAcctWin,parow-8,pacol-64, "Record deleted");
+		  wattroff(proAcctWin,A_BOLD | A_BLINK);
 		  break;
 		}
 	    }	  
@@ -1059,14 +1083,18 @@ int provAccountInsert()
 	      if (cfUpdate == 1)
 		{
 		  proAccountUpdate(upID,pafActiveID, pafID, pafAccountNo, pafSortCode, pafRef, pafTypeID); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
-		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(proAcctWin,19,5, "Data updated");
-		  mvwprintw(proAcctWin,20,5, "cfUpdate %d,upID %d pafActiveID %d padID %d", cfUpdate,upID,pafActiveID, pafID);  //DEBUG
+		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID
+		  wattron(proAcctWin,A_BOLD | A_BLINK);
+		  mvwprintw(proAcctWin,parow-8, pacol-64, "Data updated");
+		  wattroff(proAcctWin,A_BOLD | A_BLINK);
+		  //mvwprintw(proAcctWin,20,5, "cfUpdate %d,upID %d pafActiveID %d padID %d", cfUpdate,upID,pafActiveID, pafID);  //DEBUG
 		}
 	      else		
 		{
 		  proAccountInsert(pafActiveID, pafID, pafAccountNo, pafSortCode, pafRef, pafTypeID);
+		  wattron(proAcctWin,A_BOLD | A_BLINK);
 		  mvwprintw(proAcctWin,parow-8, pacol-64, "Data saved");
+		  wattroff(proAcctWin,A_BOLD | A_BLINK);
 		}
 	    }
 	}  
