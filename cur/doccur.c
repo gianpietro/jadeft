@@ -215,7 +215,7 @@ void documentTypeInsert()
 
       strcpy(dtDesc, field_buffer(doctypeField[0],0));
 
-      if ((form_driver(doctypeForm,REQ_VALIDATION) == E_OK))
+      if ((form_driver(doctypeForm,REQ_VALIDATION) == E_OK) && (!isspace(*dtDesc)))
 	{
 	  strcpy(dtDesc, trimWS(dtDesc));
 	  echo();
