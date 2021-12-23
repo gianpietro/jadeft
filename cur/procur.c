@@ -646,6 +646,7 @@ int provAccountInsert()
       proAcctField[5] = new_field(1,5,14,28,0,0);   /* provider_type_id */
       proAcctField[6] = NULL;
 
+      
       set_field_fore(proAcctField[0], COLOR_PAIR(9));
       set_field_back(proAcctField[0], COLOR_PAIR(9));
       set_field_fore(proAcctField[1], COLOR_PAIR(9));
@@ -658,6 +659,7 @@ int provAccountInsert()
       set_field_back(proAcctField[4], COLOR_PAIR(9));
       set_field_fore(proAcctField[5], COLOR_PAIR(9));
       set_field_back(proAcctField[5], COLOR_PAIR(9));
+      
 
       set_field_type(proAcctField[0],TYPE_INTEGER,1,1,2);
       set_field_type(proAcctField[1],TYPE_INTEGER,0,1,99999);
