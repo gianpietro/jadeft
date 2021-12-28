@@ -56,10 +56,9 @@ void provInsert()
   
 
     while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
-    {
-      /* Add the fields required in the form */
-      /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
-      providerField[0] = new_field(1, 1, 4, 22, 0, 0);      
+    {       
+      providerField[0] = new_field(1, 1, 4, 22, 0, 0);
+      //providerField[0] = new_field(1, 1, LINES*0.07548,COLS*0.10427, 0, 0);      
       providerField[1] = new_field(1, 30, 6, 22, 0, 0);      
       providerField[2] = NULL;
 
@@ -68,13 +67,11 @@ void provInsert()
       set_field_fore(providerField[1], COLOR_PAIR(9));
       set_field_back(providerField[1], COLOR_PAIR(9));
 
-      /* Field 1 digit allowed in RANGE from 1 to 2 */
-      set_field_type(providerField[0],TYPE_INTEGER,1,1,2);
-      /* Field allowed values of A-Z a-z and hyphen */
+      set_field_type(providerField[0],TYPE_INTEGER,1,1,2);     
       set_field_type(providerField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");   
  
       providerForm = new_form(providerField);
-      scale_form(providerForm, &rows, &cols);
+      scale_form(providerForm, &rows, &cols); 
 
       /* Add window which will be associated to form */
       proWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/4);             // (rows+15, cols+20,1,1);
@@ -91,12 +88,13 @@ void provInsert()
        
       /* Set main and sub windows */
       set_form_win(providerForm, proWin);
-      set_form_sub(providerForm, derwin(proWin,rows,cols,2,2));
+      set_form_sub(providerForm, derwin(proWin,rows,cols,2,2));      
+      
       getmaxyx(proWin,rows,cols);
       getmaxyx(proUpdateWin, urows, ucols);
       
       box(proWin, 0,0);
-      box(proUpdateWin,0,0);
+      box(proUpdateWin,0,0);     
 
       if (proWin == NULL || proUpdateWin == NULL)
 	{
@@ -109,6 +107,7 @@ void provInsert()
       //waddstr(proWin,"Provider Entry Form");
       mvwprintw(proWin,1,(cols-titleLen)/2, formTitle);     
       //wprintw(proWin,"row %d cols %d\n", rows, cols);   //DEBUG
+      //wprintw(proWin,"lines %d cols %d\n", LINES, COLS);   //DEBUG
       wattroff(proWin,A_BOLD | COLOR_PAIR(1));
 
       post_form(providerForm); 
