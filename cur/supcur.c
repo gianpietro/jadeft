@@ -1152,6 +1152,7 @@ int suppAccountInsert()
   int lenFive = strlen(titleFive);
   int lenSix = strlen(titleSix);
   int lenNine = strlen(titleNine);
+  int fldColor = 0;
 
   PGconn *conn =  fdbcon();
   PGresult *res;
@@ -1168,19 +1169,26 @@ int suppAccountInsert()
   
   while (newRec == 'y')
     {
-      supAcctField[0] = new_field(1,1,2,33,0,0);    /* active_ind        */
-      supAcctField[1] = new_field(1,30,4,33,0,0);   /* supplier_acct_ref */
-      supAcctField[2] = new_field(1,5,6,33,0,0);    /* supplier_id       */
-      supAcctField[3] = new_field(1,5,8,33,0,0);    /* property_id       */
-      supAcctField[4] = new_field(1,5,10,33,0,0);   /* supplier_type_id  */
-      supAcctField[5] = new_field(1,8,12,33,0,0);   /* start_date        */
-      supAcctField[6] = new_field(1,8,14,33,0,0);   /* end_date          */
-      supAcctField[7] = new_field(1,5,16,33,0,0);   /* payment_period_id */
-      supAcctField[8] = new_field(1,10,18,33,0,0);  /* amount            */
-      supAcctField[9] = new_field(1,30,20,33,0,0);  /* comment           */
-      supAcctField[10] = new_field(1,30,22,33,0,0); /* alias             */
-      supAcctField[11] = new_field(1,5,24,33,0,0);  /* provider_acct_id  */
-      supAcctField[12] = NULL;
+      supAcctField[0] = new_field(1,1,2,28,0,0);    /* active_ind        */
+      supAcctField[1] = new_field(1,30,4,28,0,0);   /* supplier_acct_ref */
+      supAcctField[2] = new_field(1,5,6,28,0,0);    /* supplier_id       */
+      supAcctField[3] = new_field(1,5,8,28,0,0);    /* property_id       */
+      supAcctField[4] = new_field(1,5,10,28,0,0);   /* supplier_type_id  */
+      supAcctField[5] = new_field(1,8,12,28,0,0);   /* start_date        */
+      supAcctField[6] = new_field(1,8,14,28,0,0);   /* end_date          */
+      supAcctField[7] = new_field(1,5,16,28,0,0);   /* payment_period_id */
+      supAcctField[8] = new_field(1,10,18,28,0,0);  /* amount            */
+      supAcctField[9] = new_field(1,30,20,28,0,0);  /* comment           */
+      supAcctField[10] = new_field(1,30,22,28,0,0); /* alias             */
+      supAcctField[11] = new_field(1,5,24,28,0,0);  /* provider_acct_id  */
+      supAcctField[12] = NULL; 
+
+      for (fldColor = 0; fldColor < 12; fldColor++)
+	{
+	  set_field_fore(supAcctField[fldColor], COLOR_PAIR(9));
+	  set_field_back(supAcctField[fldColor], COLOR_PAIR(9));
+	}
+            
 
       set_field_type(supAcctField[0],TYPE_INTEGER,1,1,2);
       set_field_type(supAcctField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
@@ -1198,7 +1206,7 @@ int suppAccountInsert()
       supAcctForm = new_form(supAcctField);
       scale_form(supAcctForm, &sarow, &sacol);
 
-      supAcctWin = newwin(sarow+15, sacol+10,1,1);
+      supAcctWin = newwin(LINES-10, COLS/3,LINES-(LINES-4),COLS/15);
       supWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
       prtWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
       supTypeWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
@@ -1213,6 +1221,7 @@ int suppAccountInsert()
       payPanel = new_panel(payWin);
       paPanel = new_panel(paWin);
       mainPanel = new_panel(supAcctWin);
+      wbkgd(supAcctWin, COLOR_PAIR(1));     
       //hide_panel(supUpdatePanel);
       //hide_panel(supPanel);
       update_panels();
@@ -1228,7 +1237,7 @@ int suppAccountInsert()
       keypad(supUpdateWin, TRUE);
 
       set_form_win(supAcctForm,supAcctWin);
-      set_form_sub(supAcctForm, derwin(supAcctWin,sarow,sacol,1,1));
+      set_form_sub(supAcctForm, derwin(supAcctWin,sarow,sacol,2,2));
       getmaxyx(supAcctWin,sarow,sacol);
       getmaxyx(supWin,srow,scol);
       getmaxyx(prtWin,prrow,prcol);
@@ -1243,7 +1252,10 @@ int suppAccountInsert()
       box(payWin, 0,0);
       box(paWin, 0,0);
       box(supUpdateWin,0,0);
-      waddstr(supAcctWin, "Supplier Account Form");
+      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(supAcctWin,1,(sacol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */      
+      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      //waddstr(supAcctWin, "Supplier Account Form");
       //waddstr(supWin, "Supplier");
       // waddstr(prtWin, "Property");
       //waddstr(supTypeWin, "Supplier Type");
@@ -1262,21 +1274,21 @@ int suppAccountInsert()
       post_form(supAcctForm);
       wrefresh(supAcctWin);
 
-      mvwprintw(supAcctWin, 37, 5,"row %d col %d", sarow, sacol);
+      // mvwprintw(supAcctWin, 37, 5,"row %d col %d", sarow, sacol);
 
-      mvwprintw(supAcctWin, 3,5,  "Active Ind:");
-      mvwprintw(supAcctWin, 5,5,  "Supplier Account No:");
-      mvwprintw(supAcctWin, 7,5,  "Supplier ID(F2):");
-      mvwprintw(supAcctWin, 9,5,  "Property ID(F3):");
-      mvwprintw(supAcctWin, 11,5, "Supplier Type ID(F4):");
-      mvwprintw(supAcctWin, 13,5, "Start Date:");
-      mvwprintw(supAcctWin, 15,5, "End Date:");
-      mvwprintw(supAcctWin, 17,5, "Payment Period(F5):");
-      mvwprintw(supAcctWin, 19,5, "Amount:");
-      mvwprintw(supAcctWin, 21,5, "Comment:");
-      mvwprintw(supAcctWin, 23,5, "Alias:");
-      mvwprintw(supAcctWin, 25,5, "Provider Account ID(F6):");
-      wmove(supAcctWin,3,34);
+      mvwprintw(supAcctWin, sarow-(sarow-4),sacol-(sacol-5),  "Active Ind:");
+      mvwprintw(supAcctWin, sarow-(sarow-6),sacol-(sacol-5),  "Supplier Account No:");
+      mvwprintw(supAcctWin, sarow-(sarow-8),sacol-(sacol-5),  "Supplier ID(F2):");
+      mvwprintw(supAcctWin, sarow-(sarow-10),sacol-(sacol-5),  "Property ID(F3):");
+      mvwprintw(supAcctWin, sarow-(sarow-12),sacol-(sacol-5), "Supplier Type ID(F4):");
+      mvwprintw(supAcctWin, sarow-(sarow-14),sacol-(sacol-5), "Start Date:");
+      mvwprintw(supAcctWin, sarow-(sarow-16),sacol-(sacol-5), "End Date:");
+      mvwprintw(supAcctWin, sarow-(sarow-18),sacol-(sacol-5), "Payment Period(F5):");
+      mvwprintw(supAcctWin, sarow-(sarow-20),sacol-(sacol-5), "Amount:");
+      mvwprintw(supAcctWin, sarow-(sarow-22),sacol-(sacol-5), "Comment:");
+      mvwprintw(supAcctWin, sarow-(sarow-24),sacol-(sacol-5), "Alias:");
+      mvwprintw(supAcctWin, sarow-(sarow-26),sacol-(sacol-5), "Provider Account ID(F6):");
+      wmove(supAcctWin,sarow-(sarow-4),sacol-(sacol-30));
       wrefresh(supAcctWin);
 
       while((ch = wgetch(supAcctWin)) != KEY_F(1))
@@ -1949,22 +1961,26 @@ int suppAccountInsert()
       if ((form_driver(supAcctForm,REQ_VALIDATION) == E_OK) && (safActiveID >= 1))
 	{
 	  echo();
-	  mvwprintw(supAcctWin,32,5,"Save y/n: ");
-	  mvwprintw(supAcctWin,33,5,"(d = delete record)");
-	  wmove(supAcctWin,32,16);
+	  wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));
+	  mvwprintw(supAcctWin,sarow-10,sacol-64,"Save y/n: ");
+	  wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));
+	  mvwprintw(supAcctWin,sarow-9,sacol-64,"(d = delete record)");
+	  wmove(supAcctWin,sarow-10,pacol-53);
 
 	  while((cf = wgetch(supAcctWin)) != 'y')
 	    {
-	      wmove(supAcctWin,32,16);
+	      wmove(supAcctWin,sarow-10,pacol-53);
 	      if (cf == 'n')
 		{
-		  mvwprintw(supAcctWin,34,5, "Data not saved");
+		  mvwprintw(supAcctWin,sarow-8,pacol-64, "Data not saved");
 		  break;
 		}
 	      if (cf == 'd')
 		{  
 		  supAccountDelete(upID);
-		  mvwprintw(supAcctWin,34,5, "Record deleted");                
+		  wattron(supAcctWin,A_BOLD | A_BLINK);
+		  mvwprintw(supAcctWin,sarow-8,pacol-64, "Record deleted");
+		  wattroff(supAcctWin,A_BOLD | A_BLINK);
 		  break;
 		}	      
 	    }	  
@@ -1973,22 +1989,26 @@ int suppAccountInsert()
 	      if (cfUpdate == 1)
 		{
 		  supAccountUpdate(upID, safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
-		     safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
-		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(supAcctWin,34,5, "Data updated");
-		  mvwprintw(supAcctWin,35,5, "cfUpdate %d,upID %d, safSupAcctRef %s, safSupID %d", cfUpdate,upID, safSupAcctRef, safSupID);  //DEBUG
+		                   safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID
+		  wattron(supAcctWin,A_BOLD | A_BLINK);
+		  mvwprintw(supAcctWin,sarow-8,pacol-64, "Data updated");
+		  wattroff(supAcctWin,A_BOLD | A_BLINK);
+		  //mvwprintw(supAcctWin,35,5, "cfUpdate %d,upID %d, safSupAcctRef %s, safSupID %d", cfUpdate,upID, safSupAcctRef, safSupID);  //DEBUG
 		}
 	      else
 		{
 		  supAccountInsert(safActiveID, safSupAcctRef, safSupID, safPrtID, safSupTypeID, safStartDt,
 				   safEndDt, safPayID, safAmount, safComment, safAlias, safProAcctID);
-		  mvwprintw(supAcctWin,34,5, "Data saved");
+		  wattron(supAcctWin,A_BOLD | A_BLINK);
+		  mvwprintw(supAcctWin,sarow-8,pacol-64, "Data saved");
+		  wattroff(supAcctWin,A_BOLD | A_BLINK);
 		}
 	    }
 	}
       else
 	{
-	  mvwprintw(supAcctWin,34,5, "Data invalid");	
+	  mvwprintw(supAcctWin,sarow-8,pacol-64, "Data invalid");	
 	}
       noecho();
 
@@ -2011,11 +2031,11 @@ int suppAccountInsert()
 
       cfUpdate = 0;
 
-      mvwprintw(supAcctWin,37,5,"Do you want to add a new record y/n: ");
+      mvwprintw(supAcctWin,sarow-6,pacol-64,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(supAcctWin)) != 'y')
 	{
-	  wmove(supAcctWin,37,44);
+	  wmove(supAcctWin,sarow-6,pacol-27);
 	  if(newRec == 'n')
 	    break;
 	}
