@@ -1288,6 +1288,7 @@ int suppAccountInsert()
       mvwprintw(supAcctWin, sarow-(sarow-22),sacol-(sacol-5), "Comment:");
       mvwprintw(supAcctWin, sarow-(sarow-24),sacol-(sacol-5), "Alias:");
       mvwprintw(supAcctWin, sarow-(sarow-26),sacol-(sacol-5), "Provider Account ID(F6):");
+      mvwprintw(supAcctWin, sarow-2,sacol-(sacol-5),"Press F1 when form complete (F9 for Update)");
       wmove(supAcctWin,sarow-(sarow-4),sacol-(sacol-30));
       wrefresh(supAcctWin);
 
