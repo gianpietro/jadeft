@@ -868,28 +868,44 @@ void propertyInsert()
   int newRec= 'y';        /* Add another new record */
   int rows, cols;
   int cfUpdate = 0;
-  int list = 2, i = 0, j = 0;
+  int list = 6, i = 0, j = 0;
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1],  formats[1];
+  char *titleOne = "Property Entry Form";
+  char *titleTwo = "Property";
+  int lenOne = strlen(titleOne);
+  int lenTwo = strlen(titleTwo);  
 
   PGconn *conn =  fdbcon();
   PGresult *res;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
   keypad(stdscr,TRUE);
+
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);
+  init_pair(2,COLOR_BLUE,COLOR_WHITE);
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);  
 
   while (newRec == 'y')  /* Start loop to allow option to add subsequent records to form */
     {
       /* Add the fields required in the form */
       /* Size of field rows + cols, upper left corner row + col, offscreen rows, nbuf */
-      propertyField[0] = new_field(1, 1, 2, 22, 0, 0);      // active_ind
-      propertyField[1] = new_field(1, 10, 4, 22, 0, 0);     // post_code
-      propertyField[2] = new_field(1, 30, 6, 22, 0, 0);     // address
-      propertyField[3] = new_field(1, 30, 8, 22, 0, 0);     // city
+      propertyField[0] = new_field(1, 1, 4, 28, 0, 0);      // active_ind
+      propertyField[1] = new_field(1, 10, 6, 28, 0, 0);     // post_code
+      propertyField[2] = new_field(1, 30, 8, 28, 0, 0);     // address
+      propertyField[3] = new_field(1, 30, 10, 28, 0, 0);     // city
       propertyField[4] = NULL;
+
+      set_field_fore(propertyField[0], COLOR_PAIR(9));
+      set_field_back(propertyField[0], COLOR_PAIR(9));
+      set_field_fore(propertyField[1], COLOR_PAIR(9));
+      set_field_back(propertyField[1], COLOR_PAIR(9));
+      set_field_fore(propertyField[2], COLOR_PAIR(9));
+      set_field_back(propertyField[2], COLOR_PAIR(9));
 
       set_field_type(propertyField[0],TYPE_INTEGER,1,1,2);
       set_field_type(propertyField[1],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
@@ -897,14 +913,15 @@ void propertyInsert()
       set_field_type(propertyField[3],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");   
  
       propertyForm = new_form(propertyField);
-      scale_form(propertyForm, &rows, &cols);
+      scale_form(propertyForm, &rows, &cols);      
 
       /* Add window which will be associated to form */
-      prtWin = newwin(31,81,1,1);
-      prtUpdateWin = newwin(20,50,1,120);
+      prtWin = newwin(LINES-25, COLS/3,LINES-(LINES-4),COLS/15);
+      prtUpdateWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
 
       prtPanel = new_panel(prtUpdateWin);
       mainPanel = new_panel(prtWin);
+      wbkgd(prtWin, COLOR_PAIR(1));     
       update_panels();
       doupdate();
 
@@ -913,11 +930,14 @@ void propertyInsert()
 
       /* Set main and sub windows */
       set_form_win(propertyForm, prtWin);
-      set_form_sub(propertyForm, derwin(prtWin,rows,cols,1,1));
+      set_form_sub(propertyForm, derwin(prtWin,rows,cols,2,2));
       getmaxyx(prtWin,rows,cols);
-            
-      box(prtWin, 0,0);
+      getmaxyx(prtUpdateWin,urows,ucols);
+      box(prtWin,0,0);
       box(prtUpdateWin,0,0);
+      wattron(prtWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(prtWin,1,(cols-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+      wattroff(prtWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
           
       if (prtWin == NULL || prtUpdateWin == NULL)
 	{
@@ -926,19 +946,18 @@ void propertyInsert()
 	  getch();	  
 	}
 
-      waddstr(prtWin,"Property Entry Form");
-      mvwprintw(prtWin,29,1,"row %d col %d", rows, cols);
+      //waddstr(prtWin,"Property Entry Form");
+      //mvwprintw(prtWin,29,1,"row %d col %d", rows, cols);
 
       post_form(propertyForm);
       wrefresh(prtWin);
 
-      mvwprintw(prtWin,3,5, "Active Ind:");                           
-      mvwprintw(prtWin,5,5, "Post Code:");
-      mvwprintw(prtWin,7,5, "Address:");
-      mvwprintw(prtWin,9,5, "City:");
-            
-      mvwprintw(prtWin,28,1,"Press F1 when form complete");
-      wmove(prtWin,3,23);     /* move cursor */
+      mvwprintw(prtWin,rows-(rows-6),cols-(cols-5), "Active Ind:");                           
+      mvwprintw(prtWin,rows-(rows-8),cols-(cols-5), "Post Code:");
+      mvwprintw(prtWin,rows-(rows-10),cols-(cols-5), "Address:");
+      mvwprintw(prtWin,rows-(rows-12),cols-(cols-5), "City:");            
+      mvwprintw(prtWin,rows-2,cols-(cols-5),"Press F1 when form complete (F9 for Update)");
+      wmove(prtWin,rows-(rows-6),cols-(cols-30));     /* move cursor */
 
       while((ch = wgetch(prtWin)) != KEY_F(1))
 	{
@@ -950,12 +969,16 @@ void propertyInsert()
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = trows = 0, cfUpdate = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(prtUpdateWin);
 	      box(prtUpdateWin,0,0);
-	      waddstr(prtUpdateWin, "Property");
+	      //waddstr(prtUpdateWin, "Property");
+	      wattron(prtUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(prtUpdateWin,1,(ucols-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
+	      wattroff(prtUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(prtUpdateWin,1,1);
 	      show_panel(prtPanel);
+	      wbkgd(prtUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 	      //wrefresh(prtUpdateWin);
@@ -965,6 +988,9 @@ void propertyInsert()
 	      trows = PQntuples(res);
 
 	      wrefresh(prtUpdateWin);
+	      wattron(prtUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(prtUpdateWin, 4, 1, "ID     Post Code");  //+3
+	      wattroff(prtUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 	  
 	      while((p = wgetch(prtUpdateWin)) == '\n')
 		{
@@ -975,24 +1001,29 @@ void propertyInsert()
 		  for (i; i < j; i++)
 		    {
 		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		      mvwprintw(prtUpdateWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      mvwprintw(prtUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,2));
 		      list++;
 		      wclrtoeol(prtUpdateWin);
 		    }
-		  list = 2;      
+		  list = 6;      
 		  if  (i == trows)
 		    {
 		      wclrtobot(prtUpdateWin);  
-		      mvwprintw(prtUpdateWin,10,1,"End of list");
+		      mvwprintw(prtUpdateWin,13,1,"End of list");
 		      box(prtUpdateWin,0,0);
-		      mvwprintw(prtUpdateWin,0,0, "Property");
+		      //mvwprintw(prtUpdateWin,0,0, "Property");
+		      wattron(prtUpdateWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(prtUpdateWin,1,(ucols-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */
+		      wattroff(prtUpdateWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(prtUpdateWin,10,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(prtUpdateWin,11,1,"Select Option: ");
-	      mvwscanw(prtUpdateWin,11,25, "%d", &upID);
+	      echo();
+	      wattron(prtUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      mvwprintw(prtUpdateWin,urows-7,1,"Select Option: ");
+	      mvwscanw(prtUpdateWin,urows-7,ucols-45, "%d", &upID);
+	      wattroff(prtUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 
 	      PQclear(res);
 	  
@@ -1013,10 +1044,10 @@ void propertyInsert()
 	      trows = PQntuples(res);
 	      if (trows == 1)
 		{
-		  mvwprintw(prtUpdateWin,13,1, "no or rows %d ",trows);
+		  // mvwprintw(prtUpdateWin,13,1, "no or rows %d ",trows);
 		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  mvwprintw(prtUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
-		  wrefresh(prtUpdateWin);
+		  // mvwprintw(prtUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  //wrefresh(prtUpdateWin);
 		  set_field_buffer(propertyField[0],0,PQgetvalue(res,0,1));
 		  set_field_buffer(propertyField[1],0,PQgetvalue(res,0,2));
 		  set_field_buffer(propertyField[2],0,PQgetvalue(res,0,3));
@@ -1025,7 +1056,9 @@ void propertyInsert()
 		}
 	      else
 		{
-		  mvwprintw(prtUpdateWin,12,1,"Number invalid");
+		  wattron(prtUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(prtUpdateWin,urows-6,1,"Number invalid");
+		  wattroff(prtUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
 		  wrefresh(prtUpdateWin);		
 		  wrefresh(prtWin);
 		}
@@ -1049,21 +1082,25 @@ void propertyInsert()
 	{
 	  strcpy(prtPostCode, trimWS(prtPostCode));
 	  echo();
-	  mvwprintw(prtWin,15,5,"Save: y/n: ");
-	  mvwprintw(prtWin,16,5,"(d = delete record)");
-	  wmove(prtWin,15,18);
+	  wattron(prtWin,A_BOLD | COLOR_PAIR(1));
+	  mvwprintw(prtWin,rows-10,cols-64,"Save: y/n: ");
+	  wattroff(prtWin,A_BOLD | COLOR_PAIR(1));
+	  mvwprintw(prtWin,rows-9,cols-64,"(d = delete record)");
+	  wmove(prtWin,rows-10,cols-53);
 	  while((cf = wgetch(prtWin)) != 'y')
 	    {
-	      wmove(prtWin,15,18);
+	      wmove(prtWin,rows-10,cols-53);
 	      if (cf == 'n')
 		{
-		  mvwprintw(prtWin,22,5, "Data not saved");
+		  mvwprintw(prtWin,rows-10,cols-64, "Data not saved");
 		  break;
 		}
 	      if (cf == 'd')
 		{  
 		  prtDelete(upID);
-		  mvwprintw(prtWin,rows-6,cols-65, "Record deleted");                
+		  wattron(prtWin,A_BOLD | A_BLINK);
+		  mvwprintw(prtWin,rows-8,cols-64, "Record deleted");
+		  wattroff(prtWin,A_BOLD | A_BLINK);
 		  break;
 		}	      
 	    }
@@ -1073,19 +1110,21 @@ void propertyInsert()
 		{
 		  prtUpdate(upID, actInd, prtPostCode, prtAddress, prtCity); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
-		  mvwprintw(prtWin,rows-6,cols-65, "Data updated");
-		  mvwprintw(prtWin,rows-5,cols-65, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, prtPostCode);  //DEBUG
+		  mvwprintw(prtWin,rows-8,cols-64, "Data updated");
+		  // mvwprintw(prtWin,rows-5,cols-65, "cfUpdate %d,upID %d actInd %d sname %s", cfUpdate,upID,actInd, prtPostCode);  //DEBUG
 		}
 	      else 
 		{
 		  prtInsert(actInd, prtPostCode, prtAddress, prtCity);
-	          mvwprintw(prtWin,rows-6,cols-65, "Data saved");		  
+		  wattron(prtWin,A_BOLD | A_BLINK);
+	          mvwprintw(prtWin,rows-8,cols-64, "Data saved");
+		  wattroff(prtWin,A_BOLD | A_BLINK);
 		}
 	    }
 	}
       else
 	{
-	  mvwprintw(prtWin,22,5, "Data invalid");
+	  mvwprintw(prtWin,rows-8,cols-64, "Data invalid");
 	}
       noecho();
 
@@ -1098,11 +1137,11 @@ void propertyInsert()
 
       cfUpdate = 0;
 
-      mvwprintw(prtWin,25,5,"Do you want to add a new record y/n: ");
+      mvwprintw(prtWin,rows-6,cols-64,"Do you want to add a new record y/n: ");
       echo();
       while((newRec = wgetch(prtWin)) != 'y')
 	{
-	  wmove(prtWin,25,42);
+	  wmove(prtWin,rows-6,cols-27);
 	  if(newRec == 'n')
 	    break;
 	}
