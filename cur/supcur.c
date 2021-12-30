@@ -1166,12 +1166,12 @@ int suppAccountInsert()
   char p;
   int ch;
   int srow, scol, strow, stcol, sarow, sacol, prrow, prcol, pyrow, pycol, parow, pacol, urows, ucols;
-  int list = 2;
-  int supID, prtID, supTID, payID, proANo;
+  int list = 6;
+  int supID, prtID, supTID=0, payID, proANo;
   char supIDstr[5], prtIDstr[5], supTIDstr[5], payIDstr[5], proANostr[30];
   int rows;
   int val, upID, *params[1], length[1],  formats[1];
-  int safActiveID, safSupID, safPrtID, safSupTypeID, safStartDt, safEndDt, safPayID, safProAcctID;
+  int safActiveID, safSupID, safPrtID, safSupTypeID=0, safStartDt, safEndDt, safPayID, safProAcctID;
   float safAmount;
   char safSupAcctRef[30], safComment[30], safAlias[30];
   int cf;
