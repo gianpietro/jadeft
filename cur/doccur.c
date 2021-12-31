@@ -780,13 +780,17 @@ void documentInsert()
 	  if(ch == KEY_F(5))
 	    {
 	      i = j = rows = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(docTypeWin);
 	      box(docTypeWin,0,0);
-	      waddstr(docTypeWin, "Document Type");
+	      //waddstr(docTypeWin, "Document Type");
+	      wattron(docTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(docTypeWin,1,(tcol-lenFive)/2, titleFive);     /*SET_SUB_WIM_TITLE */
+	      wattroff(docTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(docTypeWin,1,1);
 	      //wrefresh(docTypeWin);
 	      show_panel(docTypePanel);
+	      wbkgd(docTypeWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();	
 
@@ -795,7 +799,9 @@ void documentInsert()
 	      rows = PQntuples(res);
 
 	      //wrefresh(docTypeWin);
-	  
+	      wattron(docTypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(docTypeWin, 4, 1, "ID    Description");  //+3
+	      wattroff(docTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */	  
 	      while((p = wgetch(docTypeWin)) == '\n')
 		{
 		  if ( j + RANGE < rows)
@@ -805,25 +811,31 @@ void documentInsert()
 		  for (i; i < j; i++)
 		    {
 		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		      mvwprintw(docTypeWin,list,1,"%s %s ", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
+		      mvwprintw(docTypeWin,list,1,"%-5s %-25s ", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
-		      wclrtoeol(docTypeWin);  
+		      wclrtoeol(docTypeWin);
+		      box(docTypeWin,0,0);
 		    }
-		  list = 2;      
+		  list = 6;      
 		  //wclrtoeol(docTypeWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(docTypeWin);  
-		      mvwprintw(docTypeWin,10,1,"End of list");
+		      mvwprintw(docTypeWin,13,1,"End of list");
 		      box(docTypeWin,0,0);
-		      mvwprintw(docTypeWin,0,0, "Document Type");
+		      //mvwprintw(docTypeWin,0,0, "Document Type");
+		      wattron(docTypeWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(docTypeWin,1,(tcol-lenFive)/2, titleFive);    /* SET_SUB_WIN_TITLE */
+		      wattroff(docTypeWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(docTypeWin,10,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(docTypeWin,11,1,"Select Option: ");
-	      mvwscanw(docTypeWin,11,25, "%5s", &docTypeIDStr);
+	      echo();
+	      wattron(docTypeWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      mvwprintw(docTypeWin,trow-7,1,"Select Option: ");
+	      mvwscanw(docTypeWin,trow-7,tcol-45, "%5s", &docTypeIDStr);
+	      wattroff(docTypeWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 	      set_field_buffer(docField[3],0, docTypeIDStr);
 
 	      // CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES 
@@ -847,14 +859,18 @@ void documentInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  mvwprintw(docTypeWin,13,1, "no or rows %d ",rows);
+		  set_field_buffer(docField[3],0,PQgetvalue(res,0,0));
+		  //mvwprintw(docTypeWin,13,1, "no or rows %d ",rows);
 		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  mvwprintw(docTypeWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
+		  //mvwprintw(docTypeWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  wrefresh(docTypeWin);
 		}
 	      else
 		{
-		  mvwprintw(docTypeWin,12,1,"Number invalid");
+		  set_field_buffer(docField[3],0,"");
+		  wattron(docTypeWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(docTypeWin,trow-6,1,"Number invalid");
+		  wattroff(docTypeWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
 		  wrefresh(docTypeWin);		
 		  //wrefresh(MAIN_WIN);
 		}
@@ -946,7 +962,7 @@ void documentInsert()
 		}
 	      else
 		{
-		  mvwprintw(docUpdateWin,12,1,"Number invalied");
+		  mvwprintw(docUpdateWin,12,1,"Number invalid");
 		  wrefresh(docUpdateWin);		
 		  //wrefresh(PARENT_WIN);
 		}
