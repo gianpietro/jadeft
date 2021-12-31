@@ -99,7 +99,7 @@ void documentTypeInsert()
       wmove(doctypeWin,drow-(drow-8),dcol-(dcol-24));
       //mvwprintw(doctypeWin,8,5,"rows %d cols %d", drow, dcol);
       //wrefresh(doctypeWin);
-      
+
       while((ch = wgetch(doctypeWin)) != KEY_F(1))
 	{
 	  hide_panel(doctypeUpdatePanel);
@@ -318,7 +318,7 @@ void documentInsert()
   int fExist;
   int upID;
   char updateCatalog[30];                     /* variable to store catalog for update */
-  char f[] = "/tmp/";
+  char f[5];// = "/tmp/";
   char e[strlen(docfFileName)];
   char fn[30];                                /* variable to store filename for update */
   char *titleOne = "Document Import Form";
@@ -462,6 +462,8 @@ void documentInsert()
       wmove(docWin,docrow-(docrow-4),doccol-(doccol-30));
       wrefresh(docWin);     
 
+      strcpy(f,"");
+      
       while((ch = wgetch(docWin)) != KEY_F(1))
 	{
 	  hide_panel(proAcctPanel);
@@ -1025,6 +1027,7 @@ void documentInsert()
 	  /* check to see if the file name entered exists */
 	  if (cfUpdate == 0)
 	    {
+	      strcpy(f,"/tmp/");
 	      strcpy(e,docfFileName);
 	      strcat(f,e);
 	      fExist = checkFileExists(f);
@@ -1082,7 +1085,7 @@ void documentInsert()
 		  wattroff(docWin,A_BOLD | A_BLINK);
 		  //mvwprintw(docWin,35,5, "cfUpdate %d,upID %d, dtDesc %s", cfUpdate,upID, dtDesc);  //DEBUG
 		}
-      	      else
+      	      else if (fExist != 2)
 		{
 		  documentImport(docfParentID, f, e, docfTypeID, docfRef, docfTitle, docfDesc, docfStartDt, docfEndDt, parentSelected);
 		  wattron(docWin,A_BOLD | A_BLINK);
