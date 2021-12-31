@@ -304,7 +304,7 @@ void documentInsert()
   int cf;
   int cfUpdate = 0;
   int i = 0, j = 0;
-  int list = 2;
+  int list = 6;
   int rows;
   char p;
   int docProAcctID, supAcctID, supInvID, docTypeID;
@@ -321,28 +321,52 @@ void documentInsert()
   char f[] = "/tmp/";
   char e[strlen(docfFileName)];
   char fn[30];                                /* variable to store filename for update */
+  char *titleOne = "Document Import Form";
+  char *titleTwo = "Provider Account";
+  char *titleThree = "Supplier Account";
+  char *titleFour = "Invoice";
+  char *titleFive = "Document Type";
+  char *titleSix = "Document";
+  int lenOne = strlen(titleOne);
+  int lenTwo = strlen(titleTwo);
+  int lenThree = strlen(titleThree);
+  int lenFour = strlen(titleFour);
+  int lenFive = strlen(titleFive);
+  int lenSix = strlen(titleSix);
+  int fldColor;
   
   PGconn *conn = fdbcon();
   PGresult *res;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
   keypad(stdscr, TRUE);
 
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);
+  init_pair(2,COLOR_BLUE,COLOR_WHITE);
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);  
+
   while ( newRec == 'y')
     {
-      docField[0] = new_field(1,5,2,33,0,0);    /* parent_id   */
-      docField[1] = new_field(1,30,4,33,0,0);   /* file_name   */
-      docField[2] = new_field(1,5,6,33,0,0);    /* oid_value   */
-      docField[3] = new_field(1,5,8,33,0,0);    /* type_id     */
-      docField[4] = new_field(2,25,10,33,0,0);  /* reference   */
-      docField[5] = new_field(4,25,13,33,0,0);  /* title       */
-      docField[6] = new_field(5,30,18,33,0,0);  /* description */
-      docField[7] = new_field(1,8,24,33,0,0);   /* start_date  */
-      docField[8] = new_field(1,8,26,33,0,0);   /* end_date    */
-      docField[9] = new_field(1,30,28,33,0,0);  /* catalog     */
+      docField[0] = new_field(1,5,2,28,0,0);    /* parent_id   */
+      docField[1] = new_field(1,30,4,28,0,0);   /* file_name   */
+      docField[2] = new_field(1,5,6,28,0,0);    /* oid_value   */
+      docField[3] = new_field(1,5,8,28,0,0);    /* type_id     */
+      docField[4] = new_field(2,25,10,28,0,0);  /* reference   */
+      docField[5] = new_field(4,25,13,28,0,0);  /* title       */
+      docField[6] = new_field(5,30,18,28,0,0);  /* description */
+      docField[7] = new_field(1,8,24,28,0,0);   /* start_date  */
+      docField[8] = new_field(1,8,26,28,0,0);   /* end_date    */
+      docField[9] = new_field(1,30,28,28,0,0);  /* catalog     */
       docField[10] = NULL;
+
+      for (fldColor = 0; fldColor < 9; fldColor++)
+	{
+	  set_field_fore(docField[fldColor], COLOR_PAIR(9));
+	  set_field_back(docField[fldColor], COLOR_PAIR(9));
+	}
       
       set_field_type(docField[0],TYPE_INTEGER,0,1,99999);
       set_field_type(docField[1],TYPE_REGEXP,"^[A-Za-z0-9 -./]+$");
@@ -361,12 +385,12 @@ void documentInsert()
       docForm = new_form(docField);
       scale_form(docForm, &docrow, &doccol);
 
-      docWin = newwin(docrow+15,doccol+10,1,1);
-      proAcctWin = newwin(20,50,1,120);
-      supAcctWin = newwin(20,50,1,120);
-      supInvWin = newwin(20,50,1,120);
-      docTypeWin = newwin(20,50,1,120);
-      docUpdateWin = newwin(20,50,1,120);
+      docWin = newwin(LINES-10, COLS/3,LINES-(LINES-4),COLS/15);
+      proAcctWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
+      supAcctWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
+      supInvWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
+      docTypeWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
+      docUpdateWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
 
       docPanel = new_panel(docWin);
       proAcctPanel = new_panel(proAcctWin);
@@ -374,7 +398,7 @@ void documentInsert()
       supInvPanel = new_panel(supInvWin);
       docTypePanel = new_panel(docTypeWin);
       docUpdatePanel = new_panel(docUpdateWin);
-      
+      wbkgd(docWin, COLOR_PAIR(1));     
       update_panels();
       doupdate();
 
@@ -386,7 +410,7 @@ void documentInsert()
       keypad(docUpdateWin, TRUE);
 
       set_form_win(docForm, docWin);
-      set_form_sub(docForm, derwin(docWin, docrow, doccol, 1, 1));
+      set_form_sub(docForm, derwin(docWin, docrow, doccol, 2, 2));
       getmaxyx(docWin, docrow, doccol);
       getmaxyx(proAcctWin, parow, pacol);
       getmaxyx(supAcctWin, sarow, sacol);
@@ -399,12 +423,15 @@ void documentInsert()
       box(supInvWin,0,0);
       box(docTypeWin,0,0);
       box(docUpdateWin,0,0);
-      waddstr(docWin, "Document Import Form");
+      wattron(docWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(docWin,1,(doccol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */      
+      wattroff(docWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      /* waddstr(docWin, "Document Import Form");
       waddstr(proAcctWin, "Provider Account");
       waddstr(supAcctWin, "Suppler Account");
       waddstr(supInvWin, "Invoice");
       waddstr(docTypeWin, "Document Type");
-      waddstr(docUpdateWin, "Document");      
+      waddstr(docUpdateWin, "Document");*/      
 
       if(docWin == NULL || proAcctWin == NULL  || supAcctWin == NULL || supInvWin == NULL || docTypeWin == NULL  || docUpdateWin == NULL)
 	{
@@ -416,19 +443,23 @@ void documentInsert()
       post_form(docForm);
       wrefresh(docWin);
 
-      mvwprintw(docWin, 3,5,  "ParentID:");
-      mvwprintw(docWin, 5,5,  "File Name:");
-      mvwprintw(docWin, 7,5,  "OID:");
-      mvwprintw(docWin, 9,5,  "Type(F5):");
-      mvwprintw(docWin, 11,5, "Reference:");
-      mvwprintw(docWin, 14,5, "Title:");
-      mvwprintw(docWin, 19,5, "Description:");
-      mvwprintw(docWin, 25,5, "Start Date:");
-      mvwprintw(docWin, 27,5, "End Date:");
-      mvwprintw(docWin, 29,5, "Catalog:");
-      mvwprintw(docWin, 40,5, "ParentID: F2-Provider F3-Supplier F4-Invoice");
-      mvwprintw(docWin, docrow-2, 5, "Press F1 when form complete (F9 for Update)");
-      wmove(docWin,3,34);
+      wattron(docWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(docWin, docrow-(docrow-4),doccol-(doccol-5),  "ParentID*:");
+      wattroff(docWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      mvwprintw(docWin, docrow-(docrow-6),doccol-(doccol-5),  "File Name:");
+      mvwprintw(docWin, docrow-(docrow-8),doccol-(doccol-5),  "OID:");
+      mvwprintw(docWin, docrow-(docrow-10),doccol-(doccol-5),  "Type(F5):");
+      mvwprintw(docWin, docrow-(docrow-12),doccol-(doccol-5), "Reference:");
+      mvwprintw(docWin, docrow-(docrow-15),doccol-(doccol-5), "Title:");
+      mvwprintw(docWin, docrow-(docrow-20),doccol-(doccol-5), "Description:");
+      mvwprintw(docWin, docrow-(docrow-26),doccol-(doccol-5), "Start Date:");
+      mvwprintw(docWin, docrow-(docrow-28),doccol-(doccol-5), "End Date:");
+      mvwprintw(docWin, docrow-(docrow-30),doccol-(doccol-5), "Catalog:");
+      wattron(docWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
+      mvwprintw(docWin, docrow-4, doccol-(doccol-5), "*ParentID: F2-Provider F3-Supplier F4-Invoice");
+      wattroff(docWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      mvwprintw(docWin, docrow-2, doccol-(doccol-5), "Press F1 when form complete (F9 for Update)");
+      wmove(docWin,docrow-(docrow-4),doccol-(doccol-30));
       wrefresh(docWin);     
 
       while((ch = wgetch(docWin)) != KEY_F(1))
@@ -446,17 +477,25 @@ void documentInsert()
 	    {
 	      strcpy(parentSelected, parentType[0]);	     /* assign PROVIDER to parentSelected to be used for catalog field */
 	      i = j = rows = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(proAcctWin);
 	      box(proAcctWin,0,0);
-	      waddstr(proAcctWin, "Provider Account");
+	      //waddstr(proAcctWin, "Provider Account");
+	      wattron(proAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(proAcctWin,1,(pacol-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
+	      wattroff(proAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(proAcctWin,1,1);
 	      show_panel(proAcctPanel);
+	      wbkgd(proAcctWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();
 
 	      res = PQexec(conn, "SELECT * FROM provider_account WHERE active_ind = 1 ORDER BY provider_acct_id");
 	      rows = PQntuples(res);
+
+	      wattron(proAcctWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(proAcctWin, 4, 1, "ID    Provider Account");  //+3
+	      wattroff(proAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 
 	      while((p = wgetch(proAcctWin)) == '\n')
 		{
@@ -466,24 +505,30 @@ void documentInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {
-		      mvwprintw(proAcctWin,list,1,"%s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,3));
+		      mvwprintw(proAcctWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,3));
 		      list++;
 		      wclrtoeol(proAcctWin);
+		      box(proAcctWin,0,0);
 		    }
-		  list = 2;
+		  list = 6;
 		  if (i == rows)
 		    {
 		      wclrtobot(proAcctWin);  
-		      mvwprintw(proAcctWin,10,1,"End of list");
+		      mvwprintw(proAcctWin,13,1,"End of list");
 		      box(proAcctWin,0,0);
-		      mvwprintw(proAcctWin,0,0, "Provider Account");
+		      //mvwprintw(proAcctWin,0,0, "Provider Account");
+		      wattron(proAcctWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(proAcctWin,1,(pacol-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */
+		      wattroff(proAcctWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(proAcctWin,10,1);
 		      break;		      
 		    }		  
 		}
 	      echo();
-	      mvwprintw(proAcctWin,11,1,"Select Provider Account: ");
-	      mvwscanw(proAcctWin,11,25, "%5s", &docProAcctIDstr);
+	      wattron(proAcctWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      mvwprintw(proAcctWin,parow-7,1,"Select Option: ");
+	      mvwscanw(proAcctWin,parow-7, pacol-45, "%5s", &docProAcctIDstr);
+	      wattroff(proAcctWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 	      set_field_buffer(docField[0],0, docProAcctIDstr);
 
 	      /* CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES */
@@ -508,14 +553,18 @@ void documentInsert()
 	      //mvwprintw(supWin,11,1,"rows %d", rows);
 	      if (rows == 1)
 		{
-		  mvwprintw(proAcctWin,13,1, "no or rows %d ",rows);
+		  set_field_buffer(docField[0],0,PQgetvalue(res,0,0));
+		  //mvwprintw(proAcctWin,13,1, "no or rows %d ",rows);
 		  /* CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED */
-		  mvwprintw(proAcctWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,3));
+		  //mvwprintw(proAcctWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,3));
 		  wrefresh(proAcctWin);
 		}
 	      else
 		{
-		  mvwprintw(proAcctWin,12,1,"Number invalied");
+		  set_field_buffer(docField[0],0,"");
+		  wattron(proAcctWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(proAcctWin,parow-6,1,"Number invalid");
+		  wattroff(proAcctWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
 		  // strcpy(docfCat, parentSelected[0]);     //DEBUG
 		  //mvwprintw(proAcctWin,3,1,"parent type %s",docfCat); // DEBUG CODE
 		  wrefresh(proAcctWin);		
@@ -527,19 +576,26 @@ void documentInsert()
 	    {
 	      strcpy(parentSelected, parentType[1]);
 	      i = j = rows = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(supAcctWin);
 	      box(supAcctWin,0,0);
-	      waddstr(supAcctWin, "Supplier Account");
+	      //waddstr(supAcctWin, "Supplier Account");
+	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(supAcctWin,1,(sacol-lenThree)/2, titleThree);     /*SET_SUB_WIM_TITLE */
+	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(supAcctWin,1,1);
 	      //wrefresh(supAcctWin);
 	      show_panel(supAcctPanel);
+	      wbkgd(supAcctWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();	
 
 	      // ASSIGN THE REQUIRED SELECT STATEMENT 
 	      res = PQexec(conn,"SELECT * FROM supplier_account WHERE active_ind = 1 ORDER BY supplier_acct_id");	  
 	      rows = PQntuples(res);
+	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(supAcctWin, 4, 1, "ID    Supplier Account");  //+3
+	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 
 	      //wrefresh(supAcctWin);
 	  
@@ -552,25 +608,31 @@ void documentInsert()
 		  for (i; i < j; i++)
 		    {
 		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		      mvwprintw(supAcctWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
+		      mvwprintw(supAcctWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,2));
 		      list++;
-		      wclrtoeol(supAcctWin);  
+		      wclrtoeol(supAcctWin);
+		      box(supAcctWin,0,0);
 		    }
-		  list = 2;      
+		  list = 6;      
 		  //wclrtoeol(supAcctWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(supAcctWin);  
-		      mvwprintw(supAcctWin,10,1,"End of list");
+		      mvwprintw(supAcctWin,13,1,"End of list");
 		      box(supAcctWin,0,0);
-		      mvwprintw(supAcctWin,0,0, "Supplier Account");
+		      //mvwprintw(supAcctWin,0,0, "Supplier Account");
+		      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(supAcctWin,1,(sacol-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */
+		      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(supAcctWin,10,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(supAcctWin,11,1,"Select Option: ");
-	      mvwscanw(supAcctWin,11,25, "%5s", &supAcctIDStr);
+	      echo();
+	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */
+	      mvwprintw(supAcctWin,sarow-7,1,"Select Option: ");
+	      mvwscanw(supAcctWin,sarow-7,sacol-45, "%5s", &supAcctIDStr);
+	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 	      set_field_buffer(docField[0],0, supAcctIDStr);
 
 	      // CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES 
@@ -594,14 +656,18 @@ void documentInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  mvwprintw(supAcctWin,13,1, "no or rows %d ",rows);
+		  set_field_buffer(docField[0],0,PQgetvalue(res,0,0));
+		  //mvwprintw(supAcctWin,13,1, "no or rows %d ",rows);
 		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  mvwprintw(supAcctWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  //mvwprintw(supAcctWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
 		  wrefresh(supAcctWin);
 		}
 	      else
 		{
-		  mvwprintw(supAcctWin,12,1,"Number invalid");
+		  set_field_buffer(docField[0],0,"");
+		  wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(supAcctWin,sarow-6,1,"Number invalid");
+		  wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
 		  wrefresh(supAcctWin);		
 		  //wrefresh(MAIN_WIN);
 		}
@@ -612,13 +678,17 @@ void documentInsert()
 	    {
 	      strcpy(parentSelected, parentType[2]);
 	      i = j = rows = 0;
-	      list = 2;
+	      list = 6;
 	      wclear(supInvWin);
 	      box(supInvWin,0,0);
-	      waddstr(supInvWin, "Invoice");
+	      //waddstr(supInvWin, "Invoice");
+	      wattron(supInvWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
+	      mvwprintw(supInvWin,1,(invcol-lenFour)/2, titleFour);     /*SET_SUB_WIM_TITLE */
+	      wattroff(supInvWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
 	      wmove(supInvWin,1,1);
 	      //wrefresh(supInvWin);
 	      show_panel(supInvPanel);
+	      wbkgd(supInvWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
 	      update_panels();
 	      doupdate();	
 
@@ -627,6 +697,9 @@ void documentInsert()
 	      rows = PQntuples(res);
 
 	      //wrefresh(supInvWin);
+	      wattron(supInvWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
+	      mvwprintw(supInvWin, 4, 1, "ID    Invoice number");  //+3
+	      wattroff(supInvWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
 	  
 	      while((p = wgetch(supInvWin)) == '\n')
 		{
@@ -637,26 +710,32 @@ void documentInsert()
 		  for (i; i < j; i++)
 		    {
 		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		      mvwprintw(supInvWin,list,1,"%s %s %s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4));
+		      mvwprintw(supInvWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
-		      wclrtoeol(supInvWin);  
+		      wclrtoeol(supInvWin);
+		      box(supInvWin,0,0);     /* REAPPLY_BOX */
 		    }
-		  list = 2;      
+		  list = 6;      
 		  //wclrtoeol(supInvWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(supInvWin);  
-		      mvwprintw(supInvWin,10,1,"End of list");
+		      mvwprintw(supInvWin,13,1,"End of list");
 		      box(supInvWin,0,0);
-		      mvwprintw(supInvWin,0,0, "Invoice");
+		      //mvwprintw(supInvWin,0,0, "Invoice");
+		      wattron(supInvWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
+		      mvwprintw(supInvWin,1,(invcol-lenFour)/2, titleFour);    /* SET_SUB_WIN_TITLE */
+		      wattroff(supInvWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(supInvWin,10,1);
 		      break;
 		    }
 		}	  
-	      echo();  
-	      mvwprintw(supInvWin,11,1,"Select Option: ");
-	      mvwscanw(supInvWin,11,25, "%5s", &supInvIDStr);
+	      echo();
+	      wattron(supInvWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      mvwprintw(supInvWin,invrow-7,1,"Select Option: ");
+	      mvwscanw(supInvWin,invrow-7,invcol-45, "%5s", &supInvIDStr);
 	      set_field_buffer(docField[0],0, supInvIDStr);
+	      wattroff(supInvWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
 
 	      // CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES 
 	      supInvID = atoi(field_buffer(docField[0],0));
@@ -679,14 +758,19 @@ void documentInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  mvwprintw(supInvWin,13,1, "no or rows %d ",rows);
+		  set_field_buffer(docField[0],0,PQgetvalue(res,0,0));
+		  //mvwprintw(supInvWin,13,1, "no or rows %d ",rows);
 		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  mvwprintw(supInvWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
+		  //mvwprintw(supInvWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
 		  wrefresh(supInvWin);
 		}
 	      else
 		{
-		  mvwprintw(supInvWin,12,1,"Number invalid");
+		  set_field_buffer(docField[4],0,"");
+		  wattron(supInvWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  mvwprintw(supInvWin,invrow-6,1,"Number invalid");
+		  wattroff(supInvWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
+		  
 		  wrefresh(supInvWin);		
 		  //wrefresh(MAIN_WIN);
 		}
