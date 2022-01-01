@@ -25,8 +25,8 @@ void suppInsert()
   int rows, cols, urows, ucols;
   char p;
   int trows, val, upID, *params[1], length[1],  formats[1];
-  char *titleOne = "Supplier Type Form";
-  char *titleTwo = "Supplier Type";
+  const char *titleOne = "Supplier Type Form";
+  const char *titleTwo = "Supplier Type";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
  
@@ -322,8 +322,8 @@ void suppTypeInsert()
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1],  formats[1];
-  char *titleOne = "Supplier Type Form";
-  char *titleTwo = "Supplier Type";
+  const char *titleOne = "Supplier Type Form";
+  const char *titleTwo = "Supplier Type";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   
@@ -593,8 +593,8 @@ void paymentPeriodInsert()
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1],  formats[1];
-  char *titleOne = "Payment Period Form";
-  char *titleTwo = "Pay Period";
+  const char *titleOne = "Payment Period Form";
+  const char *titleTwo = "Pay Period";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   
@@ -872,8 +872,8 @@ void propertyInsert()
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1],  formats[1];
-  char *titleOne = "Property Entry Form";
-  char *titleTwo = "Property";
+  const char *titleOne = "Property Entry Form";
+  const char *titleTwo = "Property";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);  
 
@@ -1177,13 +1177,13 @@ int suppAccountInsert()
   int cf;
   int newRec = 'y';
   int cfUpdate = 0;
-  char *titleOne = "Supplier Account Form";
-  char *titleTwo = "Supplier";
-  char *titleThree = "Property";
-  char *titleFour = "Supplier Type";
-  char *titleFive = "Payment Period";
-  char *titleSix = "Provider Account";
-  char *titleNine = "Supplier Account";
+  const char *titleOne = "Supplier Account Form";
+  const char *titleTwo = "Supplier";
+  const char *titleThree = "Property";
+  const char *titleFour = "Supplier Type";
+  const char *titleFive = "Payment Period";
+  const char *titleSix = "Provider Account";
+  const char *titleNine = "Supplier Account";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   int lenThree = strlen(titleThree);
@@ -1638,7 +1638,7 @@ int suppAccountInsert()
 		}
 	      else
 		{
-		  set_field_buffer(supAcctField[4],0,"");
+		 set_field_buffer(supAcctField[4],0,"");
 		  wattron(supTypeWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
 		  mvwprintw(supTypeWin,strow-6,1,"Number invalid");
 		  wattroff(supTypeWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */

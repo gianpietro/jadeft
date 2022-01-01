@@ -30,8 +30,8 @@ void categoryInsert()
   char *catDesc;  // using a pinter instead of array
   int cfUpdate = 0;
   int cf = 0;
-  char *titleOne = "Category Type Form";
-  char *titleTwo = "Category Type";
+  const char *titleOne = "Category Type Form";
+  const char *titleTwo = "Category Type";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
 
@@ -312,9 +312,9 @@ void statementLinkInsert()
   char slfAlias[30], slfCategory[50];
   int cfUpdate = 0;
   int cf;
-  char *titleOne = "Statement Link Entry Form";
-  char *titleTwo = "Category Type";
-  char *titleThree = "Statement Link List";
+  const char *titleOne = "Statement Link Entry Form";
+  const char *titleTwo = "Category Type";
+  const char *titleThree = "Statement Link List";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   int lenThree = strlen(titleThree);

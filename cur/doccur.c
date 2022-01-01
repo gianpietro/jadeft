@@ -29,8 +29,8 @@ void documentTypeInsert()
   char dtDesc[30];
   int cfUpdate = 0;
   int cf;
-  char *titleOne = "Document Type Form";
-  char *titleTwo = "Document Type";
+  const char *titleOne = "Document Type Form";
+  const char *titleTwo = "Document Type";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
 
@@ -318,15 +318,15 @@ void documentInsert()
   int fExist;
   int upID;
   char updateCatalog[30];                     /* variable to store catalog for update */
-  char f[5];// = "/tmp/";
+  char f[6];// = "/tmp/";
   char e[strlen(docfFileName)];
   char fn[30];                                /* variable to store filename for update */
-  char *titleOne = "Document Import Form";
-  char *titleTwo = "Provider Account";
-  char *titleThree = "Supplier Account";
-  char *titleFour = "Invoice";
-  char *titleFive = "Document Type";
-  char *titleNine = "Document";
+  const char *titleOne = "Document Import Form";
+  const char *titleTwo = "Provider Account";
+  const char *titleThree = "Supplier Account";
+  const char *titleFour = "Invoice";
+  const char *titleFive = "Document Type";
+  const char *titleNine = "Document";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   int lenThree = strlen(titleThree);
@@ -624,7 +624,7 @@ void documentInsert()
 		      box(supAcctWin,0,0);
 		      //mvwprintw(supAcctWin,0,0, "Supplier Account");
 		      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
-		      mvwprintw(supAcctWin,1,(sacol-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */
+		      mvwprintw(supAcctWin,1,(sacol-lenThree)/2, titleThree);    /* SET_SUB_WIN_TITLE */
 		      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
 		      wmove(supAcctWin,10,1);
 		      break;

@@ -29,9 +29,9 @@ void provInsert()
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1], formats[1];
-  char *formTitle = "Provider Entry Form";
+  const char *formTitle = "Provider Entry Form";
   int titleLen = strlen(formTitle);
-  char *provTitle = "Provider";
+  const char *provTitle = "Provider";
   int provLen = strlen(provTitle);
     
 
@@ -331,8 +331,8 @@ void provTypeInsert()
   char p;
   int urows, ucols;
   int trows, val, upID, *params[1], length[1],  formats[1];
-  char *titleOne = "Provider Type Form";
-  char *titleTwo = "Provider Type";
+  const char *titleOne = "Provider Type Form";
+  const char *titleTwo = "Provider Type";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   
@@ -613,10 +613,10 @@ int provAccountInsert()
   int cf; // confirm save to DB
   int newRec = 'y';
   int cfUpdate = 0; //'y';
-  char *titleOne = "Provider Account Form";
-  char *titleTwo = "Provider List";
-  char *titleThree = "Provider Type";
-  char *titleFour = "Provider Account";  
+  const char *titleOne = "Provider Account Form";
+  const char *titleTwo = "Provider List";
+  const char *titleThree = "Provider Type";
+  const char *titleFour = "Provider Account";  
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   int lenThree = strlen(titleThree);

@@ -32,9 +32,9 @@ void invInsert()
   char invfNo[30], invfDesc[30];
   int cfUpdate = 0;
   int cf;
-  char *titleOne = "Invoice Entry Form";
-  char *titleTwo = "Supplier Account";
-  char *titleThree = "Invoice";
+  const char *titleOne = "Invoice Entry Form";
+  const char *titleTwo = "Supplier Account";
+  const char *titleThree = "Invoice";
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   int lenThree = strlen(titleThree);
