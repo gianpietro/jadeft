@@ -428,7 +428,7 @@ void invInsert()
       echo();
       while((newRec = wgetch(invWin)) != 'y')
 	{
-	  wmove(invWin,invrow-8,invcol-27);
+	  wmove(invWin,invrow-6,invcol-27);
 	  if(newRec == 'n')
 	    break;
 	}
