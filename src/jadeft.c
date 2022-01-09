@@ -114,11 +114,8 @@ int main (void) {
 	case 303:
 	  statementLinkInsert();
 	  break;
-	case 304:	 
-	  ptr = upLoadStatement();
-	  printStmtFile(ptr);
-	  statementInsert(ptr); 
-	  freeStatement(ptr);	  
+	case 304:	  
+	  upLoadStatement();	  
 	  break;
 	case 400:
 	  documentTypeInsert();

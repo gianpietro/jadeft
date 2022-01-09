@@ -12,10 +12,14 @@
 
 /* Function to read the downloaded bank statement file, selects required
    columns for data import and uploads these to a linked list */
-struct statement *upLoadStatement()
+//struct statement *upLoadStatement()
+void upLoadStatement()
 {
+  WINDOW *stmtWin;
+  PANEL *stmtPanel;
   struct statement *start, *newStmtPtr, *end, *ptr;
-  FILE *cp,*np;                                                          /* pointers to file */
+  FILE *cp,*np;  /* pointers to file */
+  int row, col;
   int i = 0;                                                             /* count of rows in the statement file download */
   int j = 0;                                                             /* count of characters in the date column */
   int j2 = 0;                                                            /* count of characters in the type column */ 
@@ -49,7 +53,21 @@ struct statement *upLoadStatement()
   int charCount = 0;                                                     /* number of characters in each data column */
 
   char * upf = fStmtName();                                              /* function to obtain filename to load and if exists */
+ 
+  initscr();
+  cbreak();
+  noecho();
+  keypad(stdscr, TRUE);
+  
+  stmtWin = newwin(LINES*0.75, COLS*0.75, LINES-(LINES-4), COLS*0.1);
+  stmtPanel = new_panel(stmtWin);
+  //touchwin(stmtWin);
+  //touchwin(stdscr);
+  update_panels();
+  doupdate();
 
+  getmaxyx(stmtWin, row, col);
+  
   if(upf != NULL)
     {
       cp = fopen(upf, "r");
@@ -219,6 +237,9 @@ struct statement *upLoadStatement()
 	    }
 	  l++;
 	}
+
+      printStmtFile(start);
+      statementInsert(start);
   
       for (g = 0; g < rs; g++)
 	{
@@ -240,12 +261,18 @@ struct statement *upLoadStatement()
 
       free(upf);
       free(stmtAliasRtn);
+      freeStatement(start);
 
       fclose(cp);
       fclose(np);
       
-      return start;
-    }  
+      //return start;
+    }
+  hide_panel(stmtPanel);
+  update_panels();
+  doupdate();
+  delwin(stmtWin);
+  endwin();
 }
 
 /* Select values in the statement_link table and assign values to 
@@ -315,10 +342,13 @@ void statementInsert(struct statement *start)
 
   initscr();
   cbreak();
+  noecho();
 
   stmtInsertWin = newwin(10, 110, 1, 1);
   stmtInsertPanel = new_panel(stmtInsertWin);
   show_panel(stmtInsertPanel);
+  touchwin(stmtInsertWin);
+  touchwin(stdscr);
   update_panels();
   doupdate();
 
@@ -374,32 +404,53 @@ void printStmtFile(struct statement *start)
 {
   int i= 0;
 
-  WINDOW *upLoadStmtWindow;
+  WINDOW *upLoadStmtWindow, *disStmtWin;
   PANEL *upLoadStmtPanel;
   int srow = 0;
   int scol = 0;
-  struct statement *ptr; 
+  struct statement *ptr;
+  const char *titleOne = "Statement Up-Load";
+  int lenOne = strlen(titleOne);
+
   ptr = start;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
+  keypad(stdscr, TRUE);
 
-  //keypad(stdscr, TRUE);
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);
+  init_pair(2,COLOR_BLUE,COLOR_WHITE);
+  init_pair(3,COLOR_YELLOW,COLOR_MAGENTA);
+  init_pair(4,COLOR_WHITE,COLOR_CYAN);  
+  init_pair(6,COLOR_BLACK,COLOR_YELLOW);
+  init_pair(8,COLOR_BLACK,COLOR_WHITE); 
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);
+  init_pair(10,COLOR_BLACK,COLOR_CYAN);
+  init_pair(11,COLOR_YELLOW,COLOR_BLUE);
 
-  upLoadStmtWindow = newwin(40, 170, 1, 1);
+  upLoadStmtWindow = newwin(LINES*0.75, COLS*0.75, LINES-(LINES-4), COLS*0.1);                          //(40, 170, 1, 1);
   upLoadStmtPanel = new_panel(upLoadStmtWindow);
+  //wbkgd(upLoadStmtWindow, COLOR_PAIR(11));
+  //touchwin(upLoadStmtWindow);
+  //touchwin(stdscr);
   update_panels();
   doupdate();
   
   keypad(upLoadStmtWindow, TRUE);
   getmaxyx(upLoadStmtWindow, srow, scol);
 
+  disStmtWin = derwin(upLoadStmtWindow, srow-2, scol-2, 1, 1);
+
   scrollok(upLoadStmtWindow, TRUE);
+  scrollok(disStmtWin, TRUE);
+  
 
   box(upLoadStmtWindow, 0, 0);
-  waddstr(upLoadStmtWindow, "Statement Up Load");
-
+  //touchwin(upLoadStmtWindow);
+  // waddstr(upLoadStmtWindow, "Statement Up Load");
+  waddstr(disStmtWin, "Statement upload");
   if(upLoadStmtWindow == NULL) 
      {
       addstr("Unable to create window");
@@ -407,26 +458,39 @@ void printStmtFile(struct statement *start)
       getch();
       }
 
-  wrefresh(upLoadStmtWindow);
+  hide_panel(upLoadStmtPanel);
+  update_panels();
+  doupdate();
+  
+  //wattron(disStmtWin,A_BOLD | COLOR_PAIR(11));     /* ATTON_MAIN_WIN_TITLE */
+  //mvwprintw(disStmtWin,1,(scol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+  
+  //wattroff(disStmtWin,A_BOLD | COLOR_PAIR(2));    /* ATTOFF_MAIN_WIN_TITLE */
+  wrefresh(disStmtWin);
 
-  mvwprintw(upLoadStmtWindow,3,2,"Date, Type, Description, Value, Account Number\n");
+  // wattron(disStmtWin,A_BOLD | COLOR_PAIR(11));     /* ATTON_MAIN_WIN_TITLE */
+  mvwprintw(disStmtWin,6,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     {     
-      i++;    
-        mvwprintw(upLoadStmtWindow, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);    
+      i++;
+      mvwprintw(disStmtWin, i+8, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
       if (i == 20)                                                       
-	{	  
-	  wgetch(upLoadStmtWindow);	                                 /* if 20 rows hit enter */
+	{
+	  box(disStmtWin, 0, 0);
+	  wgetch(disStmtWin);	                                 /* if 20 rows hit enter */
 	  i = 0;                                                         /* if 20 rows set i to 0 */
 	} 
       ptr = ptr->next;
-      wclrtobot(upLoadStmtWindow);  
-      wrefresh(upLoadStmtWindow);
-    } 
+      wclrtobot(disStmtWin);
+      box(disStmtWin, 0, 0);
+      // wrefresh(upLoadStmtWindow);
+    }
+ 
+  // wattroff(upLoadStmtWindow,A_BOLD | COLOR_PAIR(11));    /* ATTOFF_MAIN_WIN_TITLE */
   wgetch(upLoadStmtWindow);
-  hide_panel(upLoadStmtPanel);  
-  update_panels();
-  doupdate();
+  //hide_panel(upLoadStmtPanel);  
+  //update_panels();
+  //doupdate();
   delwin(upLoadStmtWindow);
   endwin();
 }
@@ -445,20 +509,31 @@ char * fStmtName()
   char f[FNAME] = "/tmp/";                                               /* directory where file saved */
   char *e;                                                               /* full file name with path */
   int fExist = 0;
+  const char *titleOne = "Upload File";
+  int lenOne = strlen(titleOne);
 
   initscr();
+  start_color();
   cbreak();
   noecho();
+  
+  init_pair(2,COLOR_BLUE,COLOR_WHITE);
 
-  fStmtUpWindow = newwin(10, 110, 1, 1);
+  fStmtUpWindow = newwin(LINES/5, COLS/2, LINES-(LINES-4), COLS/4); //(10, 110, 1, 1);
   fStmtUpPanel = new_panel(fStmtUpWindow);
+  wbkgd(fStmtUpWindow, COLOR_PAIR(2));
+  touchwin(fStmtUpWindow);
+  touchwin(stdscr);
   update_panels();
   doupdate();
 
   keypad(fStmtUpWindow, TRUE);
   getmaxyx(fStmtUpWindow, frow, fcol);
   box(fStmtUpWindow, 0, 0);
-  waddstr(fStmtUpWindow, "Upload File");
+  //waddstr(fStmtUpWindow, "Upload File");
+  wattron(fStmtUpWindow,A_BOLD | COLOR_PAIR(2));
+  mvwprintw(fStmtUpWindow,1,(fcol-lenOne)/2, titleOne);
+  wattroff(fStmtUpWindow,A_BOLD | COLOR_PAIR(2));
 
   if(fStmtUpWindow == NULL)
     {
