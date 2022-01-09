@@ -408,17 +408,22 @@ void printStmtFile(struct statement *start)
   PANEL *upLoadStmtPanel;
   int srow = 0;
   int scol = 0;
-  struct statement *ptr; 
+  struct statement *ptr;
+  const char *titleOne = "Statement Up-Load";
+  int lenOne = strlen(titleOne);
   ptr = start;
 
   initscr();
+  start_color();
   cbreak();
   noecho();
+  keypad(stdscr, TRUE);
 
-  //keypad(stdscr, TRUE);
+  init_pair(11,COLOR_YELLOW,COLOR_BLUE);
 
-  upLoadStmtWindow = newwin(40, 170, 1, 1);
+  upLoadStmtWindow = newwin(LINES*0.75, COLS*0.75, LINES-(LINES-4), COLS*0.1);
   upLoadStmtPanel = new_panel(upLoadStmtWindow);
+  wbkgd(upLoadStmtWindow, COLOR_PAIR(11));
   update_panels();
   doupdate();
   
@@ -428,7 +433,7 @@ void printStmtFile(struct statement *start)
   scrollok(upLoadStmtWindow, TRUE);
 
   box(upLoadStmtWindow, 0, 0);
-  waddstr(upLoadStmtWindow, "Statement Up Load");
+  //waddstr(upLoadStmtWindow, "Statement Up Load");
 
   if(upLoadStmtWindow == NULL) 
      {
@@ -438,19 +443,23 @@ void printStmtFile(struct statement *start)
       }
 
   wrefresh(upLoadStmtWindow);
+  wattron(upLoadStmtWindow,A_BOLD | COLOR_PAIR(11));     /* ATTON_MAIN_WIN_TITLE */
+  mvwprintw(upLoadStmtWindow,1,(scol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
 
-  mvwprintw(upLoadStmtWindow,3,2,"Date, Type, Description, Value, Account Number\n");
+  mvwprintw(upLoadStmtWindow,6,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     {     
       i++;    
-        mvwprintw(upLoadStmtWindow, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);    
+        mvwprintw(upLoadStmtWindow, i+8, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);    
       if (i == 20)                                                       
-	{	  
+	{
+	  box(upLoadStmtWindow, 0, 0);
 	  wgetch(upLoadStmtWindow);	                                 /* if 20 rows hit enter */
 	  i = 0;                                                         /* if 20 rows set i to 0 */
 	} 
       ptr = ptr->next;
-      wclrtobot(upLoadStmtWindow);  
+      wclrtobot(upLoadStmtWindow);
+      box(upLoadStmtWindow, 0, 0);
       wrefresh(upLoadStmtWindow);
     } 
   wgetch(upLoadStmtWindow);
