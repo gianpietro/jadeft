@@ -404,53 +404,32 @@ void printStmtFile(struct statement *start)
 {
   int i= 0;
 
-  WINDOW *upLoadStmtWindow, *disStmtWin;
+  WINDOW *upLoadStmtWindow;
   PANEL *upLoadStmtPanel;
   int srow = 0;
   int scol = 0;
-  struct statement *ptr;
-  const char *titleOne = "Statement Up-Load";
-  int lenOne = strlen(titleOne);
-
+  struct statement *ptr; 
   ptr = start;
 
   initscr();
-  start_color();
   cbreak();
   noecho();
-  keypad(stdscr, TRUE);
 
-  init_pair(1,COLOR_WHITE,COLOR_BLUE);
-  init_pair(2,COLOR_BLUE,COLOR_WHITE);
-  init_pair(3,COLOR_YELLOW,COLOR_MAGENTA);
-  init_pair(4,COLOR_WHITE,COLOR_CYAN);  
-  init_pair(6,COLOR_BLACK,COLOR_YELLOW);
-  init_pair(8,COLOR_BLACK,COLOR_WHITE); 
-  init_pair(9,COLOR_WHITE,COLOR_BLACK);
-  init_pair(10,COLOR_BLACK,COLOR_CYAN);
-  init_pair(11,COLOR_YELLOW,COLOR_BLUE);
+  //keypad(stdscr, TRUE);
 
-  upLoadStmtWindow = newwin(LINES*0.75, COLS*0.75, LINES-(LINES-4), COLS*0.1);                          //(40, 170, 1, 1);
+  upLoadStmtWindow = newwin(40, 170, 1, 1);
   upLoadStmtPanel = new_panel(upLoadStmtWindow);
-  //wbkgd(upLoadStmtWindow, COLOR_PAIR(11));
-  //touchwin(upLoadStmtWindow);
-  //touchwin(stdscr);
   update_panels();
   doupdate();
   
   keypad(upLoadStmtWindow, TRUE);
   getmaxyx(upLoadStmtWindow, srow, scol);
 
-  disStmtWin = derwin(upLoadStmtWindow, srow-2, scol-2, 1, 1);
-
   scrollok(upLoadStmtWindow, TRUE);
-  scrollok(disStmtWin, TRUE);
-  
 
   box(upLoadStmtWindow, 0, 0);
-  //touchwin(upLoadStmtWindow);
-  // waddstr(upLoadStmtWindow, "Statement Up Load");
-  waddstr(disStmtWin, "Statement upload");
+  waddstr(upLoadStmtWindow, "Statement Up Load");
+
   if(upLoadStmtWindow == NULL) 
      {
       addstr("Unable to create window");
@@ -458,39 +437,26 @@ void printStmtFile(struct statement *start)
       getch();
       }
 
-  hide_panel(upLoadStmtPanel);
-  update_panels();
-  doupdate();
-  
-  //wattron(disStmtWin,A_BOLD | COLOR_PAIR(11));     /* ATTON_MAIN_WIN_TITLE */
-  //mvwprintw(disStmtWin,1,(scol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
-  
-  //wattroff(disStmtWin,A_BOLD | COLOR_PAIR(2));    /* ATTOFF_MAIN_WIN_TITLE */
-  wrefresh(disStmtWin);
+  wrefresh(upLoadStmtWindow);
 
-  // wattron(disStmtWin,A_BOLD | COLOR_PAIR(11));     /* ATTON_MAIN_WIN_TITLE */
-  mvwprintw(disStmtWin,6,2,"Date, Type, Description, Value, Account Number\n");
+  mvwprintw(upLoadStmtWindow,3,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     {     
-      i++;
-      mvwprintw(disStmtWin, i+8, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+      i++;    
+        mvwprintw(upLoadStmtWindow, i+4, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);    
       if (i == 20)                                                       
-	{
-	  box(disStmtWin, 0, 0);
-	  wgetch(disStmtWin);	                                 /* if 20 rows hit enter */
+	{	  
+	  wgetch(upLoadStmtWindow);	                                 /* if 20 rows hit enter */
 	  i = 0;                                                         /* if 20 rows set i to 0 */
 	} 
       ptr = ptr->next;
-      wclrtobot(disStmtWin);
-      box(disStmtWin, 0, 0);
-      // wrefresh(upLoadStmtWindow);
-    }
- 
-  // wattroff(upLoadStmtWindow,A_BOLD | COLOR_PAIR(11));    /* ATTOFF_MAIN_WIN_TITLE */
+      wclrtobot(upLoadStmtWindow);  
+      wrefresh(upLoadStmtWindow);
+    } 
   wgetch(upLoadStmtWindow);
-  //hide_panel(upLoadStmtPanel);  
-  //update_panels();
-  //doupdate();
+  hide_panel(upLoadStmtPanel);  
+  update_panels();
+  doupdate();
   delwin(upLoadStmtWindow);
   endwin();
 }
