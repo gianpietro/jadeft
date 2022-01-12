@@ -25,6 +25,7 @@ struct statement *importStmt(char transactionDate[], char transactionType[], cha
     ptr->actNumber[i] = accountNumber[i];
   for (i=0; i<ALIAS; i++)
     ptr->tAlias[i] = transactionAlias[i];
+  ptr->next = NULL;
  
   return ptr;    
 }
