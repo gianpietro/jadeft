@@ -9,11 +9,11 @@
 #define TDATE 9                                                          /* transaction date */
 #define TTYPE 4                                                          /* transaction type */
 #define TDESC 150                                                        /* transaction description */
-#define TVALUE 10                                                        /* transaction value */
-#define ANUM 16                                                          /* account number */
-#define ALIAS 50                                                         /* alias matched from statement_link table */
-#define FNAME 70                                                         /* filename of statement file to upload */
-#define BACKSP 7                                                         /* backspace infStmtName is ascii  7 */
+#define TVALUE 11                                                        /* transaction value */
+#define ANUM 17                                                          /* account number */
+#define ALIAS 51                                                         /* alias matched from statement_link table */
+#define FNAME 71                                                         /* filename of statement file to upload */
+#define BACKSP 8                                                         /* backspace infStmtName is ascii  7 */
 
 
 struct statement{
