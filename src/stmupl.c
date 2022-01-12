@@ -69,10 +69,10 @@ void upLoadStatement()
   getmaxyx(stmtWin, row, col);
   
   if(upf != NULL)
-    {
+    {       
       cp = fopen(upf, "r");
       np = fopen(upf, "r");
-  
+
       while (c != EOF) 
 	{
 	  kc++;                                                          /* number of characters in the file */       
@@ -105,13 +105,13 @@ void upLoadStatement()
       transAlias = (char **) malloc (rs * sizeof(char *));
       for (h = 0; h < rs; h++)
 	{
-	  tmpDate[h] = (char *)malloc(TDATE+1 * sizeof(char));
-	  transDate[h] = (char *)malloc(TDATE+1 * sizeof(char));
-	  transType[h] = (char *)malloc(TTYPE+1 * sizeof(char));
-	  transDescription[h] = (char *)malloc(TDESC+1 * sizeof(char));
-	  transValue[h] = (char *)malloc(TVALUE+1 * sizeof(char));
-	  accountNumber[h] = (char *)malloc(ANUM+1 * sizeof(char));
-	  transAlias[h] = (char *)malloc(ALIAS+1 * sizeof(char));
+	  tmpDate[h] = (char *)malloc(TDATE * sizeof(char));
+	  transDate[h] = (char *)malloc(TDATE * sizeof(char));
+	  transType[h] = (char *)malloc(TTYPE * sizeof(char));
+	  transDescription[h] = (char *)malloc(TDESC * sizeof(char));
+	  transValue[h] = (char *)malloc(TVALUE * sizeof(char));
+	  accountNumber[h] = (char *)malloc(ANUM * sizeof(char));
+	  transAlias[h] = (char *)malloc(ALIAS * sizeof(char));
 	}
 
       if (tmpDate == NULL ||
@@ -130,11 +130,11 @@ void upLoadStatement()
 	  pos = ftell(cp);      
 	  if (c == '\n')
 	    {
-	      tmpDate[i][j+1] = '\0';                                    /* add end of string char when reach end of row */
-	      transType[i][j2+1] = '\0';
-	      transDescription[i][j3+1] = '\0';
-	      transValue[i][j4+1] = '\0';
-	      accountNumber[i][j5+1] = '\0';
+	      tmpDate[i][j] = '\0';                                    /* add end of string char when reach end of row */
+	      transType[i][j2] = '\0';
+	      transDescription[i][j3] = '\0';
+	      transValue[i][j4] = '\0';
+	      accountNumber[i][j5] = '\0';
 	      j = j2 = j3 = j4 = j5 = 0;
 	      ++i;
 	      qcount = 0;
@@ -160,12 +160,13 @@ void upLoadStatement()
 			if (charCount == 1 && n == QM)                   /* If Type blank */
 			  {
 			    transType[i][j2] = 'Z';
+			    ++j2;
 			  }
 			else if (n != QM)
 			  {
 			    transType[i][j2] = n;
+			    ++j2;
 			  }
-			++j2;		      
 		      }
 		    if (qcount == 5 && n != QM)                          /* Description column */
 		      {
@@ -201,6 +202,7 @@ void upLoadStatement()
 	  transDate[q][5] = tmpDate[q][3];
 	  transDate[q][6] = tmpDate[q][0];
 	  transDate[q][7] = tmpDate[q][1];
+	  transDate[q][8] = tmpDate[q][8];
 	}
  
       resRow = resultRows();                                             /* return number of rows in the statement_link table */
@@ -208,22 +210,22 @@ void upLoadStatement()
 
       /* match the string patter in the Decription to the alias in the
 	 statement_link table */
-      for (x = 0; x < i; x++)
+         for (x = 0; x < i; x++)
 	{ 
 	  for (w = 0; w < resRow; w++)
 	    {
 	      aliasPos = aliasMatch(transDescription[x], stmtAliasRtn[w]);
 	      if (aliasPos != -1)
 		{
-		  strcpy(transAlias[x], stmtAliasRtn[w]);	         /* assign alias to array */
+		  strcpy(transAlias[x], stmtAliasRtn[w]);	         // assign alias to array 
 		  break;
 		}
 	      else	     
-		strcpy(transAlias[x],"NA");	                         /* if no alias match found assign NA */    
+		strcpy(transAlias[x],"NA");	                         // if no alias match found assign NA 
 	    }
-	}
+	    }
 
-      for (x = 0; x < i; x++)                                            /* assign statement data to the linked list */
+      for (x = 0; x < i; x++)                                            // assign statement data to the linked list
 	{
 	  if (l == 0)
 	    {
@@ -260,7 +262,7 @@ void upLoadStatement()
       free(transAlias);     
 
       free(upf);
-      free(stmtAliasRtn);
+      //free(stmtAliasRtn);
       freeStatement(start);
 
       fclose(cp);
@@ -442,15 +444,22 @@ void printStmtFile(struct statement *start)
       getch();
       }
 
-  wrefresh(upLoadStmtWindow);
+  //wclear(upLoadStmtWindow);
+  //wrefresh(upLoadStmtWindow);
   wattron(upLoadStmtWindow,A_BOLD | COLOR_PAIR(11));     /* ATTON_MAIN_WIN_TITLE */
   mvwprintw(upLoadStmtWindow,1,(scol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+
+  show_panel(upLoadStmtPanel);
+  update_panels();
+  doupdate();
 
   mvwprintw(upLoadStmtWindow,6,2,"Date, Type, Description, Value, Account Number\n");
   while(ptr != NULL)
     {     
       i++;    
-        mvwprintw(upLoadStmtWindow, i+8, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);    
+      mvwprintw(upLoadStmtWindow, i+8, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+      // mvwprintw(upLoadStmtWindow, i+8, 2,"%-12.8s %-5.3s %-75.8s %15.8s %17.8s %-20.8s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
+      //mvwprintw(upLoadStmtWindow, i+8, 2,"%-12s \n", ptr->tType);      
       if (i == 20)                                                       
 	{
 	  box(upLoadStmtWindow, 0, 0);
@@ -460,7 +469,7 @@ void printStmtFile(struct statement *start)
       ptr = ptr->next;
       wclrtobot(upLoadStmtWindow);
       box(upLoadStmtWindow, 0, 0);
-      wrefresh(upLoadStmtWindow);
+      //wrefresh(upLoadStmtWindow);
     } 
   wgetch(upLoadStmtWindow);
   hide_panel(upLoadStmtPanel);  
