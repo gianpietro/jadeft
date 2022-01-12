@@ -13,7 +13,7 @@
 #define ANUM 17                                                          /* account number */
 #define ALIAS 51                                                         /* alias matched from statement_link table */
 #define FNAME 71                                                         /* filename of statement file to upload */
-#define BACKSP 8                                                         /* backspace infStmtName is ascii  7 */
+#define BACKSP 7                                                         /* backspace infStmtName is ascii  7 (?127)*/
 
 
 struct statement{

@@ -262,7 +262,7 @@ void upLoadStatement()
       free(transAlias);     
 
       free(upf);
-      //free(stmtAliasRtn);
+      free(stmtAliasRtn);
       freeStatement(start);
 
       fclose(cp);
