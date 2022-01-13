@@ -310,7 +310,7 @@ void documentInsert()
   int docProAcctID, supAcctID, supInvID, docTypeID;
   char docProAcctIDstr[5], supAcctIDStr[5], supInvIDStr[5], docTypeIDStr[5];
   int val, *params[1], length[1], formats[1];
-  char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
+  const char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};
   char parentSelected[9];
   //char parentSelected[1][9];
   int docfParentID, docfOid, docfTypeID, docfStartDt, docfEndDt;
@@ -972,6 +972,8 @@ void documentInsert()
 		  set_field_buffer(docField[7],0,PQgetvalue(res,0,8));
 		  set_field_buffer(docField[8],0,PQgetvalue(res,0,9));
 		  set_field_buffer(docField[9],0,PQgetvalue(res,0,10));
+
+		  strcpy(parentSelected, trimWS(field_buffer(docField[9],0)));
 		  cfUpdate = 1;
 		  //wrefresh(docUpdateWin);
 		}
@@ -1005,9 +1007,8 @@ void documentInsert()
       strcpy(docfTitle, trimWS(field_buffer(docField[5],0)));
       strcpy(docfDesc, trimWS(field_buffer(docField[6],0)));
       docfStartDt = atoi(field_buffer(docField[7],0));
-      docfEndDt = atoi(field_buffer(docField[8],0));
+      docfEndDt = atoi(field_buffer(docField[8],0));      
       strcpy(docfCat, parentSelected);
-      //set_field_buffer(docField[9],0,docfCat);
 
       if(cfUpdate == 1)
 	{
@@ -1017,8 +1018,8 @@ void documentInsert()
 	  strcpy(docfCat,updateCatalog);
 	}
       else
-	{
-	  strcpy(docfCat, parentSelected);
+        {	
+	  //strcpy(docfCat, parentSelected);
 	  set_field_buffer(docField[9],0,docfCat);
 	}
 			 
