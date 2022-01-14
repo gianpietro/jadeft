@@ -53,7 +53,7 @@ void upLoadStatement()
   long int posn = 0;                                                     /* position of file cursor n */  
   int charCount = 0;                                                     /* number of characters in each data column */
 
-   char * upf = fStmtName();                                              /* function to obtain filename to load and if exists */
+  char * upf = fStmtName();                                              /* function to obtain filename to load and if exists */
  
   initscr();
   cbreak();
