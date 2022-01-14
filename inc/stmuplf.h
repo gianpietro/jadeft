@@ -12,7 +12,7 @@ char ** addAlias();
 
 int resultRows();
 
-void statementInsert(struct statement *);
+void statementInsert(struct statement *, int);
 
 char * fStmtName();
 
