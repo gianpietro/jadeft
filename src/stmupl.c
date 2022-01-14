@@ -343,13 +343,16 @@ void statementInsert(struct statement *start, int rs)
   const char *titleOne = "Statement Import";
   int lenOne = strlen(titleOne);
   chtype *chSlide;
+  //const char *bgcolor;
   int selection;
   int importRows = rs;
   int curValue = 0;
   ptr = start;
 
   chSlide = (chtype *)malloc(sizeof(chtype));
+  // bgcolor = (char *)malloc(sizeof(char));
   *chSlide = KEY_UP;
+  //*bgcolor = WHITE;
   initCDKColor();    
   
   initscr();
@@ -358,6 +361,9 @@ void statementInsert(struct statement *start, int rs)
   noecho();
 
   init_pair(2,COLOR_BLUE,COLOR_WHITE);
+  init_pair(3,COLOR_RED,COLOR_WHITE);
+  init_pair(4,COLOR_YELLOW,COLOR_GREEN);
+  
 
   stmtInsertWin = newwin(LINES/5, COLS/2, LINES-(LINES-4), COLS/4);  
   cdkscreen = initCDKScreen(stmtInsertWin);
@@ -384,9 +390,9 @@ void statementInsert(struct statement *start, int rs)
 			      cdkscreen,                              // screen
 			      0,                                      // int xpos 
 			      srow,                                   // int ypos
-			      "Records",                              // const char *title
+			      "record",                              // const char *title
 			      "count",                                // const char *label
-			      A_REVERSE | COLOR_PAIR(10) | ' ',       // chtype fillerCharacter
+			      A_REVERSE | COLOR_PAIR(3) | ' ',        // chtype fillerCharacter --10
 			      scol,                                   // int fieldWidth  
 			      curValue,                               // int currentValue
 			      0,                                      // int lowValue
@@ -396,6 +402,8 @@ void statementInsert(struct statement *start, int rs)
 			      TRUE,                                   // boolean box
 			      FALSE                                   // boolean shadow
 			      );
+
+  setCDKSliderBackgroundColor (importSlider, "</2>");   // taken from the init_pair colors 
 					     
   mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement (y/n): ");
   wmove(stmtInsertWin, srow*0.33, scol*0.33);
@@ -409,6 +417,7 @@ void statementInsert(struct statement *start, int rs)
 	  break;
 	}
     }
+    
   if (ch == 'y')
     {
       while (ptr != NULL)
