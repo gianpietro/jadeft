@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <panel.h>
+#include <cdk.h>
 #include <libpq-fe.h>
 #include "../inc/jadlib.h"
 #include "../inc/stmuplibf.h"
@@ -52,7 +53,7 @@ void upLoadStatement()
   long int posn = 0;                                                     /* position of file cursor n */  
   int charCount = 0;                                                     /* number of characters in each data column */
 
-  char * upf = fStmtName();                                              /* function to obtain filename to load and if exists */
+   char * upf = fStmtName();                                              /* function to obtain filename to load and if exists */
  
   initscr();
   cbreak();
@@ -241,7 +242,7 @@ void upLoadStatement()
 	}
 
       printStmtFile(start);
-      statementInsert(start);
+      statementInsert(start, rs);
   
       for (g = 0; g < rs; g++)
 	{
@@ -266,7 +267,7 @@ void upLoadStatement()
       freeStatement(start);
 
       fclose(cp);
-      fclose(np);
+      fclose(np);  
       
       //return start;
     }
@@ -325,8 +326,10 @@ int resultRows()
 
 /* Insert function which will insert the linked list statement
    data into the statement table of database using ecpg function */
-void statementInsert(struct statement *start)
+void statementInsert(struct statement *start, int rs)
 {
+  CDKSCREEN *cdkscreen;// = (CDKSCREEN)NULL;
+  CDKSLIDER *importSlider =0;
   WINDOW *stmtInsertWin;
   PANEL *stmtInsertPanel;
   struct statement *ptr;
@@ -339,25 +342,42 @@ void statementInsert(struct statement *start)
   int i = 0;
   int srow, scol;
   int ch;
-
+  const char *titleOne = "Statement Import";
+  int lenOne = strlen(titleOne);
+  chtype *chSlide;
+  int selection;
+  int importRows = rs;
   ptr = start;
 
+  chSlide = (chtype *)malloc(sizeof(chtype));
+  *chSlide = KEY_UP;
+  initCDKColor();    
+
+  //cdkscreen = initCDKScreen(NULL);
   initscr();
+  start_color();
   cbreak();
   noecho();
 
-  stmtInsertWin = newwin(10, 110, 1, 1);
+  init_pair(2,COLOR_BLUE,COLOR_WHITE);
+
+  stmtInsertWin = newwin(LINES/5, COLS/2, LINES-(LINES-4), COLS/4);  
+  cdkscreen = initCDKScreen(stmtInsertWin);
   stmtInsertPanel = new_panel(stmtInsertWin);
-  show_panel(stmtInsertPanel);
-  touchwin(stmtInsertWin);
-  touchwin(stdscr);
+  wbkgd(stmtInsertWin, COLOR_PAIR(2));
+  //show_panel(stmtInsertPanel);
+  //touchwin(stmtInsertWin);
+  //touchwin(stdscr);
   update_panels();
   doupdate();
 
   keypad(stmtInsertWin, TRUE);
   getmaxyx(stmtInsertWin, srow, scol);
   box(stmtInsertWin, 0, 0);
-  waddstr(stmtInsertWin, "Insert Statement To Database");
+  wattron(stmtInsertWin,A_BOLD | COLOR_PAIR(2));     /* ATTON_MAIN_WIN_TITLE */
+  mvwprintw(stmtInsertWin,1,(scol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+  wattroff(stmtInsertWin,A_BOLD | COLOR_PAIR(2)); 
+  //waddstr(stmtInsertWin, "Insert Statement To Database");
 
   if(stmtInsertWin == NULL)
     {
@@ -365,13 +385,33 @@ void statementInsert(struct statement *start)
       refresh();
       getch();
     }
- 
+
+  importSlider = newCDKSlider(
+			      cdkscreen,
+			      0,
+			      srow,
+			      "Records",
+			      "count",
+			      A_REVERSE | COLOR_PAIR(10) | ' ',
+			      scol,
+			      0,
+			      0,
+			      importRows,
+			      1,
+			      5,
+			      TRUE,
+			      FALSE
+			      );
+						     
+						     
+						     
+  //wprintw(stmtInsertWin, "r:%d c:%d", srow, scol);
   mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement (y/n): ");
-  wmove(stmtInsertWin, 3, 35);
+  wmove(stmtInsertWin, srow*0.33, scol*0.33);
   echo();
   while ((ch = wgetch(stmtInsertWin)) != 'y')
     {
-      wmove(stmtInsertWin, 3, 35);
+      wmove(stmtInsertWin, srow*0.33, scol*0.33);
       if (ch == 'n')
 	{
 	  mvwprintw(stmtInsertWin, 4, 2, "Statement not saved");
@@ -389,16 +429,32 @@ void statementInsert(struct statement *start)
 	  strcpy(stmtAcctNo, ptr->actNumber);
 	  strcpy(stmtTranAlias, ptr->tAlias);
 	  stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
+	  selection = activateCDKSlider(importSlider, chSlide);
+	  napms(10);
 	  ptr = ptr->next;
 	}
+      /*
+      for(i=0;i<100;i++){
+	selection = activateCDKSlider(importSlider, chSlide);
+	napms(35);
+	}*/
+      
       mvwprintw(stmtInsertWin, 4, 2, "Statement saved");
     }
+
+  //refreshCDKScreen(cdkscreen);
+  //wrefresh(stmtInsertWin); 
   
   wgetch(stmtInsertWin);
   hide_panel(stmtInsertPanel);
   update_panels();
   doupdate();
-  endwin();
+  //endwin();
+  
+  destroyCDKScreen(cdkscreen);
+  //endCDK();
+  delwin(stmtInsertWin);
+  endwin();  
 }
 
 /* Print link list to terminal */
@@ -458,8 +514,6 @@ void printStmtFile(struct statement *start)
     {     
       i++;    
       mvwprintw(upLoadStmtWindow, i+8, 2,"%-12s %-5s %-75s %15s %17s %-20s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
-      // mvwprintw(upLoadStmtWindow, i+8, 2,"%-12.8s %-5.3s %-75.8s %15.8s %17.8s %-20.8s\n", ptr->tDate, ptr->tType, ptr->tDescription, ptr->tValue, ptr->actNumber, ptr->tAlias);
-      //mvwprintw(upLoadStmtWindow, i+8, 2,"%-12s \n", ptr->tType);      
       if (i == 20)                                                       
 	{
 	  box(upLoadStmtWindow, 0, 0);
@@ -506,8 +560,8 @@ char * fStmtName()
   fStmtUpWindow = newwin(LINES/5, COLS/2, LINES-(LINES-4), COLS/4); //(10, 110, 1, 1);
   fStmtUpPanel = new_panel(fStmtUpWindow);
   wbkgd(fStmtUpWindow, COLOR_PAIR(2));
-  touchwin(fStmtUpWindow);
-  touchwin(stdscr);
+  //touchwin(fStmtUpWindow);
+  //touchwin(stdscr);
   update_panels();
   doupdate();
 
