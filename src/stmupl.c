@@ -403,7 +403,7 @@ void statementInsert(struct statement *start, int rs)
 			      FALSE                                   // boolean shadow
 			      );
 
-  setCDKSliderBackgroundColor (importSlider, "</2>");   // taken from the init_pair colors 
+  setCDKSliderBackgroundColor (importSlider, "</2>");   // slider backgroung color, takes from the init_pair colors 
 					     
   mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement (y/n): ");
   wmove(stmtInsertWin, srow*0.33, scol*0.33);
