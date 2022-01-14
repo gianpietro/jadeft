@@ -61,9 +61,7 @@ void upLoadStatement()
   keypad(stdscr, TRUE);
   
   stmtWin = newwin(LINES*0.75, COLS*0.75, LINES-(LINES-4), COLS*0.1);
-  stmtPanel = new_panel(stmtWin);
-  //touchwin(stmtWin);
-  //touchwin(stdscr);
+  stmtPanel = new_panel(stmtWin);  
   update_panels();
   doupdate();
 
