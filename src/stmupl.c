@@ -329,7 +329,7 @@ int resultRows()
 void statementInsert(struct statement *start, int rs)
 {
   CDKSCREEN *cdkscreen;// = (CDKSCREEN)NULL;
-  CDKSLIDER *importSlider =0;
+  CDKSLIDER *importSlider = 0;
   WINDOW *stmtInsertWin;
   PANEL *stmtInsertPanel;
   struct statement *ptr;
@@ -347,13 +347,13 @@ void statementInsert(struct statement *start, int rs)
   chtype *chSlide;
   int selection;
   int importRows = rs;
+  int curValue = 0;
   ptr = start;
 
   chSlide = (chtype *)malloc(sizeof(chtype));
   *chSlide = KEY_UP;
   initCDKColor();    
-
-  //cdkscreen = initCDKScreen(NULL);
+  
   initscr();
   start_color();
   cbreak();
@@ -364,10 +364,7 @@ void statementInsert(struct statement *start, int rs)
   stmtInsertWin = newwin(LINES/5, COLS/2, LINES-(LINES-4), COLS/4);  
   cdkscreen = initCDKScreen(stmtInsertWin);
   stmtInsertPanel = new_panel(stmtInsertWin);
-  wbkgd(stmtInsertWin, COLOR_PAIR(2));
-  //show_panel(stmtInsertPanel);
-  //touchwin(stmtInsertWin);
-  //touchwin(stdscr);
+  wbkgd(stmtInsertWin, COLOR_PAIR(2)); 
   update_panels();
   doupdate();
 
@@ -377,7 +374,6 @@ void statementInsert(struct statement *start, int rs)
   wattron(stmtInsertWin,A_BOLD | COLOR_PAIR(2));     /* ATTON_MAIN_WIN_TITLE */
   mvwprintw(stmtInsertWin,1,(scol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
   wattroff(stmtInsertWin,A_BOLD | COLOR_PAIR(2)); 
-  //waddstr(stmtInsertWin, "Insert Statement To Database");
 
   if(stmtInsertWin == NULL)
     {
@@ -387,25 +383,22 @@ void statementInsert(struct statement *start, int rs)
     }
 
   importSlider = newCDKSlider(
-			      cdkscreen,
-			      0,
-			      srow,
-			      "Records",
-			      "count",
-			      A_REVERSE | COLOR_PAIR(10) | ' ',
-			      scol,
-			      0,
-			      0,
-			      importRows,
-			      1,
-			      5,
-			      TRUE,
-			      FALSE
+			      cdkscreen,                              // screen
+			      0,                                      // int xpos 
+			      srow,                                   // int ypos
+			      "Records",                              // const char *title
+			      "count",                                // const char *label
+			      A_REVERSE | COLOR_PAIR(10) | ' ',       // chtype fillerCharacter
+			      scol,                                   // int fieldWidth  
+			      curValue,                               // int currentValue
+			      0,                                      // int lowValue
+			      importRows,                             // int highValue   
+			      1,                                      // int increment
+			      5,                                      // int fastIncrement
+			      TRUE,                                   // boolean box
+			      FALSE                                   // boolean shadow
 			      );
-						     
-						     
-						     
-  //wprintw(stmtInsertWin, "r:%d c:%d", srow, scol);
+					     
   mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement (y/n): ");
   wmove(stmtInsertWin, srow*0.33, scol*0.33);
   echo();
@@ -428,31 +421,20 @@ void statementInsert(struct statement *start, int rs)
 	  stmtValue = atof(ptr->tValue);
 	  strcpy(stmtAcctNo, ptr->actNumber);
 	  strcpy(stmtTranAlias, ptr->tAlias);
-	  stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
+	  //stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
 	  selection = activateCDKSlider(importSlider, chSlide);
 	  napms(10);
 	  ptr = ptr->next;
-	}
-      /*
-      for(i=0;i<100;i++){
-	selection = activateCDKSlider(importSlider, chSlide);
-	napms(35);
-	}*/
-      
+	}      
       mvwprintw(stmtInsertWin, 4, 2, "Statement saved");
     }
-
-  //refreshCDKScreen(cdkscreen);
-  //wrefresh(stmtInsertWin); 
   
   wgetch(stmtInsertWin);
   hide_panel(stmtInsertPanel);
   update_panels();
   doupdate();
-  //endwin();
   
   destroyCDKScreen(cdkscreen);
-  //endCDK();
   delwin(stmtInsertWin);
   endwin();  
 }
