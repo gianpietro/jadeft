@@ -345,7 +345,7 @@ void statementLinkInsert()
       set_field_fore(stmtLinkField[2], COLOR_PAIR(9));
       set_field_back(stmtLinkField[2], COLOR_PAIR(9));
 
-      set_field_type(stmtLinkField[0],TYPE_REGEXP,"^[A-Za-z0-9 -&]+$");
+      set_field_type(stmtLinkField[0],TYPE_REGEXP,"^[A-Za-z0-9- &]+$");
       set_field_type(stmtLinkField[1],TYPE_INTEGER,0,1,99999);
       set_field_type(stmtLinkField[2],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
 
