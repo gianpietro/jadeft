@@ -17,10 +17,9 @@ void stmtDataAudit()
 {
   WINDOW *mainWin,*subOneWin, *subTwoWin, *updateWin;
   FORM *mainForm;
-  FIELD *inputField[7];
+  FIELD *inputField[8];
   PANEL *mainPanel, *subOnePanel, *subTwoPanel, *updatePanel;
   int list = 2, i = 0, j = 0;
-  //int RANGE = 5;
   char p;
   int ch, mrow, mcol, s1row, s1col, s2row, s2col, urow, ucol;
   int subOneID, subTwoID;
@@ -30,18 +29,20 @@ void stmtDataAudit()
   int upID;
   int val, *params[1], length[1], formats[1];   //PQexecParams 
   int fv0, fv1, fv3, fv5;  // field values
-  char fv2[30], fv4[30];  
+  char fv2[30], fv4[30];
+  float XXXXamount;
   int cf; // confirm save to DB
   int newRec = 'y';
   int cfUpdate = 0;
-  const char *titleOne = "Provider Account Form";
+  const char *titleOne = "Statement Form";
   const char *titleTwo = "Provider List";
   const char *titleThree = "Provider Type";
   const char *titleFour = "Provider Account";  
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   int lenThree = strlen(titleThree);
-  int lenFour = strlen(titleFour); 
+  int lenFour = strlen(titleFour);
+  int fldColor = 0;
 
   PGconn *conn =  fdbcon();
   PGresult *res;
@@ -58,35 +59,38 @@ void stmtDataAudit()
   
   while (newRec == 'y')
     {
-      inputField[0] = new_field(1,1,4,28,0,0);    
-      inputField[1] = new_field(1,5,6,28,0,0);    
-      inputField[2] = new_field(1,30,8,28,0,0);   
-      inputField[3] = new_field(1,9,10,28,0,0);   
-      inputField[4] = new_field(1,30,12,28,0,0);  
-      inputField[5] = new_field(1,5,14,28,0,0);   
-      inputField[6] = NULL;
+      inputField[0] = new_field(1,6,4,28,0,0);        /* statement_id */
+      inputField[1] = new_field(1,8,6,28,0,0);        /* date */
+      inputField[2] = new_field(1,3,8,28,0,0);        /* type */
+      inputField[3] = new_field(5,30,10,28,0,0);      /* description */
+      inputField[4] = new_field(1,10,16,28,0,0);      /* value */
+      inputField[5] = new_field(1,30,18,28,0,0);      /* account */
+      inputField[6] = new_field(1,30,20,28,0,0);      /* alias */
+      inputField[7] = NULL;
 
-      
-      set_field_fore(inputField[0], COLOR_PAIR(9));
-      set_field_back(inputField[0], COLOR_PAIR(9));
-      set_field_fore(inputField[1], COLOR_PAIR(9));
+      set_field_fore(inputField[0], COLOR_PAIR(1));   
+      set_field_back(inputField[0], COLOR_PAIR(1));
+      set_field_fore(inputField[1], COLOR_PAIR(9));   
       set_field_back(inputField[1], COLOR_PAIR(9));
-      set_field_fore(inputField[2], COLOR_PAIR(9));
+      set_field_fore(inputField[2], COLOR_PAIR(9));   
       set_field_back(inputField[2], COLOR_PAIR(9));
-      set_field_fore(inputField[3], COLOR_PAIR(9));
+      set_field_fore(inputField[3], COLOR_PAIR(9));   
       set_field_back(inputField[3], COLOR_PAIR(9));
-      set_field_fore(inputField[4], COLOR_PAIR(9));
+      set_field_fore(inputField[4], COLOR_PAIR(9));   
       set_field_back(inputField[4], COLOR_PAIR(9));
-      set_field_fore(inputField[5], COLOR_PAIR(9));
+      set_field_fore(inputField[5], COLOR_PAIR(9));   
       set_field_back(inputField[5], COLOR_PAIR(9));
-      
+      set_field_fore(inputField[6], COLOR_PAIR(9));   
+      set_field_back(inputField[6], COLOR_PAIR(9));   
 
-      set_field_type(inputField[0],TYPE_INTEGER,1,1,2);
-      set_field_type(inputField[1],TYPE_INTEGER,0,1,99999);
-      set_field_type(inputField[2],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
-      set_field_type(inputField[3],TYPE_INTEGER,0,1,999999999);
-      set_field_type(inputField[4],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
-      set_field_type(inputField[5],TYPE_INTEGER,0,1,99999);
+      field_opts_off(inputField[0], O_ACTIVE);
+      //set_field_type(inputField[0],TYPE_INTEGER,1,1,2);
+      set_field_type(inputField[1],TYPE_INTEGER,0,1,99999999);
+      set_field_type(inputField[2],TYPE_REGEXP,"^[A-Z ]+$");
+      //set_field_type(inputField[3],TYPE_);
+      //set_field_type(inputField[4],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(inputField[5],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
+      set_field_type(inputField[6],TYPE_REGEXP,"^[A-Za-z0-9- &]+$");
 
       mainForm = new_form(inputField);
       scale_form(mainForm, &mrow, &mcol);   
@@ -133,14 +137,15 @@ void stmtDataAudit()
       post_form(mainForm);  
       wrefresh(mainWin);
 
-      mvwprintw(mainWin, mrow-(mrow-6),mcol-(mcol-5), "Active Ind:");
-      mvwprintw(mainWin, mrow-(mrow-8),mcol-(mcol-5), "Provider ID(F2):");
-      mvwprintw(mainWin, mrow-(mrow-10),mcol-(mcol-5), "Account Number:");
-      mvwprintw(mainWin, mrow-(mrow-12),mcol-(mcol-5), "Sort Code:");
-      mvwprintw(mainWin, mrow-(mrow-14),mcol-(mcol-5), "Reference:");
-      mvwprintw(mainWin, mrow-(mrow-16),mcol-(mcol-5), "Provider Type ID(F3):");
+      mvwprintw(mainWin, mrow-(mrow-6),mcol-(mcol-5), "Statement_ID:");
+      mvwprintw(mainWin, mrow-(mrow-8),mcol-(mcol-5), "Date:");
+      mvwprintw(mainWin, mrow-(mrow-10),mcol-(mcol-5), "Type:");
+      mvwprintw(mainWin, mrow-(mrow-12),mcol-(mcol-5), "Description:");
+      mvwprintw(mainWin, mrow-(mrow-18),mcol-(mcol-5), "Value:");
+      mvwprintw(mainWin, mrow-(mrow-20),mcol-(mcol-5), "Account:");
+      mvwprintw(mainWin, mrow-(mrow-22),mcol-(mcol-5), "Alias:");
       mvwprintw(mainWin, mrow-2,mcol-(mcol-5),"Press F1 when form complete (F9 for Update)");
-      wmove(mainWin, mrow-(mrow-6),mcol-(mcol-30));     
+      wmove(mainWin, mrow-(mrow-8),mcol-(mcol-30));     
       wrefresh(mainWin);
   
       while((ch = wgetch(mainWin)) != KEY_F(1))
@@ -438,7 +443,7 @@ void stmtDataAudit()
       strcpy(fv4, trimWS(field_buffer(inputField[4],0)));
       fv5 = atoi(field_buffer(inputField[5],0));
 
-      if ((form_driver(mainForm,REQ_VALIDATION) == E_OK) && (fv0 >= 1))
+      if ((form_driver(mainForm,REQ_VALIDATION) == E_OK) && (fv5 >= 0))
 	{
 	  echo();
 	  wattron(mainWin,A_BOLD | COLOR_PAIR(1));
