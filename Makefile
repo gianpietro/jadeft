@@ -12,13 +12,13 @@ INCDIR = inc
 CFLAGS = -g
 
 OBJ =  fdbcon.so prolib.so procur.so supcur.so invcur.so jadlib.so suplib.so invlib.so \
-	doccur.so doclib.so catcur.so catlib.so stmupl.so stmuplib.so stmlib.so
+	doccur.so doclib.so catcur.so catlib.so stmupl.so stmuplib.so stmlib.so stmcur.so
 
 program : $(OBJ)
 	gcc $(CFLAGS) $(SRCDIR)/jadeft.c $(OBJDIR)/fdbcon.so $(OBJDIR)/prolib.so \
 	$(OBJDIR)/procur.so $(OBJDIR)/supcur.so $(OBJDIR)/invcur.so $(OBJDIR)/jadlib.so $(OBJDIR)/suplib.so \
 	$(OBJDIR)/invlib.so $(OBJDIR)/doccur.so $(OBJDIR)/doclib.so $(OBJDIR)/catcur.so $(OBJDIR)/catlib.so \
-	$(OBJDIR)/stmupl.so $(OBJDIR)/stmuplib.so $(OBJDIR)/stmlib.so   \
+	$(OBJDIR)/stmupl.so $(OBJDIR)/stmuplib.so $(OBJDIR)/stmlib.so $(OBJDIR)/stmcur.so   \
 	-o $(BINDIR)/jadeft -I/usr/include -lpq -lecpg -lform -lpanel -lcdk -lncurses
 
 fdbcon.so : fdbcon.c fdbcon.h
@@ -64,6 +64,9 @@ stmuplib.so : stmuplib.c stmuplibf.h
 	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
 
 stmlib.so : stmlib.c stmlib.h
+	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
+
+stmcur.so : stmcur.c stmcur.h
 	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
 
 clean:
