@@ -1842,7 +1842,7 @@ int suppAccountInsert()
 		  //mvwprintw(paWin,12,1,"Number invalid");
 		  wattron(paWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
 		  mvwprintw(paWin,parow-6,1,"Number invalid");
-		  wattroff(paWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
+		  wattroff(paWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_NUMBER_INVALID */                   
 		  wrefresh(paWin);		
 		  //wrefresh(supAcctWin);
 		}

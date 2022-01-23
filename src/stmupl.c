@@ -566,7 +566,7 @@ char * fStmtName()
     {
       addstr("Unable to create window");
       refresh();      
-     getch();
+      getch();
     }
 
   mvwprintw(fStmtUpWindow, 3, 2, "Enter file name: ");

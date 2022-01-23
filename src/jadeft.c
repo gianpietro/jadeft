@@ -14,6 +14,7 @@
 #include "../inc/invcur.h"
 #include "../inc/doccur.h"
 #include "../inc/catcur.h"
+#include "../inc/stmcur.h"
 #include "../inc/stmuplf.h"
 #include "../inc/stmuplibf.h"
 
@@ -52,6 +53,7 @@ int main (void) {
   menulist[3][3] = "</05>Category         <!05>";
   menulist[3][4] = "</05>Statement Config <!05>";
   menulist[3][5] = "</05>Statement Upload <!05>";
+  menulist[3][6] = "</05>Statement Audit  <!05>";
 
   menulist[4][0] = "</07/B>Documents      <!07>";
   menulist[4][1] = "</05>Document Type    <!05>";
@@ -60,8 +62,8 @@ int main (void) {
   submenusize[0] = 3;
   submenusize[1] = 4;
   submenusize[2] = 5;
-  submenusize[3] = 6;
-  submenusize[4] = 3;
+  submenusize[3] = 7;
+  submenusize[4] = 3;  
 
   menuloc[0] = LEFT;
   menuloc[1] = LEFT;
@@ -116,6 +118,9 @@ int main (void) {
 	  break;
 	case 304:	  
 	  upLoadStatement();	  
+	  break;
+	case 305:
+	  stmtDataAudit();
 	  break;
 	case 400:
 	  documentTypeInsert();
