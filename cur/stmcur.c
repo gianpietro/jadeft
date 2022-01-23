@@ -232,15 +232,18 @@ void stmtDataAudit()
 		  set_field_buffer(inputField[4],0,PQgetvalue(res,0,5));
 		  set_field_buffer(inputField[5],0,PQgetvalue(res,0,6));*/
 		  strcpy(fv5, trimWS(field_buffer(inputField[5],0)));
-
-		  mvwprintw(updateWin, urow-11,1,"Date From:");
-		  mvwscanw(updateWin,urow-11, ucol-45, "%d", &df);
-		  mvwprintw(updateWin, urow-10,1,"Date To:");
-		  mvwscanw(updateWin,urow-10, ucol-45, "%d", &df);
+		  
+		  if (upID > 0)
+		    {
+		      mvwprintw(updateWin, urow-11,1,"Date From:");
+		      mvwscanw(updateWin,urow-11, ucol-45, "%d", &df);
+		      mvwprintw(updateWin, urow-10,1,"Date To:");
+		      mvwscanw(updateWin,urow-10, ucol-45, "%d", &df);
+		    }
 		  cfUpdate = 1;
-		  hide_panel(updatePanel);
-		  update_panels();
-		  doupdate();
+		  //hide_panel(updatePanel);
+		  //update_panels();
+		  //doupdate();
 		}
 	      else
 		{
