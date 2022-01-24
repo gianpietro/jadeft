@@ -15,29 +15,31 @@
    and delete values */
 void stmtDataAudit()
 {
-  WINDOW *mainWin, *updateWin;
+  WINDOW *mainWin, *updateWin, *stmtSelectWin;
   FORM *mainForm;
   FIELD *inputField[8];
-  PANEL *mainPanel,*updatePanel;
+  PANEL *mainPanel,*updatePanel, *stmtSelectPanel;
   int list = 2, i = 0, j = 0;
   char p;
-  int ch, mrow, mcol, urow, ucol;
+  int ch, mrow, mcol, urow, ucol, srow, scol;
   int rows; 
   int upID;
-  int val, *params[1], length[1], formats[1];   //PQexecParams 
-  int fv1;  // field values
+  int val, *params[1], length[1], formats[1];   /* PQexecParams  */
+  int fv1;                                      /* field values */
   char fv2[4], fv3[150], fv5[50], fv6[30];
   float fv4;
-  int cf; // confirm save to DB
+  int cf;                                       /* confirm save to DB */
   int newRec = 'y';
   int cfUpdate = 0;
   const char *titleOne = "Statement Form";
-  const char *titleFour = "Provider Account";  
+  const char *titleFour = "Provider Account";
+  const char *titleFive = "Statement Items";
   int lenOne = strlen(titleOne);
   int lenFour = strlen(titleFour);
-  int fldColor = 0;
-  int df= 0; //date from
-  int dt = 0; //date to
+  int lenFive = strlen(titleFive);
+  //int fldColor = 0;
+  int df = 0;                                   /* date from */
+  int dt = 0;                                   /* date to  */
 
   PGconn *conn =  fdbcon();
   PGresult *res;
@@ -94,11 +96,13 @@ void stmtDataAudit()
       //subOneWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
       //subTwoWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
       updateWin = newwin(LINES*0.5, COLS/3,LINES-(LINES-4),COLS/2);
+      stmtSelectWin = newwin(LINES*0.72, COLS/2,LINES-(LINES-4),COLS/2);
 
       //subOnePanel = new_panel(subOneWin);      
       //subTwoPanel = new_panel(subTwoWin);
       updatePanel = new_panel(updateWin);
       mainPanel = new_panel(mainWin);
+      stmtSelectPanel = new_panel(stmtSelectWin);
       wbkgd(mainWin, COLOR_PAIR(1));     
       update_panels();
       doupdate();
@@ -107,6 +111,7 @@ void stmtDataAudit()
       //keypad(subOneWin, TRUE);
       //keypad(subTwoWin, TRUE);
       keypad(updateWin, TRUE);
+      keypad(stmtSelectWin, TRUE);
 
       set_form_win(mainForm,mainWin);
       set_form_sub(mainForm, derwin(mainWin,mrow,mcol,2,2));      
@@ -114,15 +119,17 @@ void stmtDataAudit()
       //getmaxyx(subOneWin, s1row, s1col);
       //getmaxyx(subTwoWin, s2row, s2col);
       getmaxyx(updateWin, urow, ucol);
+      getmaxyx(stmtSelectWin, srow, scol);
       box(mainWin,0,0);
       //box(subOneWin,0,0);
       //box(subTwoWin,0,0);
       box(updateWin,0,0);
+      box(stmtSelectWin,0,0);
       wattron(mainWin,A_BOLD | COLOR_PAIR(1));     
       mvwprintw(mainWin,1,(mcol-lenOne)/2,titleOne);  
       wattroff(mainWin,A_BOLD | COLOR_PAIR(1));   
 
-      if(mainWin == NULL || updateWin == NULL)
+      if(mainWin == NULL || updateWin == NULL || stmtSelectWin == NULL)
 	{
 	  endwin();
 	  puts("Unable to create window");
@@ -148,6 +155,7 @@ void stmtDataAudit()
 	  //hide_panel(subOnePanel);
 	  //hide_panel(subTwoPanel);
 	  hide_panel(updatePanel);
+	  hide_panel(stmtSelectPanel);
 	  show_panel(mainPanel);
 	  update_panels();
 	  doupdate();	  
@@ -241,10 +249,95 @@ void stmtDataAudit()
 		      mvwscanw(updateWin,urow-10, ucol-45, "%d", &df);
 		    }
 		  cfUpdate = 1;
-		  //hide_panel(updatePanel);
-		  //update_panels();
-		  //doupdate();
-		}
+		  hide_panel(updatePanel);
+		  update_panels();
+		  doupdate();
+		  /**********************************************
+		   **********  start of statement report ********
+                   **********************************************/
+		  i = j = rows = 0;
+		  list = 6;
+		  wclear(stmtSelectWin);
+		  box(stmtSelectWin,0,0);
+		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));   
+		  mvwprintw(stmtSelectWin,1,(scol-lenFive)/2, titleFive);   
+		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));   
+		  wmove(stmtSelectWin,1,1);
+		  show_panel(stmtSelectPanel);
+		  wbkgd(stmtSelectWin, COLOR_PAIR(1));          
+		  update_panels();
+		  doupdate();
+
+		  res = PQexec(conn,"SELECT * FROM statement ORDER BY date");	  
+		  rows = PQntuples(res);
+
+		  wrefresh(stmtSelectWin);
+		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));    
+		  mvwprintw(stmtSelectWin, 4, 1, "ID    Date     Value    Alias");  //+3
+		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));   
+	  
+		  while((p = wgetch(stmtSelectWin)) == '\n')
+		    {
+		      if ( j + 20 < rows)
+			j = j + 20;	
+		      else
+			j = j + (rows - j);
+		      for (i; i < j; i++)
+			{
+			  mvwprintw(stmtSelectWin,list,1,"%-5s %-15s %-15s %-15s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4), PQgetvalue(res,i,6));
+			  list++;
+			  wclrtoeol(stmtSelectWin);
+			  box(stmtSelectWin,0,0);  
+			}
+		      list = 6;      
+		      if  (i == rows)
+			{
+			  wclrtobot(stmtSelectWin);  
+			  mvwprintw(stmtSelectWin,urow-15,1,"End of list");
+			  box(stmtSelectWin,0,0);
+			  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));  
+			  mvwprintw(stmtSelectWin,1,(scol-lenFive)/2, titleFive);  
+			  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));   
+			  wmove(stmtSelectWin,10,1);
+			  break;
+			}
+		    }
+		  echo();
+		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
+		  mvwprintw(stmtSelectWin,urow-14,1,"Select Option: ");  //urow-7
+		  mvwscanw(stmtSelectWin,urow-14, ucol-45, "%d", &upID);
+		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
+
+		  PQclear(res);
+	  
+		  val = htonl((uint32_t)upID);
+		  params[0] = (int *)&val;
+		  length[0] = sizeof(val);
+		  formats[0] = 1;
+
+		  res = PQexecParams(conn, "SELECT * FROM provider_account WHERE provider_acct_id = $1 ORDER BY provider_acct_id;"
+				     ,1
+				     ,NULL
+				     ,(const char *const *)params
+				     ,length
+				     ,formats
+				     ,0);
+	  
+		  rows = PQntuples(res);
+		  if (rows == 1)
+		    {
+		      //assign values
+		    }
+		  else
+		    {
+		      wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));       
+		      mvwprintw(stmtSelectWin,urow-13,1,"Number invalid");
+		      wrefresh(stmtSelectWin);
+		      wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));      
+		    }
+		  noecho();
+		  //PQclear(res);
+		} //if upID
 	      else
 		{
 		  wattron(updateWin,A_BOLD | COLOR_PAIR(1));       
