@@ -22,13 +22,13 @@ void stmtDataAudit()
   int list = 2, i = 0, j = 0;
   char p;
   int ch, mrow, mcol, urow, ucol, srow, scol;
-  int rows; 
-  int upID;
-  int val, *params[1], length[1], formats[1];   /* PQexecParams  */
-  int fv1;                                      /* field values */
+  int rows = 0; 
+  int upID = 0, stID = 0;
+  int val = 0, *params[1], length[1], formats[1];     /* PQexecParams  */
+  int fv1;                                            /* field values */
   char fv2[4], fv3[150], fv5[50], fv6[30];
   float fv4;
-  int cf;                                       /* confirm save to DB */
+  int cf;                                             /* confirm save to DB */
   int newRec = 'y';
   int cfUpdate = 0;
   const char *titleOne = "Statement Form";
@@ -38,8 +38,8 @@ void stmtDataAudit()
   int lenFour = strlen(titleFour);
   int lenFive = strlen(titleFive);
   //int fldColor = 0;
-  int df = 0;                                   /* date from */
-  int dt = 0;                                   /* date to  */
+  int df = 0;                                         /* date from */
+  int dt = 0;                                         /* date to  */
 
   PGconn *conn =  fdbcon();
   PGresult *res;
@@ -268,7 +268,19 @@ void stmtDataAudit()
 		  update_panels();
 		  doupdate();
 
-		  res = PQexec(conn,"SELECT * FROM statement ORDER BY date");	  
+		  val = htonl((uint32_t)fv5);  // REVIEW AT THE IS A CHAR STRING NOT INT
+		  params[0] = (int *)&val;
+		  length[0] = sizeof(val);
+		  formats[0] = 1;
+
+		  res = PQexec(conn,"SELECT * FROM statement WHERE account = $1 ORDER BY date;"
+			             ,1
+				     ,NULL
+				     ,(const char *const *)params
+				     ,length
+				     ,formats
+				     ,0);
+		  
 		  rows = PQntuples(res);
 
 		  wrefresh(stmtSelectWin);
@@ -305,17 +317,17 @@ void stmtDataAudit()
 		  echo();
 		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
 		  mvwprintw(stmtSelectWin,urow-14,1,"Select Option: ");  //urow-7
-		  mvwscanw(stmtSelectWin,urow-14, ucol-45, "%d", &upID);
+		  mvwscanw(stmtSelectWin,urow-14, ucol-45, "%d", &stID);
 		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
 
 		  PQclear(res);
 	  
-		  val = htonl((uint32_t)upID);
+		  val = htonl((uint32_t)stID);
 		  params[0] = (int *)&val;
 		  length[0] = sizeof(val);
 		  formats[0] = 1;
 
-		  res = PQexecParams(conn, "SELECT * FROM provider_account WHERE provider_acct_id = $1 ORDER BY provider_acct_id;"
+		  res = PQexecParams(conn, "SELECT * FROM statement WHERE statement_id = $1;"
 				     ,1
 				     ,NULL
 				     ,(const char *const *)params
@@ -337,7 +349,7 @@ void stmtDataAudit()
 		    }
 		  noecho();
 		  //PQclear(res);
-		} //if upID
+		} // if rows == 1 provider
 	      else
 		{
 		  wattron(updateWin,A_BOLD | COLOR_PAIR(1));       
