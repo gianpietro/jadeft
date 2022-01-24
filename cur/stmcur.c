@@ -24,7 +24,7 @@ void stmtDataAudit()
   int ch, mrow, mcol, urow, ucol, srow, scol;
   int rows = 0; 
   int upID = 0, stID = 0;
-  int val = 0, *params[1], length[1], formats[1];     /* PQexecParams  */
+  int val = 0, *params[2], length[2], formats[2];     /* PQexecParams  */
   int fv1;                                            /* field values */
   char fv2[4], fv3[150], fv5[50], fv6[30];
   float fv4;
@@ -40,6 +40,7 @@ void stmtDataAudit()
   //int fldColor = 0;
   int df = 0;                                         /* date from */
   int dt = 0;                                         /* date to  */
+  int valdf = 0, valdt = 0;
 
   PGconn *conn =  fdbcon();
   PGresult *res;
@@ -246,7 +247,7 @@ void stmtDataAudit()
 		      mvwprintw(updateWin, urow-11,1,"Date From:");
 		      mvwscanw(updateWin,urow-11, ucol-45, "%d", &df);
 		      mvwprintw(updateWin, urow-10,1,"Date To:");
-		      mvwscanw(updateWin,urow-10, ucol-45, "%d", &df);
+		      mvwscanw(updateWin,urow-10, ucol-45, "%d", &dt);
 		    }
 		  cfUpdate = 1;
 		  hide_panel(updatePanel);
@@ -268,13 +269,17 @@ void stmtDataAudit()
 		  update_panels();
 		  doupdate();
 
-		  val = htonl((uint32_t)fv5);  // REVIEW AT THE IS A CHAR STRING NOT INT
-		  params[0] = (int *)&val;
-		  length[0] = sizeof(val);
+		  valdf = htonl((uint32_t)df);  // REVIEW AT THE IS A CHAR STRING NOT INT
+		  valdt = htonl((uint32_t)dt);		  
+		  params[0] = (int *)&valdf;
+		  params[1] = (int *)&valdt;
+		  length[0] = sizeof(valdf);
+		  length[1] = sizeof(valdt);
 		  formats[0] = 1;
+		  formats[1] = 1;
 
-		  res = PQexec(conn,"SELECT * FROM statement WHERE account = $1 ORDER BY date;"
-			             ,1
+		  res = PQexecParams(conn,"SELECT * FROM statement WHERE date >= $1 AND date <= $2 ORDER BY date;"
+			             ,2
 				     ,NULL
 				     ,(const char *const *)params
 				     ,length
