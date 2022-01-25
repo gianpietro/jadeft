@@ -41,6 +41,7 @@ void stmtDataAudit()
   int df = 0;                                         /* date from */
   int dt = 0;                                         /* date to  */
   int valdf = 0, valdt = 0;
+  int strows = 0;
 
   PGconn *conn =  fdbcon();
   PGresult *res;
@@ -244,19 +245,21 @@ void stmtDataAudit()
 		  
 		  if (upID > 0)
 		    {
+		      mvwprintw(updateWin, urow-12,1,"upID %d\n", upID);
 		      mvwprintw(updateWin, urow-11,1,"Date From:");
 		      mvwscanw(updateWin,urow-11, ucol-45, "%d", &df);
 		      mvwprintw(updateWin, urow-10,1,"Date To:");
 		      mvwscanw(updateWin,urow-10, ucol-45, "%d", &dt);
 		    }
 		  cfUpdate = 1;
+		  upID = 0;
 		  hide_panel(updatePanel);
 		  update_panels();
 		  doupdate();
 		  /**********************************************
 		   **********  start of statement report ********
                    **********************************************/
-		  i = j = rows = 0;
+		  i = j = strows = 0;
 		  list = 6;
 		  wclear(stmtSelectWin);
 		  box(stmtSelectWin,0,0);
@@ -286,7 +289,7 @@ void stmtDataAudit()
 				     ,formats
 				     ,0);
 		  
-		  rows = PQntuples(res);
+		  strows = PQntuples(res);
 
 		  wrefresh(stmtSelectWin);
 		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));    
@@ -295,10 +298,10 @@ void stmtDataAudit()
 	  
 		  while((p = wgetch(stmtSelectWin)) == '\n')
 		    {
-		      if ( j + 20 < rows)
+		      if ( j + 20 < strows)
 			j = j + 20;	
 		      else
-			j = j + (rows - j);
+			j = j + (strows - j);
 		      for (i; i < j; i++)
 			{
 			  mvwprintw(stmtSelectWin,list,1,"%-5s %-15s %-15s %-15s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4), PQgetvalue(res,i,6));
@@ -307,7 +310,7 @@ void stmtDataAudit()
 			  box(stmtSelectWin,0,0);  
 			}
 		      list = 6;      
-		      if  (i == rows)
+		      if  (i == strows)
 			{
 			  wclrtobot(stmtSelectWin);  
 			  mvwprintw(stmtSelectWin,urow-15,1,"End of list");
@@ -340,8 +343,8 @@ void stmtDataAudit()
 				     ,formats
 				     ,0);
 	  
-		  rows = PQntuples(res);
-		  if (rows == 1)
+		  strows = PQntuples(res);
+		  if (strows == 1)
 		    {
 		      //assign values
 		    }
@@ -352,7 +355,7 @@ void stmtDataAudit()
 		      wrefresh(stmtSelectWin);
 		      wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));      
 		    }
-		  noecho();
+		  noecho();		  
 		  //PQclear(res);
 		} // if rows == 1 provider
 	      else
