@@ -313,7 +313,7 @@ void stmtDataAudit()
 		      if  (i == strows)
 			{
 			  wclrtobot(stmtSelectWin);  
-			  mvwprintw(stmtSelectWin,urow-15,1,"End of list");
+			  mvwprintw(stmtSelectWin,srow-12,1,"End of list");
 			  box(stmtSelectWin,0,0);
 			  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));  
 			  mvwprintw(stmtSelectWin,1,(scol-lenFive)/2, titleFive);  
@@ -324,8 +324,8 @@ void stmtDataAudit()
 		    }
 		  echo();
 		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
-		  mvwprintw(stmtSelectWin,urow-14,1,"Select Option: ");  //urow-7
-		  mvwscanw(stmtSelectWin,urow-14, ucol-45, "%d", &stID);
+		  mvwprintw(stmtSelectWin,srow-11,1,"Select Option: ");  //srow-7
+		  mvwscanw(stmtSelectWin,srow-11, scol-85, "%d", &stID);
 		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
 
 		  PQclear(res);
@@ -351,7 +351,7 @@ void stmtDataAudit()
 		  else
 		    {
 		      wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));       
-		      mvwprintw(stmtSelectWin,urow-13,1,"Number invalid");
+		      mvwprintw(stmtSelectWin,srow-10,1,"Number invalid");
 		      wrefresh(stmtSelectWin);
 		      wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));      
 		    }
@@ -464,6 +464,5 @@ void stmtDataAudit()
     }
 
   PQfinish(conn); 
-  endwin();
-  
+  endwin();  
 }
