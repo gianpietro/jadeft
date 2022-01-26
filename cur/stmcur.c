@@ -24,7 +24,9 @@ void stmtDataAudit()
   int ch, mrow, mcol, urow, ucol, srow, scol;
   int rows = 0; 
   int upID = 0, stID = 0;
-  int val = 0, *params[2], length[2], formats[2];     /* PQexecParams  */
+  int val = 0, *params[3], length[3], formats[3];     /* PQexecParams  */
+  char *paramsStmt[3];
+  int lengthStmt[3], formatsStmt[3];
   int fv1;                                            /* field values */
   char fv2[4], fv3[150], fv5[50], fv6[30];
   float fv4;
@@ -235,19 +237,21 @@ void stmtDataAudit()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  /*set_field_buffer(inputField[0],0,PQgetvalue(res,0,1));
-		  set_field_buffer(inputField[1],0,PQgetvalue(res,0,2));
-		  set_field_buffer(inputField[2],0,PQgetvalue(res,0,3));
-		  set_field_buffer(inputField[3],0,PQgetvalue(res,0,4));
-		  set_field_buffer(inputField[4],0,PQgetvalue(res,0,5));
-		  set_field_buffer(inputField[5],0,PQgetvalue(res,0,6));*/
-		  strcpy(fv5, trimWS(field_buffer(inputField[5],0)));
+		  //set_field_buffer(inputField[0],0,PQgetvalue(res,0,1));
+		  //set_field_buffer(inputField[1],0,PQgetvalue(res,0,2));
+		  //set_field_buffer(inputField[2],0,PQgetvalue(res,0,3));
+		  //set_field_buffer(inputField[3],0,PQgetvalue(res,0,4));
+		  //set_field_buffer(inputField[4],0,PQgetvalue(res,0,5));
+		  //set_field_buffer(inputField[5],0,PQgetvalue(res,0,6));
+		  //strcpy(fv5, trimWS(field_buffer(inputField[5],0)));
+		  strcpy(fv5, PQgetvalue(res,0,3));
 		  
 		  if (upID > 0)
 		    {
-		      mvwprintw(updateWin, urow-12,1,"upID %d\n", upID);
+		      mvwprintw(updateWin, urow-12,1,"fv5: %s\n", fv5);  // DEBUG
 		      mvwprintw(updateWin, urow-11,1,"Date From:");
 		      mvwscanw(updateWin,urow-11, ucol-45, "%d", &df);
+		      box(stmtSelectWin,0,0);
 		      mvwprintw(updateWin, urow-10,1,"Date To:");
 		      mvwscanw(updateWin,urow-10, ucol-45, "%d", &dt);
 		    }
@@ -256,6 +260,7 @@ void stmtDataAudit()
 		  hide_panel(updatePanel);
 		  update_panels();
 		  doupdate();
+		  noecho();
 		  /**********************************************
 		   **********  start of statement report ********
                    **********************************************/
@@ -272,26 +277,45 @@ void stmtDataAudit()
 		  update_panels();
 		  doupdate();
 
+		  paramsStmt[0] =  fv5;
+		  lengthStmt[0] = strlen(fv5);
+		  mvwprintw(stmtSelectWin, srow-12,1,"para: %s len:%d\n", paramsStmt[0],lengthStmt[0]);  // DEBUG
+		  formatsStmt[0] = 0; //text
+		  /* 
 		  valdf = htonl((uint32_t)df);  // REVIEW AT THE IS A CHAR STRING NOT INT
-		  valdt = htonl((uint32_t)dt);		  
-		  params[0] = (int *)&valdf;
-		  params[1] = (int *)&valdt;
-		  length[0] = sizeof(valdf);
-		  length[1] = sizeof(valdt);
-		  formats[0] = 1;
+		  params[1] = (int *)&valdf;
+		  length[1] = sizeof(valdf);
 		  formats[1] = 1;
+		  
+		  valdt = htonl((uint32_t)dt);		  
+		  params[2] = (int *)&valdt;
+		  length[2] = sizeof(valdt);
+		  formats[2] = 1;  //binary
+                  */   
+		  
 
-		  res = PQexecParams(conn,"SELECT * FROM statement WHERE date >= $1 AND date <= $2 ORDER BY date;"
-			             ,2
+		  // res = PQexecParams(conn,"SELECT * FROM statement WHERE date >= $1 AND date <= $2 ORDER BY date;"
+		  /*res = PQexecParams(conn,"SELECT * FROM statement WHERE account LIKE %$1%;"		     
+			             ,1
 				     ,NULL
-				     ,(const char *const *)params
-				     ,length
-				     ,formats
+				     ,(const char *const *)paramsStmt
+				     ,lengthStmt
+				     ,formatsStmt
+				     ,1);*/
+
+		  res = PQexecParams(conn, "SELECT * FROM statement WHERE account = $1;"				    
+				     ,1
+				     ,NULL
+				     ,(const char *const *)paramsStmt
+				     ,NULL
+				     ,NULL
 				     ,0);
 		  
+		  
+                  //show_binary_results(res);
 		  strows = PQntuples(res);
 
-		  wrefresh(stmtSelectWin);
+		  wrefresh(stmtSelectWin);		  
 		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));    
 		  mvwprintw(stmtSelectWin, 4, 1, "ID    Date     Value    Alias");  //+3
 		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));   
@@ -329,7 +353,7 @@ void stmtDataAudit()
 		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
 
 		  PQclear(res);
-	  
+	          
 		  val = htonl((uint32_t)stID);
 		  params[0] = (int *)&val;
 		  length[0] = sizeof(val);
@@ -342,8 +366,9 @@ void stmtDataAudit()
 				     ,length
 				     ,formats
 				     ,0);
-	  
+		 
 		  strows = PQntuples(res);
+		  
 		  if (strows == 1)
 		    {
 		      //assign values
