@@ -26,7 +26,8 @@ void stmtDataAudit()
   int upID = 0, stID = 0;
   int val = 0, *params[3], length[3], formats[3];     /* PQexecParams  */
   char *paramsStmt[3];
-  int lengthStmt[3], formatsStmt[3];
+  //char *paramsStmtDate[2];
+  //int lengthStmt[3], formatsStmt[3];
   int fv1;                                            /* field values */
   char fv2[4], fv3[150], fv5[50], fv6[30];
   float fv4;
@@ -40,11 +41,14 @@ void stmtDataAudit()
   int lenFour = strlen(titleFour);
   int lenFive = strlen(titleFive);
   //int fldColor = 0;
-  int df = 0;                                         /* date from */
-  int dt = 0;                                         /* date to  */
-  int valdf = 0, valdt = 0;
+  char df[9];                                         /* date from */  
+  char dt[9];                                         /* date to   */
+  char datef[9];                                      /* used to copy df */ 
+  char datet[9];                                      /* used to copy dt */  
+  int ckdate = 0;
+  //int valdf = 0, valdt = 0;
   int strows = 0;
-
+  
   PGconn *conn =  fdbcon();
   PGresult *res;
 
@@ -166,6 +170,10 @@ void stmtDataAudit()
 	  keyNavigate(ch, mainForm);
 	  if(ch == KEY_F(9))
 	    {
+	      strcpy(df, " ");
+	      strcpy(dt, "NONE");
+	      //strcpy(datet, "");
+	      //dt[1] = "Z";
 	      i = j = rows = 0, cfUpdate = 0;
 	      list = 6;
 	      wclear(updateWin);
@@ -245,15 +253,23 @@ void stmtDataAudit()
 		  //set_field_buffer(inputField[5],0,PQgetvalue(res,0,6));
 		  //strcpy(fv5, trimWS(field_buffer(inputField[5],0)));
 		  strcpy(fv5, PQgetvalue(res,0,3));
+
 		  
 		  if (upID > 0)
 		    {
 		      mvwprintw(updateWin, urow-12,1,"fv5: %s\n", fv5);  // DEBUG
 		      mvwprintw(updateWin, urow-11,1,"Date From:");
-		      mvwscanw(updateWin,urow-11, ucol-45, "%d", &df);
-		      box(stmtSelectWin,0,0);
+  	              mvwscanw(updateWin,urow-11, ucol-45, "%s", df);    // need to scan in as string
+		      df[9] = '\0';		   
+		      strcpy(datef, df);
+		      //box(stmtSelectWin,0,0);
 		      mvwprintw(updateWin, urow-10,1,"Date To:");
-		      mvwscanw(updateWin,urow-10, ucol-45, "%d", &dt);
+		      mvwscanw(updateWin,urow-10, ucol-45, "%s", dt);
+		      dt[9] = '\0';
+		      strcpy(datet,dt);
+		      mvwprintw(updateWin, urow-9, 1,"%s\n",datef);  //DEBUG showing only two digits
+		      mvwprintw(updateWin, urow-8, 1,"%s\n",datet);  //DEBUG showing only two digits
+		      wgetch(updateWin);
 		    }
 		  cfUpdate = 1;
 		  upID = 0;
@@ -263,8 +279,8 @@ void stmtDataAudit()
 		  noecho();
 		  /**********************************************
 		   **********  start of statement report ********
-                   **********************************************/
-		  i = j = strows = 0;
+                   **********************************************/		  
+		  i = j = strows = 0;		  
 		  list = 6;
 		  wclear(stmtSelectWin);
 		  box(stmtSelectWin,0,0);
@@ -278,15 +294,31 @@ void stmtDataAudit()
 		  doupdate();
 
 		  paramsStmt[0] =  fv5;
-		  lengthStmt[0] = strlen(fv5);
-		  mvwprintw(stmtSelectWin, srow-12,1,"para: %s len:%d\n", paramsStmt[0],lengthStmt[0]);  // DEBUG
-		  formatsStmt[0] = 0; //text
-		  /* 
-		  valdf = htonl((uint32_t)df);  // REVIEW AT THE IS A CHAR STRING NOT INT
-		  params[1] = (int *)&valdf;
-		  length[1] = sizeof(valdf);
-		  formats[1] = 1;
+		  //lengthStmt[0] = strlen(fv5);
+		  //mvwprintw(stmtSelectWin, srow-12,1,"para: %s len:%d\n", paramsStmt[0],lengthStmt[0]);  // DEBUG
+		  //formatsStmt[0] = 0; //text
+
+		  paramsStmt[1] = datef;
+		  paramsStmt[2] = datet;
+
+		  //paramsStmtDate[0] = fv5;
+		  //paramsStmtDate[1] = datef;
 		  
+                  
+		  // valdf = htonl((uint32_t)df);  // REVIEW AT THE IS A CHAR STRING NOT INT
+		  //paramsStmt[1] = (int *)&valdf;
+		  //length[1] = sizeof(valdf);
+		  //formats[1] = 0;
+		  //  mvwprintw(stmtSelectWin, srow-12,1,"para: %s date:%s\n", paramsStmt[0],paramsStmt[1]);  // DEBUG
+		 
+
+		  /*
+		  valdf = htonl((uint32_t)df);  // REVIEW AT THE IS A CHAR STRING NOT INT
+		  params = (int *)&valdf;
+		  length[1] = sizeof(valdf);
+		  formats[1] = 1;*/
+
+		  /*
 		  valdt = htonl((uint32_t)dt);		  
 		  params[2] = (int *)&valdt;
 		  length[2] = sizeof(valdt);
@@ -302,15 +334,31 @@ void stmtDataAudit()
 				     ,lengthStmt
 				     ,formatsStmt
 				     ,1);*/
-
-		  res = PQexecParams(conn, "SELECT * FROM statement WHERE account = $1;"				    
-				     ,1
-				     ,NULL
-				     ,(const char *const *)paramsStmt
-				     ,NULL
-				     ,NULL
-				     ,0);
 		  
+                  ckdate =  strcmp(datet,"NONE");
+		  mvwprintw(stmtSelectWin, urow-7, 1,"ck %d\n",ckdate);  //DEBUG showing only two digits
+		  
+		  if(ckdate < 0 || ckdate > 0)
+		    {
+		      res = PQexecParams(conn, "SELECT * FROM statement WHERE account = $1 AND date >= $2 AND date <= $3 ORDER BY date;"				    
+					 ,3
+					 ,NULL
+					 ,(const char *const *)paramsStmt
+					 ,NULL				     
+					 ,NULL
+					 ,0);
+		    }
+		  if(ckdate == 0)
+		    {
+		      res = PQexecParams(conn, "SELECT * FROM statement WHERE account = $1 AND date >= $2 ORDER BY date;"				    
+					 ,2
+					 ,NULL
+					 ,(const char *const *)paramsStmt
+					 ,NULL				     
+					 ,NULL
+					 ,0);
+		    }
+
 		  
                   //show_binary_results(res);
 		  strows = PQntuples(res);
