@@ -336,7 +336,7 @@ void invInsert()
 	      else
 		{
 		  wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
-		  mvwprintw(invUpdateWin,urows-6,1,"Number invalied");
+		  mvwprintw(invUpdateWin,urows-6,1,"Number invalid");
 		  wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
 		  wrefresh(invUpdateWin);		
 		  //wrefresh(PARENT_WIN);
