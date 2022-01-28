@@ -1,3 +1,11 @@
+/*********************************************** 
+ Jade Finacial Tracker
+ Started in October 2020 by reviewing the 
+ technology to be used for the project and
+ learning basics of PostgreSQL
+ Coding started end of April 2021
+ **********************************************/
+
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
