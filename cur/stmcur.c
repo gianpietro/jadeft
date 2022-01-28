@@ -350,7 +350,7 @@ void stmtDataAudit()
 		    }
 		  if(ckdate == 0)
 		    {
-		      res = PQexecParams(conn, "SELECT * FROM statement WHERE account = $1 AND date >= $2 ORDER BY date;"				    
+		       res = PQexecParams(conn, "SELECT * FROM statement WHERE account = $1 AND date >= $2 ORDER BY date;"
 					 ,2
 					 ,NULL
 					 ,(const char *const *)paramsStmt
@@ -359,8 +359,6 @@ void stmtDataAudit()
 					 ,0);
 		    }
 
-		  
-                  //show_binary_results(res);
 		  strows = PQntuples(res);
 
 		  wrefresh(stmtSelectWin);		  
