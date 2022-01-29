@@ -379,6 +379,7 @@ void stmtDataAudit()
 				    PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4), PQgetvalue(res,i,6),PQgetvalue(res,i,3));
 			  list++;
 			  wclrtoeol(stmtSelectWin);
+			  wclrtobot(stmtSelectWin);
 			  box(stmtSelectWin,0,0);  
 			}
 		      list = 6;      
