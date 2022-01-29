@@ -363,7 +363,7 @@ void stmtDataAudit()
 
 		  wrefresh(stmtSelectWin);		  
 		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));    
-		  mvwprintw(stmtSelectWin, 4, 1, "ID    Date     Value    Alias");  //+3
+		  mvwprintw(stmtSelectWin, 4, 1, "ID    Date            Value           Alias           Description");  //+3
 		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));   
 	  
 		  while((p = wgetch(stmtSelectWin)) == '\n')
@@ -374,7 +374,8 @@ void stmtDataAudit()
 			j = j + (strows - j);
 		      for (i; i < j; i++)
 			{
-			  mvwprintw(stmtSelectWin,list,1,"%-5s %-15s %-15s %-15s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4), PQgetvalue(res,i,6));
+			  mvwprintw(stmtSelectWin,list,1,"%-5s %-15s %-15s %-15s %-15s",
+				    PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4), PQgetvalue(res,i,6),PQgetvalue(res,i,3));
 			  list++;
 			  wclrtoeol(stmtSelectWin);
 			  box(stmtSelectWin,0,0);  
