@@ -502,7 +502,7 @@ void statementLinkInsert()
 	      else
 		{
 		  set_field_buffer(stmtLinkField[1],0,"");
-		  set_field_buffer(stmtLinkField[2],0,"");	 //Set category to field
+		  set_field_buffer(stmtLinkField[2],0,"");	
 		  wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
 		  mvwprintw(catTypeWin,ctrow-6,1,"Number invalid");
 		  wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
