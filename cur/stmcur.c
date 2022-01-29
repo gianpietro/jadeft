@@ -416,8 +416,15 @@ void stmtDataAudit()
 		  strows = PQntuples(res);
 		  
 		  if (strows == 1)
-		    {
+		    {		      
 		      //assign values
+		      set_field_buffer(inputField[0],0,PQgetvalue(res,0,0));
+		      set_field_buffer(inputField[1],0,PQgetvalue(res,0,1));
+		      set_field_buffer(inputField[2],0,PQgetvalue(res,0,2));
+		      set_field_buffer(inputField[3],0,PQgetvalue(res,0,3));
+		      set_field_buffer(inputField[4],0,PQgetvalue(res,0,4));
+		      set_field_buffer(inputField[5],0,PQgetvalue(res,0,5));
+		      set_field_buffer(inputField[6],0,PQgetvalue(res,0,6));
 		    }
 		  else
 		    {
@@ -441,7 +448,7 @@ void stmtDataAudit()
 	    } //F9	  
 	}//while F1
       //hide_panel(subOnePanel);
-      //hide_panel(subTwoPanel);
+      hide_panel(stmtSelectPanel);
       hide_panel(updatePanel);
       update_panels();
       doupdate();
