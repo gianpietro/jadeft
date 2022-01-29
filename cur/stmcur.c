@@ -7,6 +7,7 @@
 #include <libpq-fe.h>
 #include <arpa/inet.h>
 #include "../inc/stmcur.h"
+#include "../inc/stmlib.h"
 //#include "../inc/prolib.h"
 #include "../inc/jadlib.h"
 
@@ -28,9 +29,9 @@ void stmtDataAudit()
   char *paramsStmt[3];
   //char *paramsStmtDate[2];
   //int lengthStmt[3], formatsStmt[3];
-  int fv1;                                            /* field values */
-  char fv2[4], fv3[150], fv5[50], fv6[30];
-  float fv4;
+  int fv1, fv2;                                            
+  char fv3[4], fv4[150], fv6[50], fv7[30];
+  float fv5;
   int cf;                                             /* confirm save to DB */
   int newRec = 'y';
   int cfUpdate = 0;
@@ -251,13 +252,13 @@ void stmtDataAudit()
 		  //set_field_buffer(inputField[3],0,PQgetvalue(res,0,4));
 		  //set_field_buffer(inputField[4],0,PQgetvalue(res,0,5));
 		  //set_field_buffer(inputField[5],0,PQgetvalue(res,0,6));
-		  //strcpy(fv5, trimWS(field_buffer(inputField[5],0)));
-		  strcpy(fv5, PQgetvalue(res,0,3));
+		  //strcpy(fv6, trimWS(field_buffer(inputField[5],0)));
+		  strcpy(fv6, PQgetvalue(res,0,3));
 
 		  
 		  if (upID > 0)
 		    {
-		      mvwprintw(updateWin, urow-12,1,"fv5: %s\n", fv5);  // DEBUG
+		      mvwprintw(updateWin, urow-12,1,"fv6: %s\n", fv6);  // DEBUG
 		      mvwprintw(updateWin, urow-11,1,"Date From:");
   	              mvwscanw(updateWin,urow-11, ucol-45, "%s", df);    // need to scan in as string
 		      df[9] = '\0';		   
@@ -293,15 +294,15 @@ void stmtDataAudit()
 		  update_panels();
 		  doupdate();
 
-		  paramsStmt[0] =  fv5;
-		  //lengthStmt[0] = strlen(fv5);
+		  paramsStmt[0] =  fv6;
+		  //lengthStmt[0] = strlen(fv6);
 		  //mvwprintw(stmtSelectWin, srow-12,1,"para: %s len:%d\n", paramsStmt[0],lengthStmt[0]);  // DEBUG
 		  //formatsStmt[0] = 0; //text
 
 		  paramsStmt[1] = datef;
 		  paramsStmt[2] = datet;
 
-		  //paramsStmtDate[0] = fv5;
+		  //paramsStmtDate[0] = fv6;
 		  //paramsStmtDate[1] = datef;
 		  
                   
@@ -457,14 +458,15 @@ void stmtDataAudit()
       /* code goes here for assign buffer value and validate prior to insert */
       form_driver(mainForm,REQ_VALIDATION);
 
-      /*fv0 = atoi(field_buffer(inputField[0],0));
-      fv1 = atoi(field_buffer(inputField[1],0));
-      strcpy(fv2,trimWS(field_buffer(inputField[2],0)));
-      fv3 = atoi(field_buffer(inputField[3],0));
-      strcpy(fv4, trimWS(field_buffer(inputField[4],0)));
-      strcpy(fv5, trimWS(field_buffer(inputField[5],0)));*/
+      fv1 = atoi(field_buffer(inputField[0],0));
+      fv2 = atoi(field_buffer(inputField[1],0));
+      strcpy(fv3,trimWS(field_buffer(inputField[2],0)));
+      strcpy(fv4, trimWS(field_buffer(inputField[3],0)));
+      fv5 = atof(field_buffer(inputField[4],0));	     
+      strcpy(fv6, trimWS(field_buffer(inputField[5],0)));
+      strcpy(fv7, trimWS(field_buffer(inputField[6],0)));
 
-      if ((form_driver(mainForm,REQ_VALIDATION) == E_OK) && (fv5 >= 0))
+      if ((form_driver(mainForm,REQ_VALIDATION) == E_OK) && (fv6 >= 0))
 	{
 	  echo();
 	  wattron(mainWin,A_BOLD | COLOR_PAIR(1));
@@ -494,7 +496,7 @@ void stmtDataAudit()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //recordUpdate(upID,fv0, fv1, fv2, fv3, fv4, fv5); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  //recordUpdate(upID,fv0, fv1, fv2, fv3, fv4, fv6); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID
 		  wattron(mainWin,A_BOLD | A_BLINK);
 		  mvwprintw(mainWin,mrow-8, mcol-64, "Data updated");
@@ -502,7 +504,7 @@ void stmtDataAudit()
 		}
 	      else		
 		{
-		  //recordInsert(fv0, fv1, fv2, fv3, fv4, fv5);
+		  stmtInsert(fv2, fv3, fv4, fv5, fv6, fv7);
 		  wattron(mainWin,A_BOLD | A_BLINK);
 		  mvwprintw(mainWin,mrow-8, mcol-64, "Data saved");
 		  wattroff(mainWin,A_BOLD | A_BLINK);
