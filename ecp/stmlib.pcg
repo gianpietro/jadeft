@@ -34,5 +34,51 @@ void stmtInsert(int stmtTranDate, char stmtTranType[], char stmtTranDesc[], doub
   EXEC SQL DISCONNECT;
 }
 
-  
+void recordUpdate(int stID, int fv2, char fv3[], char fv4[], double fv5, char fv6[], char fv7[])
+{
+  EXEC SQL BEGIN DECLARE SECTION;
+   int v_stID;
+   int v_fv2;
+   char v_fv3[TTYPE];
+   char v_fv4[TDESC];
+   double v_fv5;
+   char v_fv6[ANUM];
+   char v_fv7[ALIAS];
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_stID = stID;
+  v_fv2 = fv2;
+  strcpy(v_fv3, fv3);
+  strcpy(v_fv4, fv4);
+  v_fv5 = fv5;
+  strcpy(v_fv6, fv6);
+  strcpy(v_fv7, fv7);
+
+  EXEC SQL
+   UPDATE statement SET date = :v_fv2, type = :v_fv3, description = :v_fv4, value = :v_fv5, account = :v_fv6, alias = :v_fv7 WHERE statement_id = :v_stID;
+
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT; 
+}
+
+void recordDelete(int stID)
+{
+ EXEC SQL BEGIN DECLARE SECTION;
+   int v_stID;  
+  EXEC SQL END DECLARE SECTION;
+
+  connectToDB();
+
+  v_stID = stID;
+
+  EXEC SQL
+   DELETE FROM statement WHERE statement_id = :v_stID;
+  EXEC SQL COMMIT;
+
+  EXEC SQL DISCONNECT;
+}
+
 

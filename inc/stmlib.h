@@ -3,4 +3,8 @@
 
 void stmtInsert(int, char *, char *, double, char *, char *);
 
+void recordUpdate(int, int, char *, char *, double, char *, char *);
+
+void recordDelete(int);
+
 #endif
