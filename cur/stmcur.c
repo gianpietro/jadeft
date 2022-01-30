@@ -486,7 +486,7 @@ void stmtDataAudit()
 		}
 	      if (cf == 'd')
 		{  
-		  //recordDelete(upID);
+		  recordDelete(stID);
 		  wattron(mainWin,A_BOLD | A_BLINK);
 		  mvwprintw(mainWin,mrow-8,mcol-64, "Record deleted");
 		  wattroff(mainWin,A_BOLD | A_BLINK);
@@ -497,7 +497,7 @@ void stmtDataAudit()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  //recordUpdate(upID,fv0, fv1, fv2, fv3, fv4, fv6); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
+		  recordUpdate(stID, fv2, fv3, fv4, fv5, fv6, fv7); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
 		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID
 		  wattron(mainWin,A_BOLD | A_BLINK);
 		  mvwprintw(mainWin,mrow-8, mcol-64, "Data updated");
