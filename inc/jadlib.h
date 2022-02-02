@@ -13,4 +13,6 @@ void keyNavigate(int ch, FORM * f);
 
 int checkFileExists(char *);
 
+char *truncateStr(char *);
+
 #endif
