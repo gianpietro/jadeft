@@ -376,7 +376,7 @@ void stmtDataAudit()
 			j = j + (strows - j);
 		      for (i; i < j; i++)
 			{
-			  strcpy(desc, truncateStr(PQgetvalue(res,i,3)));
+			  strcpy(desc, truncateStr(PQgetvalue(res,i,3)));                               
 			  mvwprintw(stmtSelectWin,list,1,"%-5s %-15s %-15s %-15s %-15s",
 				    PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4), PQgetvalue(res,i,6), desc);    //PQgetvalue(res,i,3));
 			  list++;
