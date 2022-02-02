@@ -71,7 +71,11 @@ int checkFileExists(char fName[])
     return 2;     
 }
 
-
+/*
+  Function to truncate a string which is more than
+  40 characters. Used to display statement description
+  in a report. 
+*/
 char *truncateStr(char * str)
 {
   size_t len = strlen(str);
