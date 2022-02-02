@@ -70,3 +70,17 @@ int checkFileExists(char fName[])
   else
     return 2;     
 }
+
+
+char *truncateStr(char * str)
+{
+  size_t len = strlen(str);
+
+  if (len > 50)
+    {
+      str[len - 50] = '\0';
+      return str;
+    }
+  else
+    return str;	    
+}
