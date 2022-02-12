@@ -8,7 +8,6 @@
 #include <arpa/inet.h>
 #include "../inc/stmcur.h"
 #include "../inc/stmlib.h"
-//#include "../inc/prolib.h"
 #include "../inc/jadlib.h"
 
 
@@ -26,9 +25,7 @@ void stmtDataAudit()
   int rows = 0; 
   int upID = 0, stID = 0;
   int val = 0, *params[3], length[3], formats[3];     /* PQexecParams  */
-  char *paramsStmt[3];
-  //char *paramsStmtDate[2];
-  //int lengthStmt[3], formatsStmt[3];
+  char *paramsStmt[3];  
   int fv1, fv2;                                            
   char fv3[4], fv4[150], fv6[50], fv7[30];
   float fv5;
@@ -41,13 +38,11 @@ void stmtDataAudit()
   int lenOne = strlen(titleOne);
   int lenFour = strlen(titleFour);
   int lenFive = strlen(titleFive);
-  //int fldColor = 0;
   char df[9];                                         /* date from */  
   char dt[9];                                         /* date to   */
   char datef[9];                                      /* used to copy df */ 
   char datet[9];                                      /* used to copy dt */  
   int ckdate = 0;
-  //int valdf = 0, valdt = 0;
   int strows = 0;
   char desc[150];
   
@@ -91,11 +86,8 @@ void stmtDataAudit()
       set_field_back(inputField[6], COLOR_PAIR(9));   
 
       field_opts_off(inputField[0], O_ACTIVE);
-      //set_field_type(inputField[0],TYPE_INTEGER,1,1,2);
       set_field_type(inputField[1],TYPE_INTEGER,0,1,99999999);
       set_field_type(inputField[2],TYPE_REGEXP,"^[A-Z ]+$");
-      //set_field_type(inputField[3],TYPE_);
-      //set_field_type(inputField[4],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       set_field_type(inputField[5],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       set_field_type(inputField[6],TYPE_REGEXP,"^[A-Za-z0-9- &]+$");
 
@@ -103,13 +95,9 @@ void stmtDataAudit()
       scale_form(mainForm, &mrow, &mcol);   
 
       mainWin = newwin(LINES-15, COLS/3,LINES-(LINES-4),COLS/15);
-      //subOneWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
-      //subTwoWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/2);
       updateWin = newwin(LINES*0.5, COLS/3,LINES-(LINES-4),COLS/2);
       stmtSelectWin = newwin(LINES*0.72, COLS/2,LINES-(LINES-4),COLS/2);
 
-      //subOnePanel = new_panel(subOneWin);      
-      //subTwoPanel = new_panel(subTwoWin);
       updatePanel = new_panel(updateWin);
       mainPanel = new_panel(mainWin);
       stmtSelectPanel = new_panel(stmtSelectWin);
@@ -118,21 +106,15 @@ void stmtDataAudit()
       doupdate();
       
       keypad(mainWin, TRUE);
-      //keypad(subOneWin, TRUE);
-      //keypad(subTwoWin, TRUE);
       keypad(updateWin, TRUE);
       keypad(stmtSelectWin, TRUE);
 
       set_form_win(mainForm,mainWin);
       set_form_sub(mainForm, derwin(mainWin,mrow,mcol,2,2));      
       getmaxyx(mainWin, mrow, mcol);
-      //getmaxyx(subOneWin, s1row, s1col);
-      //getmaxyx(subTwoWin, s2row, s2col);
       getmaxyx(updateWin, urow, ucol);
       getmaxyx(stmtSelectWin, srow, scol);
       box(mainWin,0,0);
-      //box(subOneWin,0,0);
-      //box(subTwoWin,0,0);
       box(updateWin,0,0);
       box(stmtSelectWin,0,0);
       wattron(mainWin,A_BOLD | COLOR_PAIR(1));     
@@ -162,8 +144,6 @@ void stmtDataAudit()
   
       while((ch = wgetch(mainWin)) != KEY_F(1))
 	{
-	  //hide_panel(subOnePanel);
-	  //hide_panel(subTwoPanel);
 	  hide_panel(updatePanel);
 	  hide_panel(stmtSelectPanel);
 	  show_panel(mainPanel);
@@ -174,8 +154,6 @@ void stmtDataAudit()
 	    {
 	      strcpy(df, " ");
 	      strcpy(dt, "NONE");
-	      //strcpy(datet, "");
-	      //dt[1] = "Z";
 	      i = j = rows = 0, cfUpdate = 0;
 	      list = 6;
 	      wclear(updateWin);
@@ -247,19 +225,9 @@ void stmtDataAudit()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  //set_field_buffer(inputField[0],0,PQgetvalue(res,0,1));
-		  //set_field_buffer(inputField[1],0,PQgetvalue(res,0,2));
-		  //set_field_buffer(inputField[2],0,PQgetvalue(res,0,3));
-		  //set_field_buffer(inputField[3],0,PQgetvalue(res,0,4));
-		  //set_field_buffer(inputField[4],0,PQgetvalue(res,0,5));
-		  //set_field_buffer(inputField[5],0,PQgetvalue(res,0,6));
-		  //strcpy(fv6, trimWS(field_buffer(inputField[5],0)));
-		  strcpy(fv6, PQgetvalue(res,0,3));
-
-		  
+		  strcpy(fv6, PQgetvalue(res,0,3));		  
 		  if (upID > 0)
-		    {
-		      mvwprintw(updateWin, urow-12,1,"fv6: %s\n", fv6);  // DEBUG
+		    {		      
 		      mvwprintw(updateWin, urow-11,1,"Date From:");
   	              mvwscanw(updateWin,urow-11, ucol-45, "%s", df);    // need to scan in as string
 		      df[9] = '\0';		   
@@ -269,9 +237,7 @@ void stmtDataAudit()
 		      mvwscanw(updateWin,urow-10, ucol-45, "%s", dt);
 		      dt[9] = '\0';
 		      strcpy(datet,dt);
-		      mvwprintw(updateWin, urow-9, 1,"%s\n",datef);  //DEBUG showing only two digits
-		      mvwprintw(updateWin, urow-8, 1,"%s\n",datet);  //DEBUG showing only two digits
-		      wgetch(updateWin);
+		      //wgetch(updateWin);
 		    }
 		  cfUpdate = 1;
 		  upID = 0;
@@ -295,50 +261,11 @@ void stmtDataAudit()
 		  update_panels();
 		  doupdate();
 
-		  paramsStmt[0] =  fv6;
-		  //lengthStmt[0] = strlen(fv6);
-		  //mvwprintw(stmtSelectWin, srow-12,1,"para: %s len:%d\n", paramsStmt[0],lengthStmt[0]);  // DEBUG
-		  //formatsStmt[0] = 0; //text
-
+		  paramsStmt[0] =  fv6;		 
 		  paramsStmt[1] = datef;
 		  paramsStmt[2] = datet;
-
-		  //paramsStmtDate[0] = fv6;
-		  //paramsStmtDate[1] = datef;
 		  
-                  
-		  // valdf = htonl((uint32_t)df);  // REVIEW AT THE IS A CHAR STRING NOT INT
-		  //paramsStmt[1] = (int *)&valdf;
-		  //length[1] = sizeof(valdf);
-		  //formats[1] = 0;
-		  //  mvwprintw(stmtSelectWin, srow-12,1,"para: %s date:%s\n", paramsStmt[0],paramsStmt[1]);  // DEBUG
-		 
-
-		  /*
-		  valdf = htonl((uint32_t)df);  // REVIEW AT THE IS A CHAR STRING NOT INT
-		  params = (int *)&valdf;
-		  length[1] = sizeof(valdf);
-		  formats[1] = 1;*/
-
-		  /*
-		  valdt = htonl((uint32_t)dt);		  
-		  params[2] = (int *)&valdt;
-		  length[2] = sizeof(valdt);
-		  formats[2] = 1;  //binary
-                  */   
-		  
-
-		  // res = PQexecParams(conn,"SELECT * FROM statement WHERE date >= $1 AND date <= $2 ORDER BY date;"
-		  /*res = PQexecParams(conn,"SELECT * FROM statement WHERE account LIKE %$1%;"		     
-			             ,1
-				     ,NULL
-				     ,(const char *const *)paramsStmt
-				     ,lengthStmt
-				     ,formatsStmt
-				     ,1);*/
-		  
-                  ckdate =  strcmp(datet,"NONE");
-		  mvwprintw(stmtSelectWin, urow-7, 1,"ck %d\n",ckdate);  //DEBUG showing only two digits
+                  ckdate =  strcmp(datet,"NONE");		 
 		  
 		  if(ckdate < 0 || ckdate > 0)
 		    {
@@ -365,7 +292,7 @@ void stmtDataAudit()
 
 		  wrefresh(stmtSelectWin);		  
 		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));    
-		  mvwprintw(stmtSelectWin, 4, 1, "ID    Date            Value           Alias           Description");  //+3
+		  mvwprintw(stmtSelectWin, 4, 1, "ID    Date            Value           Alias           Description");  
 		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));   
 	  
 		  while((p = wgetch(stmtSelectWin)) == '\n')
@@ -378,7 +305,7 @@ void stmtDataAudit()
 			{
 			  strcpy(desc, truncateStr(PQgetvalue(res,i,3)));                               
 			  mvwprintw(stmtSelectWin,list,1,"%-5s %-15s %-15s %-15s %-15s",
-				    PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4), PQgetvalue(res,i,6), desc);    //PQgetvalue(res,i,3));
+				    PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,4), PQgetvalue(res,i,6), desc);   
 			  list++;
 			  wclrtoeol(stmtSelectWin);
 			  wclrtobot(stmtSelectWin);
@@ -399,7 +326,7 @@ void stmtDataAudit()
 		    }
 		  echo();
 		  wattron(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
-		  mvwprintw(stmtSelectWin,srow-11,1,"Select Option: ");  //srow-7
+		  mvwprintw(stmtSelectWin,srow-11,1,"Select Option: ");  
 		  mvwscanw(stmtSelectWin,srow-11, scol-85, "%d", &stID);
 		  wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));           
 
@@ -438,8 +365,7 @@ void stmtDataAudit()
 		      wrefresh(stmtSelectWin);
 		      wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));      
 		    }
-		  noecho();		  
-		  //PQclear(res);
+		  noecho();		  		  
 		} // if rows == 1 provider
 	      else
 		{
@@ -452,7 +378,6 @@ void stmtDataAudit()
 	      PQclear(res);
 	    } //F9	  
 	}//while F1
-      //hide_panel(subOnePanel);
       hide_panel(stmtSelectPanel);
       hide_panel(updatePanel);
       update_panels();
