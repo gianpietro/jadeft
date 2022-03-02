@@ -81,8 +81,8 @@ char *truncateStr(char * str)
   size_t len = strlen(str);
 
   if (len > 40)
-    {
-      str[len - (len - 40)] = '\0';
+    {      
+      str[41] = '\0';
       return str;
     }
   else
