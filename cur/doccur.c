@@ -1014,7 +1014,7 @@ void documentInsert()
 	{
 	  set_field_buffer(docField[9],0,docfCat);
 	  docfOid = atoi(field_buffer(docField[2],0));	  
-	  strcpy(updateCatalog,field_buffer(docField[9],0));
+	  strcpy(updateCatalog,trimWS(field_buffer(docField[9],0)));
 	  strcpy(docfCat,updateCatalog);
 	}
       else
