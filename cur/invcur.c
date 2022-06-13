@@ -60,7 +60,7 @@ void invInsert()
       invoiceField[2] = new_field(1,8,6,28,0,0);  /* end_date */
       invoiceField[3] = new_field(1,5,8,28,0,0);  /* supplier_acct_id */
       invoiceField[4] = new_field(1,30,10,28,0,0);  /* description */
-      invoiceField[5] = new_field(1,10,12,28,0,0);  /* amount */      
+      invoiceField[5] = new_field(1,12,12,28,0,0);  /* amount */      
       invoiceField[6] = NULL;
 
       for (fldColor = 0; fldColor < 6; fldColor++)
@@ -74,8 +74,7 @@ void invInsert()
       set_field_type(invoiceField[2],TYPE_INTEGER,0,1,99999999);
       set_field_type(invoiceField[3],TYPE_INTEGER,0,1,99999);
       set_field_type(invoiceField[4],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
-      //set_field_type(invoiceField[5],TYPE_NUMERIC,2,-100000,1000000);
-
+      set_field_type(invoiceField[5],TYPE_NUMERIC,2,-999999.99,9999999.99);
       invoiceForm = new_form(invoiceField);
       scale_form(invoiceForm, &invrow, &invcol);
 
@@ -140,7 +139,7 @@ void invInsert()
 	  keyNavigate(ch, invoiceForm);
 	  // I had to set validation for the field at this point as would cause
 	  // navigation to stop when entering subsequent data after first entry
-	  set_field_type(invoiceField[5],TYPE_NUMERIC,2,-100000,1000000);
+	  //set_field_type(invoiceField[5],TYPE_NUMERIC,2,-100000,1000000);
 	  if(ch == KEY_F(2))
 	    {
 	      i = j = rows = 0;
