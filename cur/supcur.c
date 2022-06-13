@@ -1216,7 +1216,7 @@ int suppAccountInsert()
       supAcctField[5] = new_field(1,8,12,28,0,0);   /* start_date        */
       supAcctField[6] = new_field(1,8,14,28,0,0);   /* end_date          */
       supAcctField[7] = new_field(1,5,16,28,0,0);   /* payment_period_id */
-      supAcctField[8] = new_field(1,10,18,28,0,0);  /* amount            */
+      supAcctField[8] = new_field(1,12,18,28,0,0);  /* amount            */
       supAcctField[9] = new_field(1,30,20,28,0,0);  /* comment           */
       supAcctField[10] = new_field(1,30,22,28,0,0); /* alias             */
       supAcctField[11] = new_field(1,5,24,28,0,0);  /* provider_acct_id  */
@@ -1237,7 +1237,7 @@ int suppAccountInsert()
       set_field_type(supAcctField[5],TYPE_INTEGER,0,1,99999999);
       set_field_type(supAcctField[6],TYPE_INTEGER,0,1,99999999);
       set_field_type(supAcctField[7],TYPE_INTEGER,0,1,99999);
-      // set_field_type(supAcctField[8],TYPE_NUMERIC,2,-100000,1000000);
+      set_field_type(supAcctField[8],TYPE_NUMERIC,2,-999999.99,9999999.99);
       set_field_type(supAcctField[9],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       set_field_type(supAcctField[10],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       set_field_type(supAcctField[11],TYPE_INTEGER,0,1,99999);
@@ -1343,7 +1343,7 @@ int suppAccountInsert()
 	update_panels();
 	doupdate();
 	keyNavigate(ch, supAcctForm);   
-	set_field_type(supAcctField[8],TYPE_NUMERIC,2,-100000,1000000);
+	//set_field_type(supAcctField[8],TYPE_NUMERIC,2,-100000,1000000);
 	if(ch == KEY_F(2))
 	    {
 	      i = j = rows = 0;
