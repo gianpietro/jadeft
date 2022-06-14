@@ -28,7 +28,7 @@ void invInsert()
   char supAcctIDstr[5];
   int supAcctID;
   int invfStartDt, invfEndDt, invfSupAcctID;
-  float invfAmount;
+  double invfAmount;
   char invfNo[30], invfDesc[30];
   int cfUpdate = 0;
   int cf;
@@ -74,7 +74,7 @@ void invInsert()
       set_field_type(invoiceField[2],TYPE_INTEGER,0,1,99999999);
       set_field_type(invoiceField[3],TYPE_INTEGER,0,1,99999);
       set_field_type(invoiceField[4],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
-      set_field_type(invoiceField[5],TYPE_NUMERIC,2,-999999.99,9999999.99);
+      set_field_type(invoiceField[5],TYPE_NUMERIC,2,-999999.99, 9999999.99);
       invoiceForm = new_form(invoiceField);
       scale_form(invoiceForm, &invrow, &invcol);
 
