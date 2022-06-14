@@ -1172,7 +1172,7 @@ int suppAccountInsert()
   int rows;
   int val, upID, *params[1], length[1],  formats[1];
   int safActiveID, safSupID, safPrtID, safSupTypeID=0, safStartDt, safEndDt, safPayID, safProAcctID;
-  float safAmount;
+  double safAmount;
   char safSupAcctRef[30], safComment[30], safAlias[30];
   int cf;
   int newRec = 'y';
