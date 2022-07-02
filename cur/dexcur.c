@@ -30,14 +30,14 @@ void selectType()
   char p;  
   int proID = 0;
   int val, *params[1], length[1], formats[1];
-  //int proAcctID = 0, providerID = 0;
   char proAcctID[5],proName[30], providerID[5], proAcctNo[30];
   int cont;
   char *paramsDoc[2];
   int docExportID;
   char docFileName[30];
   int oidValue;
-  char *expFName;// = (char *) malloc(35*sizeof(char));
+  char *expFName;
+  int ConfirmExport = 'n';
   
   PGconn *conn =  fdbcon();
   PGresult *res;  
@@ -49,8 +49,12 @@ void selectType()
   keypad(stdscr, TRUE);
 
   init_pair(2,COLOR_BLUE,COLOR_WHITE);
+  init_pair(3,COLOR_WHITE,COLOR_GREEN);
+  //init_pair(4,COLOR_WHITE,COLOR_MAGENTA);
+  init_pair(4,COLOR_WHITE,COLOR_BLUE);
+  //init_pair(4,COLOR_WHITE,COLOR_MAGENTA);
 
-  selectWin = newwin(LINES*0.4, COLS*0.4,LINES*0.07,COLS/5);
+  selectWin = newwin(LINES*0.4, COLS*0.4,LINES*0.07,COLS/4);
   selectProWin = newwin(LINES*0.5, COLS*0.5,LINES*0.07,COLS/5);
   docWin = newwin(LINES*0.4, COLS*0.5, LINES/2, COLS/5), 
   selectPanel = new_panel(selectWin);
@@ -94,6 +98,8 @@ void selectType()
     {
       hide_panel(selectPanel);
       hide_panel(docPanel);
+      wbkgd(selectProWin,COLOR_PAIR(4));
+      wattron(selectProWin, A_BOLD | COLOR_PAIR(4));
       mvwprintw(selectProWin, 1, (pcol-lenTwo)/2, titleTwo);
       wmove(selectProWin,1,1);
       show_panel(selectProPanel);
@@ -109,8 +115,12 @@ void selectType()
                           ORDER BY pa.provider_acct_id");
       
       rRow = PQntuples(res);
-
+      
       mvwprintw(selectProWin,4,1, "AccountID       Name                      ProviderID           AccountNo");
+      wattroff(selectProWin, A_BOLD | COLOR_PAIR(4));
+      mvwprintw(selectProWin,6,1, "Press Enter to continue");
+      wmove(selectProWin,6,pcol*0.25);
+      box(selectProWin,0,0);
 
       while((p = wgetch(selectProWin)) == '\n')
 	{
@@ -162,17 +172,23 @@ void selectType()
 			 ,formats
 			 ,0);
 
-      rRow = PQntuples(res);      
+      rRow = PQntuples(res);
       
       if(rRow == 1)
 	{
+	  hide_panel(selectPanel);
+	  update_panels();
+	  doupdate();
 	  echo();
 	  strcpy(proAcctID, PQgetvalue(res,0,0));
 	  strcpy(proName,PQgetvalue(res,0,1));
 	  strcpy(providerID, PQgetvalue(res,0,2));
 	  strcpy(proAcctNo,PQgetvalue(res,0,3));
 	  strcpy(sDate, "NONE");
-	  mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(2));
+	  //mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);	  
+	  mvwprintw(selectWin,8,1,"AcctID: %s      Name: %s      ProID: %s      AcctNo: %s  ",proAcctID,proName,providerID,proAcctNo);
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(2));
 	  mvwprintw(selectWin,10,1,"Enter start date(optional): ");
 	  mvwscanw(selectWin,10,col*0.35, "%s", sDate);
 	  sDate[9] = '\0';
@@ -180,8 +196,10 @@ void selectType()
 	  PQclear(res);
 	  
 	  /******** Start of section  to select document ********/
-	  hide_panel(selectPanel);
+	  wbkgd(docWin,COLOR_PAIR(4));
+          wattron(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin, 1, (dcol-lenThree)/2, titleThree);
+	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -194,8 +212,6 @@ void selectType()
 	  paramsDoc[1] = startDate;
 	  
 	  ckdate = strcmp(startDate, "NONE");
-
-	  mvwprintw(docWin,2,1,"drow %d dcol %d", drow, dcol);  //DEBUG
 	  
 	  if(ckdate < 0 || ckdate > 0)
 	    {
@@ -204,7 +220,8 @@ void selectType()
                                        INNER JOIN provider p ON (pa.provider_id = p.provider_id) \
                                        INNER JOIN documents d ON (pa.provider_acct_id = d.parent_id) \
                                        WHERE pa.provider_acct_id = $1 \
-                                       AND d.start_date >= $2;"
+                                       AND d.start_date >= $2 \
+                                       AND d.catalog = 'PROVIDER';"
 				 ,2
 				 ,NULL
 				 ,(const char *const *)paramsDoc
@@ -218,9 +235,9 @@ void selectType()
                                        FROM provider_account pa \
                                        INNER JOIN provider p ON (pa.provider_id = p.provider_id) \
                                        INNER JOIN documents d ON (pa.provider_acct_id = d.parent_id) \
-                                       WHERE pa.provider_acct_id = $1;" \
-                                     
-				 ,1
+                                       WHERE pa.provider_acct_id = $1 \
+                                       AND d.catalog = 'PROVIDER';" \
+       				 ,1
 				 ,NULL
 				 ,(const char *const *)paramsDoc
 				 ,NULL				     
@@ -229,7 +246,14 @@ void selectType()
 	    }
 
 	  rRow = PQntuples(res);
-	  mvwprintw(docWin,3,1,"rRow %d ", rRow); //DEBUG
+	  //mvwprintw(docWin,6,1, "Press Enter to continue");
+	  //wmove(docWin,6,pcol*0.25);
+	  mvwprintw(docWin,4,1, "DocumentID      Title                     Start_Date           OID             File");
+	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
+	  mvwprintw(docWin,6,1, "Press Enter to continue");
+	  wmove(docWin,6,pcol*0.25);
+	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
+	  //mvwprintw(docWin,3,1,"rRow %d ", rRow); //DEBUG
 	  
 	  while((p = wgetch(docWin)) == '\n')
 	    {
@@ -239,7 +263,8 @@ void selectType()
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
-		  mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
+		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
+		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
 		  list++;		  
 		}
 	      list = 6;
@@ -284,34 +309,41 @@ void selectType()
 	      strcpy(docFileName, PQgetvalue(res,0,2));
 	      oidValue = atoi(PQgetvalue(res,0,3));
 	      mvwprintw(selectWin,12,1, "Document ID to export %d", docExportID);
-	      //mvwprintw(selectWin,13,1, "fileName %s, OID %d",docFileName, oidValue);
 
-             
-	      expFName = exportDocument(oidValue, docFileName);
-	      //strcpy(valExpFName, expFName);
-	      //valExpFName = *expFName;
-	      mvwprintw(selectWin,14,1,"exported file %s", expFName);
+	      mvwprintw(selectWin, 14,1, "Export document y/n: ");
+	      wmove(selectWin, 14,25);
+	      echo();
+	      while((ConfirmExport = wgetch(selectWin)) != 'y')
+		{
+		  wmove(selectWin, 14,25);
+		  if(ConfirmExport == 'n')
+		    break;
+		}
+	      noecho();
+         
+	      if (ConfirmExport == 'y')
+		{
+		  expFName = exportDocument(oidValue, docFileName);
+		  mvwprintw(selectWin,14,1,"exported file %s", expFName);
+		}
 	    }
 	  else
 	    {
 	      mvwprintw(selectWin,12,1,"Number invalid - press Enter to continue");
 	    }
-
+	  wgetch(selectWin);  //used for select export document y/n	  
 	  PQclear(res);
-	  rRow = 0;
-
-	  mvwscanw(selectWin,13,col*0.8, "%d", cont); //DEBUG
-	 
+	  rRow = 0;	 
 	}  //if row == 1
       else
 	{
 	  mvwprintw(selectWin,8,1,"Number invalid - press Enter to continue");
 	  mvwscanw(selectWin,8,col*0.8, "%d", cont);	  
 	}
-
     } //selectOption == 1
 
   hide_panel(selectPanel);
+  hide_panel(docPanel);
   update_panels();
   doupdate();
   delwin(selectWin);
@@ -325,7 +357,7 @@ void selectType()
 
 char * exportDocument(int oid, char fn[])
 {
-  char *fullFileName = (char *)malloc(35*sizeof(char));    /* tmp directory */
+  char *fullFileName = (char *)malloc(35*sizeof(char)); 
   char *expFileName = (char *)malloc(35*sizeof(char));
 
   PGconn *conn = fdbcon();
@@ -341,6 +373,8 @@ char * exportDocument(int oid, char fn[])
   res = PQexec(conn, "END");
   PQclear(res);
   PQfinish(conn);
+
+  free(expFileName);
   
   return fullFileName;   
 }
