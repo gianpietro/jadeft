@@ -37,7 +37,8 @@ void selectType()
   int docExportID;
   char docFileName[30];
   int oidValue;
-
+  char *expFName;// = (char *) malloc(35*sizeof(char));
+  
   PGconn *conn =  fdbcon();
   PGresult *res;  
 
@@ -283,7 +284,13 @@ void selectType()
 	      strcpy(docFileName, PQgetvalue(res,0,2));
 	      oidValue = atoi(PQgetvalue(res,0,3));
 	      mvwprintw(selectWin,12,1, "Document ID to export %d", docExportID);
-	      mvwprintw(selectWin,13,1, "fileName %s, OID %d",docFileName, oidValue);
+	      //mvwprintw(selectWin,13,1, "fileName %s, OID %d",docFileName, oidValue);
+
+             
+	      expFName = exportDocument(oidValue, docFileName);
+	      //strcpy(valExpFName, expFName);
+	      //valExpFName = *expFName;
+	      mvwprintw(selectWin,14,1,"exported file %s", expFName);
 	    }
 	  else
 	    {
@@ -311,7 +318,29 @@ void selectType()
   
   noecho();
   endwin();
+
+  free(expFName);
 }
 
 
+char * exportDocument(int oid, char fn[])
+{
+  char *fullFileName = (char *)malloc(35*sizeof(char));    /* tmp directory */
+  char *expFileName = (char *)malloc(35*sizeof(char));
 
+  PGconn *conn = fdbcon();
+  PGresult * res;
+    
+  strcpy(fullFileName, "/tmp/");
+  strcpy(expFileName, fn);
+  strcat(fullFileName, expFileName);
+  
+  res = PQexec(conn, "BEGIN");
+  PQclear(res);
+  lo_export(conn, oid, fullFileName);
+  res = PQexec(conn, "END");
+  PQclear(res);
+  PQfinish(conn);
+  
+  return fullFileName;   
+}
