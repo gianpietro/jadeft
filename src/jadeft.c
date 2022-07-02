@@ -25,6 +25,7 @@
 #include "../inc/stmcur.h"
 #include "../inc/stmuplf.h"
 #include "../inc/stmuplibf.h"
+#include "../inc/dexcur.h"
 
 static const char *menulist[MAX_MENU_ITEMS][MAX_SUB_ITEMS];
 
@@ -66,12 +67,13 @@ int main (void) {
   menulist[4][0] = "</07/B>Documents      <!07>";
   menulist[4][1] = "</05>Document Type    <!05>";
   menulist[4][2] = "</05>Document Insert  <!05>";
+  menulist[4][3] = "</05>Document Export  <!05>";
   
   submenusize[0] = 3;
   submenusize[1] = 4;
   submenusize[2] = 5;
   submenusize[3] = 7;
-  submenusize[4] = 3;  
+  submenusize[4] = 4;  
 
   menuloc[0] = LEFT;
   menuloc[1] = LEFT;
@@ -135,6 +137,9 @@ int main (void) {
 	  break;
 	case 401:
 	  documentInsert();
+	  break;
+	case 402:
+	  selectType();
 	  break;
 	default:
 	  sprintf(temp,"No selection");
