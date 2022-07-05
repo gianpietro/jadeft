@@ -56,7 +56,7 @@ int main (void) {
   menulist[2][3] = "</05>Supplier Account <!05>";
   menulist[2][4] = "</05>Invoice          <!05>";
 
-  menulist[3][0] = "</07/B>Other Admin    <!07>";
+  menulist[3][0] = "</07/B>Core Admin     <!07>";
   menulist[3][1] = "</05>Property         <!05>";
   menulist[3][2] = "</05>Payment period   <!05>";
   menulist[3][3] = "</05>Category         <!05>";

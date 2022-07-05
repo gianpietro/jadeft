@@ -50,18 +50,20 @@ void selectType()
 
   init_pair(2,COLOR_BLUE,COLOR_WHITE);
   init_pair(3,COLOR_WHITE,COLOR_GREEN);
-  //init_pair(4,COLOR_WHITE,COLOR_MAGENTA);
-  init_pair(4,COLOR_WHITE,COLOR_BLUE);
-  //init_pair(4,COLOR_WHITE,COLOR_MAGENTA);
+  init_pair(4,COLOR_WHITE,COLOR_MAGENTA);
+  init_pair(8,COLOR_BLACK,COLOR_WHITE);
+  //init_pair(4,COLOR_WHITE,COLOR_BLUE);
+  
 
   selectWin = newwin(LINES*0.4, COLS*0.4,LINES*0.07,COLS/4);
   selectProWin = newwin(LINES*0.5, COLS*0.5,LINES*0.07,COLS/5);
-  docWin = newwin(LINES*0.4, COLS*0.5, LINES/2, COLS/5), 
+  docWin = newwin(LINES*0.4, COLS*0.5, LINES/2, COLS/5);
   selectPanel = new_panel(selectWin);
   selectProPanel = new_panel(selectProWin);
   docPanel = new_panel(docWin);
   
-  wbkgd(selectWin,COLOR_PAIR(2));
+  wbkgd(selectWin,COLOR_PAIR(3));  //COLORCHG
+  
   update_panels();
   doupdate();
 
@@ -83,9 +85,9 @@ void selectType()
       getch();
     }
 
-  wattron(selectWin,A_BOLD | COLOR_PAIR(2));
+  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG
   mvwprintw(selectWin, 1, (col-lenOne)/2, titleOne);
-  wattroff(selectWin,A_BOLD | COLOR_PAIR(2));
+  // wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  //COLORCHG
 
   mvwprintw(selectWin,3,1, "1 - Provider");
   mvwprintw(selectWin,4,1, "2 - Supplier\n");
@@ -94,6 +96,7 @@ void selectType()
   echo();
   mvwscanw(selectWin,6,18,"%d",&selectOption);
   noecho();
+  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  //COLORCHG new line
   if (selectOption == 1)
     {
       hide_panel(selectPanel);
@@ -185,12 +188,14 @@ void selectType()
 	  strcpy(providerID, PQgetvalue(res,0,2));
 	  strcpy(proAcctNo,PQgetvalue(res,0,3));
 	  strcpy(sDate, "NONE");
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(2));
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
 	  //mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);	  
 	  mvwprintw(selectWin,8,1,"AcctID: %s      Name: %s      ProID: %s      AcctNo: %s  ",proAcctID,proName,providerID,proAcctNo);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(2));
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	  mvwprintw(selectWin,10,1,"Enter start date(optional): ");
 	  mvwscanw(selectWin,10,col*0.35, "%s", sDate);
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG
 	  sDate[9] = '\0';
 	  strcpy(startDate, sDate);
 	  PQclear(res);
@@ -308,10 +313,11 @@ void selectType()
 	    {
 	      strcpy(docFileName, PQgetvalue(res,0,2));
 	      oidValue = atoi(PQgetvalue(res,0,3));
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	      mvwprintw(selectWin,12,1, "Document ID to export %d", docExportID);
-
 	      mvwprintw(selectWin, 14,1, "Export document y/n: ");
 	      wmove(selectWin, 14,25);
+	      //wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	      echo();
 	      while((ConfirmExport = wgetch(selectWin)) != 'y')
 		{
@@ -320,27 +326,52 @@ void selectType()
 		    break;
 		}
 	      noecho();
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
          
 	      if (ConfirmExport == 'y')
 		{
+		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 		  expFName = exportDocument(oidValue, docFileName);
 		  mvwprintw(selectWin,14,1,"exported file %s", expFName);
+		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 		}
 	    }
 	  else
 	    {
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	      mvwprintw(selectWin,12,1,"Number invalid - press Enter to continue");
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	    }
 	  wgetch(selectWin);  //used for select export document y/n	  
 	  PQclear(res);
-	  rRow = 0;	 
+	  rRow = 0;	  
 	}  //if row == 1
       else
 	{
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	  mvwprintw(selectWin,8,1,"Number invalid - press Enter to continue");
-	  mvwscanw(selectWin,8,col*0.8, "%d", cont);	  
+	  mvwscanw(selectWin,8,col*0.8, "%d", cont);
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	}
-    } //selectOption == 1
+    }
+  else if (selectOption == 2)
+    {
+      hide_panel(selectProPanel);
+      hide_panel(docPanel);
+      update_panels();
+      doupdate();
+      mvwprintw(selectWin,8,1,"option 2 Service - WIP");
+      mvwscanw(selectWin,8,col*0.8, "%d", cont);	  
+    }
+  else
+    {
+      hide_panel(selectProPanel);
+      hide_panel(docPanel);
+      update_panels();
+      doupdate();
+      mvwprintw(selectWin,8,1,"No Option");
+      mvwscanw(selectWin,8,col*0.8, "%d", cont);
+    }
 
   hide_panel(selectPanel);
   hide_panel(docPanel);
