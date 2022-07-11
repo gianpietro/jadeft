@@ -20,9 +20,14 @@ void selectType()
   const char *titleOne = "Document Export Select Source";
   const char *titleTwo = "Provider Account List";
   const char *titleThree = "Document For Provider Account";
+  const char *titleFour = "Supplier Account List";
+  const char *titleFive = "Document For Supplier Account";    
   int lenOne = strlen(titleOne);
   int lenTwo = strlen(titleTwo);
   int lenThree = strlen(titleThree);
+  int lenFour = strlen(titleFour);
+  int lenFive = strlen(titleFive);
+  //char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};  //removed const
   char sDate[9];
   char startDate[9];
   int ckdate = 0;
@@ -38,6 +43,7 @@ void selectType()
   int oidValue;
   char *expFName;
   int ConfirmExport = 'n';
+  //char pType[9];
   
   PGconn *conn =  fdbcon();
   PGresult *res;  
@@ -52,7 +58,7 @@ void selectType()
   init_pair(3,COLOR_WHITE,COLOR_GREEN);
   init_pair(4,COLOR_WHITE,COLOR_MAGENTA);
   init_pair(8,COLOR_BLACK,COLOR_WHITE);
-  //init_pair(4,COLOR_WHITE,COLOR_BLUE);
+  //init_pair(4,COLOR_WHITE,COLOR_GREEN);
   
 
   selectWin = newwin(LINES*0.4, COLS*0.4,LINES*0.07,COLS/4);
@@ -213,8 +219,11 @@ void selectType()
 	  i = j = rRow = 0;
 	  list = 6;
 
+	  //strcpy(pType, "PROVIDER");  //GS1
+
 	  paramsDoc[0] = proAcctID;
 	  paramsDoc[1] = startDate;
+	  //paramsDoc[2] = pType;  //GS1 new line
 	  
 	  ckdate = strcmp(startDate, "NONE");
 	  
@@ -226,7 +235,8 @@ void selectType()
                                        INNER JOIN documents d ON (pa.provider_acct_id = d.parent_id) \
                                        WHERE pa.provider_acct_id = $1 \
                                        AND d.start_date >= $2 \
-                                       AND d.catalog = 'PROVIDER';"
+                                       AND d.catalog = 'PROVIDER' \
+                                       ORDER BY d.document_id;"
 				 ,2
 				 ,NULL
 				 ,(const char *const *)paramsDoc
@@ -241,7 +251,8 @@ void selectType()
                                        INNER JOIN provider p ON (pa.provider_id = p.provider_id) \
                                        INNER JOIN documents d ON (pa.provider_acct_id = d.parent_id) \
                                        WHERE pa.provider_acct_id = $1 \
-                                       AND d.catalog = 'PROVIDER';" \
+                                       AND d.catalog = 'PROVIDER' \
+                                       ORDER BY d.document_id;" \
        				 ,1
 				 ,NULL
 				 ,(const char *const *)paramsDoc
@@ -350,19 +361,280 @@ void selectType()
 	{
 	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	  mvwprintw(selectWin,8,1,"Number invalid - press Enter to continue");
-	  mvwscanw(selectWin,8,col*0.8, "%d", cont);
+	  wgetch(selectWin);
+	  //mvwscanw(selectWin,8,col*0.8, "%d", &cont);
 	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	}
     }
   else if (selectOption == 2)
     {
-      hide_panel(selectProPanel);
+      hide_panel(selectPanel);
       hide_panel(docPanel);
+      wbkgd(selectProWin,COLOR_PAIR(4));
+      wattron(selectProWin, A_BOLD | COLOR_PAIR(4));
+      mvwprintw(selectProWin, 1, (pcol-lenFour)/2, titleFour);
+      wmove(selectProWin,1,1);
+      show_panel(selectProPanel);
       update_panels();
       doupdate();
-      mvwprintw(selectWin,8,1,"option 2 Service - WIP");
-      mvwscanw(selectWin,8,col*0.8, "%d", cont);	  
+
+      i = j = rRow = 0;
+      list = 6;
+
+      res = PQexec(conn, "SELECT sa.supplier_acct_id, s.supplier_name,s.supplier_id, sa.supplier_acct_ref \
+                          FROM supplier_account sa \
+                          INNER JOIN supplier s ON (sa.supplier_id = s.supplier_id) \
+                          ORDER BY sa.supplier_acct_id;");
+      
+      rRow = PQntuples(res);
+      
+      mvwprintw(selectProWin,4,1, "AccountID       Name                      SupplierID           AccountRef");
+      wattroff(selectProWin, A_BOLD | COLOR_PAIR(4));
+      mvwprintw(selectProWin,6,1, "Press Enter to continue");
+      wmove(selectProWin,6,pcol*0.25);
+      box(selectProWin,0,0);
+
+      while((p = wgetch(selectProWin)) == '\n')
+	{
+	  if ( j + RANGE < rRow)
+	    j = j + RANGE;	
+	  else
+	    j = j + (rRow - j);
+	  for (i; i < j; i++)
+	    {
+	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3));
+	      list++;
+	      wclrtoeol(selectProWin);
+	      box(selectProWin,0,0);
+	    }
+	  list = 6;
+	  if (i == rRow)
+	    {
+	      wclrtobot(selectProWin);
+	      mvwprintw(selectProWin,row-8,1,"End of List");
+	      box(selectProWin,0,0);
+	      break;
+	    }
+	}
+      echo();
+      mvwprintw(selectProWin,row-7,1, "Select Option: ");
+      mvwscanw(selectProWin,row-7,col*0.3,"%d", &proID);
+      hide_panel(selectProPanel);
+      update_panels();
+      doupdate();
+      delwin(selectProWin);
+      noecho();
+
+      PQclear(res);
+      rRow = 0;
+
+      val = htonl((uint32_t)proID);
+      params[0] = (int *)&val;
+      length[0] = sizeof(val);
+      formats[0] = 1;
+
+      res = PQexecParams(conn,"SELECT sa.supplier_acct_id, s.supplier_name,s.supplier_id, sa.supplier_acct_ref \
+                               FROM supplier_account sa \
+                               INNER JOIN supplier s ON (sa.supplier_id = s.supplier_id) \
+                               WHERE sa.supplier_acct_id = $1;" \
+			 ,1
+			 ,NULL
+			 ,(const char *const *)params
+			 ,length
+			 ,formats
+			 ,0);
+
+      rRow = PQntuples(res);
+      
+      if(rRow == 1)
+	{
+	  hide_panel(selectPanel);
+	  update_panels();
+	  doupdate();
+	  echo();
+	  strcpy(proAcctID, PQgetvalue(res,0,0));
+	  strcpy(proName,PQgetvalue(res,0,1));
+	  strcpy(providerID, PQgetvalue(res,0,2));
+	  strcpy(proAcctNo,PQgetvalue(res,0,3));
+	  strcpy(sDate, "NONE");
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
+	  //mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);	  
+	  mvwprintw(selectWin,8,1,"AcctID: %s      Name: %s      SupID: %s      AcctRef: %s  ",proAcctID,proName,providerID,proAcctNo);
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  mvwprintw(selectWin,10,1,"Enter start date(optional): ");
+	  mvwscanw(selectWin,10,col*0.35, "%s", sDate);
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG
+	  sDate[9] = '\0';
+	  strcpy(startDate, sDate);
+	  PQclear(res);
+	  
+	  /******** Start of section  to select document ********/
+	  wbkgd(docWin,COLOR_PAIR(4));
+          wattron(docWin, A_BOLD | COLOR_PAIR(4));
+	  mvwprintw(docWin, 1, (dcol-lenFive)/2, titleFive);
+	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
+	  show_panel(docPanel);
+	  update_panels();
+	  doupdate();
+	  noecho();
+
+	  i = j = rRow = 0;
+	  list = 6;
+
+	  //strcpy(pType, "PROVIDER");  //GS1
+
+	  paramsDoc[0] = proAcctID;
+	  paramsDoc[1] = startDate;
+	  //paramsDoc[2] = pType;  //GS1 new line
+	  
+	  ckdate = strcmp(startDate, "NONE");
+	  
+	  if(ckdate < 0 || ckdate > 0)
+	    {
+	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, s.supplier_name, s.supplier_id, sa.supplier_acct_id, sa.supplier_acct_ref \
+                                       FROM supplier_account sa \
+                                       INNER JOIN supplier s ON (sa.supplier_id = s.supplier_id) \
+                                       INNER JOIN documents d ON (sa.supplier_acct_id = d.parent_id) \
+                                       WHERE sa.supplier_acct_id = $1 \
+                                       AND d.start_date >= $2 \
+                                       AND d.catalog IN ('SUPPLIER') \
+                                       ORDER BY d.document_id;"
+				 ,2
+				 ,NULL
+				 ,(const char *const *)paramsDoc
+				 ,NULL				     
+				 ,NULL
+				 ,0);
+	    }
+	  if(ckdate == 0)
+	    {
+	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, s.supplier_name, s.supplier_id, sa.supplier_acct_id, sa.supplier_acct_ref \
+                                       FROM supplier_account sa \
+                                       INNER JOIN supplier s ON (sa.supplier_id = s.supplier_id) \
+                                       INNER JOIN documents d ON (sa.supplier_acct_id = d.parent_id) \
+                                       WHERE sa.supplier_acct_id = $1 \
+                                       AND d.catalog IN ('SUPPLIER') \
+                                       ORDER BY d.document_id;" \
+       				 ,1
+				 ,NULL
+				 ,(const char *const *)paramsDoc
+				 ,NULL				     
+				 ,NULL
+				 ,0);
+	    }
+
+	  rRow = PQntuples(res);
+	  //mvwprintw(docWin,6,1, "Press Enter to continue");
+	  //wmove(docWin,6,pcol*0.25);
+	  mvwprintw(docWin,4,1, "DocumentID      Title                     Start_Date           OID             File");
+	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
+	  mvwprintw(docWin,6,1, "Press Enter to continue");
+	  wmove(docWin,6,pcol*0.25);
+	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
+	  //mvwprintw(docWin,3,1,"rRow %d ", rRow); //DEBUG
+	  
+	  while((p = wgetch(docWin)) == '\n')
+	    {
+	      if (j + RANGE < rRow)
+		j + j + RANGE;
+	      else
+		j = j + (rRow - j);
+	      for (i; i < j; i++)
+		{
+		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
+		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
+		  list++;		  
+		}
+	      list = 6;
+	      if (i == rRow)
+		{
+		  mvwprintw(docWin, drow-9,1, "End of list");
+		  break;
+		}
+	    }
+	  echo();
+	  mvwprintw(docWin, drow-8,1, "Select Option: ");
+	  mvwscanw(docWin, drow-8, dcol*0.17, "%d", &docExportID);
+          PQclear(res);
+
+	  /**** start of section to select document details for export ****/
+	  /* now that we have the docExportId we have to 
+             1. run a query on the documents table filetered in docExportID
+             2. if the query pulls back one row  
+             2. assign the file_name and oid_value to variables
+             3. pass these values to an export function to create the document
+             4. if the query does not pull back one row
+             5. then output message that number entered is invalid and end
+	  */
+
+          val = htonl((uint32_t)docExportID);
+	  params[0] = (int *)&val;
+	  length[0] = sizeof(val);
+	  formats[0] = 1;
+
+	  res = PQexecParams(conn,"SELECT * FROM documents WHERE document_id = $1;"
+			     ,1
+			     ,NULL
+			     ,(const char *const *)params
+			     ,length
+			     ,formats
+			     ,0);
+
+	  rRow = PQntuples(res);
+
+	  if (rRow == 1)
+	    {
+	      strcpy(docFileName, PQgetvalue(res,0,2));
+	      oidValue = atoi(PQgetvalue(res,0,3));
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      mvwprintw(selectWin,12,1, "Document ID to export %d", docExportID);
+	      mvwprintw(selectWin, 14,1, "Export document y/n: ");
+	      wmove(selectWin, 14,25);
+	      //wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      echo();
+	      while((ConfirmExport = wgetch(selectWin)) != 'y')
+		{
+		  wmove(selectWin, 14,25);
+		  if(ConfirmExport == 'n')
+		    break;
+		}
+	      noecho();
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+         
+	      if (ConfirmExport == 'y')
+		{
+		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  expFName = exportDocument(oidValue, docFileName);
+		  mvwprintw(selectWin,14,1,"exported file %s", expFName);
+		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		}
+	    }
+	  else
+	    {
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      mvwprintw(selectWin,12,1,"Number invalid - press Enter to continue");
+	      //wgetch(selectWin);
+	      //mvwscanw(selectWin,12,col*0.8, "%d", &cont);
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	    }
+	  wgetch(selectWin);  //used for select export document y/n	  
+	  PQclear(res);
+	  rRow = 0;	  
+	}  //if row == 1
+      else
+	{
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  mvwprintw(selectWin,8,1,"Number invalid - press Enter to continue");
+	  wgetch(selectWin);
+	  //mvwscanw(selectWin,8,col*0.8, "%d", &cont);
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	}      
     }
+  /*else if (selectOption == 3)
+    {
+      code for invoice
+    }*/
   else
     {
       hide_panel(selectProPanel);
@@ -370,7 +642,8 @@ void selectType()
       update_panels();
       doupdate();
       mvwprintw(selectWin,8,1,"No Option");
-      mvwscanw(selectWin,8,col*0.8, "%d", cont);
+      wgetch(selectWin);
+      //mvwscanw(selectWin,8,col*0.8, "%d", &cont);
     }
 
   hide_panel(selectPanel);
@@ -388,8 +661,8 @@ void selectType()
 
 char * exportDocument(int oid, char fn[])
 {
-  char *fullFileName = (char *)malloc(35*sizeof(char)); 
-  char *expFileName = (char *)malloc(35*sizeof(char));
+  char *fullFileName = (char *)malloc(FNAMEEXP*sizeof(char)); 
+  char *expFileName = (char *)malloc(FNAMEEXP*sizeof(char));
 
   PGconn *conn = fdbcon();
   PGresult * res;
