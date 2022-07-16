@@ -392,14 +392,15 @@ void selectType()
       i = j = rRow = 0;
       list = 6;
 
-      res = PQexec(conn, "SELECT sa.supplier_acct_id, s.supplier_name,s.supplier_id, sa.supplier_acct_ref \
+      res = PQexec(conn, "SELECT sa.supplier_acct_id, s.supplier_name,s.supplier_id, sa.supplier_acct_ref, p.property_id, p.post_code \
                           FROM supplier_account sa \
                           INNER JOIN supplier s ON (sa.supplier_id = s.supplier_id) \
-                          ORDER BY sa.supplier_acct_id;");
+                          INNER JOIN property p ON (p.property_id = sa.property_id) \
+                          ORDER BY sa.supplier_acct_id");
       
       rRow = PQntuples(res);
       
-      mvwprintw(selectProWin,4,1, "AccountID       Name                      SupplierID           AccountRef");
+      mvwprintw(selectProWin,4,1, "AccountID       Name                      SupplierID           AccountRef           Post_Code");
       wattroff(selectProWin, A_BOLD | COLOR_PAIR(4));
       mvwprintw(selectProWin,6,1, "Press Enter to continue");
       wmove(selectProWin,6,pcol*0.25);
@@ -413,7 +414,7 @@ void selectType()
 	    j = j + (rRow - j);
 	  for (i; i < j; i++)
 	    {
-	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3));
+	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,5));
 	      list++;
 	      wclrtoeol(selectProWin);
 	      box(selectProWin,0,0);
@@ -658,14 +659,15 @@ void selectType()
       i = j = rRow = 0;
       list = 6;
 
-      res = PQexec(conn, "SELECT sa.supplier_acct_id, s.supplier_name,s.supplier_id, sa.supplier_acct_ref \
+      res = PQexec(conn, "SELECT sa.supplier_acct_id, s.supplier_name,s.supplier_id, sa.supplier_acct_ref, p.property_id, p.post_code  \
                           FROM supplier_account sa \
                           INNER JOIN supplier s ON (sa.supplier_id = s.supplier_id) \
+                          INNER JOIN property p ON (p.property_id = sa.property_id) \
                           ORDER BY sa.supplier_acct_id;");
       
       rRow = PQntuples(res);
       
-      mvwprintw(selectProWin,4,1, "AccountID       Name                      SupplierID           AccountRef");
+      mvwprintw(selectProWin,4,1, "AccountID       Name                      SupplierID           AccountRef           Post_Code");
       wattroff(selectProWin, A_BOLD | COLOR_PAIR(4));
       mvwprintw(selectProWin,6,1, "Press Enter to continue");
       wmove(selectProWin,6,pcol*0.25);
@@ -679,7 +681,7 @@ void selectType()
 	    j = j + (rRow - j);
 	  for (i; i < j; i++)
 	    {
-	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3));
+	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,5));
 	      list++;
 	      wclrtoeol(selectProWin);
 	      box(selectProWin,0,0);
@@ -919,7 +921,7 @@ void selectType()
       hide_panel(docPanel);
       wbkgd(selectProWin,COLOR_PAIR(4));
       wattron(selectProWin, A_BOLD | COLOR_PAIR(4));
-      mvwprintw(selectProWin, 1, (pcol-lenTwo)/2, titleTwo);
+      mvwprintw(selectProWin, 1, (pcol-lenEight)/2, titleEight);
       wmove(selectProWin,1,1);
       show_panel(selectProPanel);
       update_panels();
@@ -928,12 +930,12 @@ void selectType()
       i = j = rRow = 0;
       list = 6;
 
-      res = PQexec(conn, "SELECT d.type_id, d.description FROM document_type \
+      res = PQexec(conn, "SELECT d.type_id, d.description FROM document_type d \
                           ORDER BY d.description");
       
       rRow = PQntuples(res);
       
-      mvwprintw(selectProWin,4,1, "TypeID       DocumentType");
+      mvwprintw(selectProWin,4,1, "TypeID          DocumentType");
       wattroff(selectProWin, A_BOLD | COLOR_PAIR(4));
       mvwprintw(selectProWin,6,1, "Press Enter to continue");
       wmove(selectProWin,6,pcol*0.25);
@@ -978,7 +980,7 @@ void selectType()
       length[0] = sizeof(val);
       formats[0] = 1;
 
-      res = PQexecParams(conn,"SELECT d.type_id, d.description FROM document_type \
+      res = PQexecParams(conn,"SELECT d.type_id, d.description FROM document_type d \
                                WHERE d.type_id = $1 \
                                ORDER BY d.description;"
 			 ,1
@@ -998,12 +1000,12 @@ void selectType()
 	  echo();
 	  strcpy(proAcctID, PQgetvalue(res,0,0));
 	  strcpy(proName,PQgetvalue(res,0,1));
-	  strcpy(providerID, PQgetvalue(res,0,2));
-	  strcpy(proAcctNo,PQgetvalue(res,0,3));
+	  //strcpy(providerID, PQgetvalue(res,0,2));
+	  //strcpy(proAcctNo,PQgetvalue(res,0,3));
 	  strcpy(sDate, "NONE");
 	  wattron(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
 	  //mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);	  
-	  mvwprintw(selectWin,10,1,"TypeID: %s      DocumentType: %s", proAcctID, proName);
+	  mvwprintw(selectWin,10,1,"TypeID: %s         DocumentType: %s", proAcctID, proName);
 	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
 	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
 	  mvwprintw(selectWin,12,1,"Enter start date(optional): ");
@@ -1016,7 +1018,7 @@ void selectType()
 	  /******** Start of section  to select document ********/
 	  wbkgd(docWin,COLOR_PAIR(4));
           wattron(docWin, A_BOLD | COLOR_PAIR(4));
-	  mvwprintw(docWin, 1, (dcol-lenThree)/2, titleThree);
+	  mvwprintw(docWin, 1, (dcol-lenNine)/2, titleNine);
 	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  show_panel(docPanel);
 	  update_panels();
