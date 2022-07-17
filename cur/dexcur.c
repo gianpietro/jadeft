@@ -1089,7 +1089,7 @@ void selectType()
 	  rRow = PQntuples(res);
 	  //mvwprintw(docWin,6,1, "Press Enter to continue");
 	  //wmove(docWin,6,pcol*0.25);
-	  mvwprintw(docWin,4,1, "DocumentID      Title                               Start_Date           OID             File  \
+	  mvwprintw(docWin,4,1, "DocumentID      Title                               Start_Date           OID             FILE  \
                     Description                   Post_Code");
 	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin,6,1, "Press Enter to continue");
