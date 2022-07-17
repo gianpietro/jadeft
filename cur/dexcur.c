@@ -229,7 +229,8 @@ void selectType()
 	  
 	  if(ckdate < 0 || ckdate > 0)
 	    {
-	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, p.provider_name, p.provider_id, pa.provider_acct_id, pa.provider_acct_no \
+	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, p.provider_name, p.provider_id, \
+                                       pa.provider_acct_id, pa.provider_acct_no \
                                        FROM provider_account pa \
                                        INNER JOIN provider p ON (pa.provider_id = p.provider_id) \
                                        INNER JOIN documents d ON (pa.provider_acct_id = d.parent_id) \
@@ -246,7 +247,8 @@ void selectType()
 	    }
 	  if(ckdate == 0)
 	    {
-	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, p.provider_name, p.provider_id, pa.provider_acct_id, pa.provider_acct_no \
+	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, p.provider_name, p.provider_id, \
+                                       pa.provider_acct_id, pa.provider_acct_no \
                                        FROM provider_account pa \
                                        INNER JOIN provider p ON (pa.provider_id = p.provider_id) \
                                        INNER JOIN documents d ON (pa.provider_acct_id = d.parent_id) \
@@ -276,7 +278,8 @@ void selectType()
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
-		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
+		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),
+			    PQgetvalue(res,i,3),PQgetvalue(res,i,4));
 		  list++;
 		  wclrtobot(docWin);
 		  box(docWin,0,0);		    
@@ -403,7 +406,8 @@ void selectType()
 	    j = j + (rRow - j);
 	  for (i; i < j; i++)
 	    {
-	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,5));
+	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),
+			PQgetvalue(res,i,3),PQgetvalue(res,i,5));
 	      list++;
 	      wclrtoeol(selectProWin);
 	      box(selectProWin,0,0);
@@ -489,7 +493,8 @@ void selectType()
 	  
 	  if(ckdate < 0 || ckdate > 0)
 	    {
-	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, s.supplier_name, s.supplier_id, sa.supplier_acct_id, sa.supplier_acct_ref \
+	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, s.supplier_name, s.supplier_id, \
+                                       sa.supplier_acct_id, sa.supplier_acct_ref \
                                        FROM supplier_account sa \
                                        INNER JOIN supplier s ON (sa.supplier_id = s.supplier_id) \
                                        INNER JOIN documents d ON (sa.supplier_acct_id = d.parent_id) \
@@ -506,7 +511,8 @@ void selectType()
 	    }
 	  if(ckdate == 0)
 	    {
-	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, s.supplier_name, s.supplier_id, sa.supplier_acct_id, sa.supplier_acct_ref \
+	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, s.supplier_name, s.supplier_id, \
+                                       sa.supplier_acct_id, sa.supplier_acct_ref \
                                        FROM supplier_account sa \
                                        INNER JOIN supplier s ON (sa.supplier_id = s.supplier_id) \
                                        INNER JOIN documents d ON (sa.supplier_acct_id = d.parent_id) \
@@ -535,7 +541,8 @@ void selectType()
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
-		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
+		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),
+			    PQgetvalue(res,i,3),PQgetvalue(res,i,4));
 		  list++;
 		  wclrtobot(docWin);
 		  box(docWin,0,0);
