@@ -67,7 +67,7 @@ void selectType()
 
   selectWin = newwin(LINES*0.4, COLS*0.4,LINES*0.07,COLS/4);
   selectProWin = newwin(LINES*0.5, COLS*0.5,LINES*0.07,COLS/5);
-  docWin = newwin(LINES*0.4, COLS*0.7, LINES/2, COLS/5);
+  docWin = newwin(LINES*0.4, COLS*0.7, LINES/2, COLS/8);
   selectPanel = new_panel(selectWin);
   selectProPanel = new_panel(selectProWin);
   docPanel = new_panel(docWin);
@@ -348,7 +348,7 @@ void selectType()
 		{
 		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 		  expFName = exportDocument(oidValue, docFileName);
-		  mvwprintw(selectWin,17,1,"exported file %s", expFName);
+		  mvwprintw(selectWin,17,1,"Exported file %s", expFName);
 		  wgetch(selectWin);
 		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 		}
@@ -601,7 +601,7 @@ void selectType()
 		{
 		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 		  expFName = exportDocument(oidValue, docFileName);
-		  mvwprintw(selectWin,17,1,"exported file %s", expFName);
+		  mvwprintw(selectWin,17,1,"Exported file %s", expFName);
 		  wgetch(selectWin);
 		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 		}
@@ -859,7 +859,7 @@ void selectType()
 		{
 		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));
 		  expFName = exportDocument(oidValue, docFileName);
-		  mvwprintw(selectWin,17,1,"exported file %s", expFName);
+		  mvwprintw(selectWin,17,1,"Exported file %s", expFName);
 		  wgetch(selectWin);
 		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 		}
@@ -898,7 +898,7 @@ void selectType()
       list = 6;
 
       res = PQexec(conn, "SELECT d.type_id, d.description FROM document_type d \
-                          ORDER BY d.description");
+                          ORDER BY d.type_id");
       
       rRow = PQntuples(res);
       
@@ -949,7 +949,7 @@ void selectType()
 
       res = PQexecParams(conn,"SELECT d.type_id, d.description FROM document_type d \
                                WHERE d.type_id = $1 \
-                               ORDER BY d.description;"
+                               ORDER BY d.type_id;"
 			 ,1
 			 ,NULL
 			 ,(const char *const *)params
@@ -1002,7 +1002,7 @@ void selectType()
 	    {
 	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, d.type_id, dt.description, p.post_code \
                                        FROM documents d \
-                                       LEFT OUTER JOIN	supplier_invoice si ON (si.supplier_invoice_id = d.parent_id AND d.catalog = 'INVOICE') \
+                                       LEFT OUTER JOIN supplier_invoice si ON (si.supplier_invoice_id = d.parent_id AND d.catalog = 'INVOICE') \
                                        LEFT OUTER JOIN supplier_account sa ON (sa.supplier_acct_id = si.supplier_acct_id) \
                                        LEFT OUTER JOIN supplier_account sa2 ON (sa2.supplier_acct_id = d.parent_id AND d.catalog = 'SUPPLIER') \
                                        LEFT OUTER JOIN property p ON (sa.property_id = p.property_id OR sa2.property_id = p.property_id) \
@@ -1021,7 +1021,7 @@ void selectType()
 	    {
 	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, d.type_id, dt.description, p.post_code\
                                        FROM documents d \
-                                       LEFT OUTER JOIN	supplier_invoice si ON (si.supplier_invoice_id = d.parent_id AND d.catalog = 'INVOICE') \
+                                       LEFT OUTER JOIN supplier_invoice si ON (si.supplier_invoice_id = d.parent_id AND d.catalog = 'INVOICE') \
                                        LEFT OUTER JOIN supplier_account sa ON (sa.supplier_acct_id = si.supplier_acct_id) \
                                        LEFT OUTER JOIN supplier_account sa2 ON (sa2.supplier_acct_id = d.parent_id AND d.catalog = 'SUPPLIER') \
                                        LEFT OUTER JOIN property p ON (sa.property_id = p.property_id OR sa2.property_id = p.property_id) \
@@ -1111,7 +1111,7 @@ void selectType()
 		{
 		  wattron(selectWin,A_BOLD | COLOR_PAIR(3)); 
 		  expFName = exportDocument(oidValue, docFileName);
-		  mvwprintw(selectWin,17,1,"exported file %s", expFName);
+		  mvwprintw(selectWin,17,1,"Exported file %s", expFName);
 		  wgetch(selectWin);
 		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));
 		}
