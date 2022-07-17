@@ -35,7 +35,6 @@ void selectType()
   int lenSeven = strlen(titleSeven);
   int lenEight = strlen(titleEight);
   int lenNine = strlen(titleNine);
-  //char parentType[3][9] = {"PROVIDER", "SUPPLIER", "INVOICE"};  //removed const
   char sDate[9];
   char startDate[9];
   int ckdate = 0;
@@ -51,7 +50,6 @@ void selectType()
   int oidValue;
   char *expFName;
   int ConfirmExport = 'n';
-  //char pType[9];
   
   PGconn *conn =  fdbcon();
   PGresult *res;  
@@ -66,8 +64,6 @@ void selectType()
   init_pair(3,COLOR_WHITE,COLOR_GREEN);
   init_pair(4,COLOR_WHITE,COLOR_MAGENTA);
   init_pair(8,COLOR_BLACK,COLOR_WHITE);
-  //init_pair(4,COLOR_WHITE,COLOR_GREEN);
-  
 
   selectWin = newwin(LINES*0.4, COLS*0.4,LINES*0.07,COLS/4);
   selectProWin = newwin(LINES*0.5, COLS*0.5,LINES*0.07,COLS/5);
@@ -76,7 +72,7 @@ void selectType()
   selectProPanel = new_panel(selectProWin);
   docPanel = new_panel(docWin);
   
-  wbkgd(selectWin,COLOR_PAIR(3));  //COLORCHG
+  wbkgd(selectWin,COLOR_PAIR(3));  
   
   update_panels();
   doupdate();
@@ -99,9 +95,8 @@ void selectType()
       getch();
     }
 
-  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG
+  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   
   mvwprintw(selectWin, 1, (col-lenOne)/2, titleOne);
-  // wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  //COLORCHG
 
   mvwprintw(selectWin,3,1, "1 - Provider");
   mvwprintw(selectWin,4,1, "2 - Supplier\n");
@@ -112,7 +107,7 @@ void selectType()
   echo();
   mvwscanw(selectWin,8,18,"%d",&selectOption);
   noecho();
-  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  //COLORCHG new line
+  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
   if (selectOption == 1)
     {
       hide_panel(selectPanel);
@@ -204,14 +199,13 @@ void selectType()
 	  strcpy(providerID, PQgetvalue(res,0,2));
 	  strcpy(proAcctNo,PQgetvalue(res,0,3));
 	  strcpy(sDate, "NONE");
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
-	  //mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);	  
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(8));  
 	  mvwprintw(selectWin,10,1,"AcctID: %s      Name: %s      ProID: %s      AcctNo: %s  ",proAcctID,proName,providerID,proAcctNo);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8)); 
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	  mvwprintw(selectWin,12,1,"Enter start date(optional): ");
 	  mvwscanw(selectWin,12,col*0.35, "%s", sDate);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	  sDate[9] = '\0';
 	  strcpy(startDate, sDate);
 	  PQclear(res);
@@ -220,7 +214,6 @@ void selectType()
 	  wbkgd(docWin,COLOR_PAIR(4));
           wattron(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin, 1, (dcol-lenThree)/2, titleThree);
-	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -229,11 +222,8 @@ void selectType()
 	  i = j = rRow = 0;
 	  list = 6;
 
-	  //strcpy(pType, "PROVIDER");  //GS1
-
 	  paramsDoc[0] = proAcctID;
 	  paramsDoc[1] = startDate;
-	  //paramsDoc[2] = pType;  //GS1 new line
 	  
 	  ckdate = strcmp(startDate, "NONE");
 	  
@@ -272,14 +262,11 @@ void selectType()
 	    }
 
 	  rRow = PQntuples(res);
-	  //mvwprintw(docWin,6,1, "Press Enter to continue");
-	  //wmove(docWin,6,pcol*0.25);
+
 	  mvwprintw(docWin,4,1, "DocumentID      Title                     Start_Date           OID             File");
 	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin,6,1, "Press Enter to continue");
 	  wmove(docWin,6,pcol*0.25);
-	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
-	  //mvwprintw(docWin,3,1,"rRow %d ", rRow); //DEBUG
 	  
 	  while((p = wgetch(docWin)) == '\n')
 	    {
@@ -289,7 +276,6 @@ void selectType()
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
-		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
 		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
 		  list++;
 		  wclrtobot(docWin);
@@ -338,11 +324,11 @@ void selectType()
 	    {
 	      strcpy(docFileName, PQgetvalue(res,0,2));
 	      oidValue = atoi(PQgetvalue(res,0,3));
-	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   
 	      mvwprintw(selectWin,15,1, "Document ID to export %d", docExportID);
 	      mvwprintw(selectWin,16,1, "Export document y/n: ");
 	      wmove(selectWin,16,25);
-	      //wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	
 	      echo();
 	      while((ConfirmExport = wgetch(selectWin)) != 'y')
 		{
@@ -351,34 +337,33 @@ void selectType()
 		    break;
 		}
 	      noecho();
-	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  
          
 	      if (ConfirmExport == 'y')
 		{
-		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 		  expFName = exportDocument(oidValue, docFileName);
 		  mvwprintw(selectWin,17,1,"exported file %s", expFName);
 		  wgetch(selectWin);
-		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 		}
 	    }
 	  else
 	    {
-	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	      mvwprintw(selectWin,15,1,"Number invalid - press Enter to continue");
-	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	    }
-	  //wgetch(selectWin);  //used for select export document y/n	  
+	
 	  PQclear(res);
 	  rRow = 0;	  
-	}  //if row == 1
+	}  
       else
 	{
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	  mvwprintw(selectWin,10,1,"Number invalid - press Enter to continue");
 	  wgetch(selectWin);
-	  //mvwscanw(selectWin,8,col*0.8, "%d", &cont);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));
 	}
     }
   else if (selectOption == 2)
@@ -473,14 +458,14 @@ void selectType()
 	  strcpy(providerID, PQgetvalue(res,0,2));
 	  strcpy(proAcctNo,PQgetvalue(res,0,3));
 	  strcpy(sDate, "NONE");
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
-	  //mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);	  
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(8)); 
+
 	  mvwprintw(selectWin,10,1,"AcctID: %s      Name: %s      SupID: %s      AcctRef: %s  ",proAcctID,proName,providerID,proAcctNo);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8));
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	  mvwprintw(selectWin,12,1,"Enter start date(optional): ");
 	  mvwscanw(selectWin,12,col*0.35, "%s", sDate);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));
 	  sDate[9] = '\0';
 	  strcpy(startDate, sDate);
 	  PQclear(res);
@@ -489,7 +474,6 @@ void selectType()
 	  wbkgd(docWin,COLOR_PAIR(4));
           wattron(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin, 1, (dcol-lenFive)/2, titleFive);
-	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -498,11 +482,8 @@ void selectType()
 	  i = j = rRow = 0;
 	  list = 6;
 
-	  //strcpy(pType, "PROVIDER");  //GS1
-
 	  paramsDoc[0] = proAcctID;
 	  paramsDoc[1] = startDate;
-	  //paramsDoc[2] = pType;  //GS1 new line
 	  
 	  ckdate = strcmp(startDate, "NONE");
 	  
@@ -541,14 +522,10 @@ void selectType()
 	    }
 
 	  rRow = PQntuples(res);
-	  //mvwprintw(docWin,6,1, "Press Enter to continue");
-	  //wmove(docWin,6,pcol*0.25);
 	  mvwprintw(docWin,4,1, "DocumentID      Title                     Start_Date           OID             File");
 	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin,6,1, "Press Enter to continue");
 	  wmove(docWin,6,pcol*0.25);
-	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
-	  //mvwprintw(docWin,3,1,"rRow %d ", rRow); //DEBUG
 	  
 	  while((p = wgetch(docWin)) == '\n')
 	    {
@@ -558,7 +535,6 @@ void selectType()
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
-		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
 		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
 		  list++;
 		  wclrtobot(docWin);
@@ -577,16 +553,6 @@ void selectType()
 	  mvwprintw(docWin, drow-8,1, "Select Option: ");
 	  mvwscanw(docWin, drow-8, dcol*0.17, "%d", &docExportID);
           PQclear(res);
-
-	  /**** start of section to select document details for export ****/
-	  /* now that we have the docExportId we have to 
-             1. run a query on the documents table filetered in docExportID
-             2. if the query pulls back one row  
-             2. assign the file_name and oid_value to variables
-             3. pass these values to an export function to create the document
-             4. if the query does not pull back one row
-             5. then output message that number entered is invalid and end
-	  */
 
           val = htonl((uint32_t)docExportID);
 	  params[0] = (int *)&val;
@@ -607,11 +573,11 @@ void selectType()
 	    {
 	      strcpy(docFileName, PQgetvalue(res,0,2));
 	      oidValue = atoi(PQgetvalue(res,0,3));
-	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	      mvwprintw(selectWin,15,1, "Document ID to export %d", docExportID);
 	      mvwprintw(selectWin,16,1, "Export document y/n: ");
 	      wmove(selectWin,16,25);
-	      //wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+
 	      echo();
 	      while((ConfirmExport = wgetch(selectWin)) != 'y')
 		{
@@ -620,36 +586,33 @@ void selectType()
 		    break;
 		}
 	      noecho();
-	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  
          
 	      if (ConfirmExport == 'y')
 		{
-		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 		  expFName = exportDocument(oidValue, docFileName);
 		  mvwprintw(selectWin,17,1,"exported file %s", expFName);
 		  wgetch(selectWin);
-		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 		}
 	    }
 	  else
 	    {
-	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	      mvwprintw(selectWin,15,1,"Number invalid - press Enter to continue");
-	      //wgetch(selectWin);
-	      //mvwscanw(selectWin,12,col*0.8, "%d", &cont);
-	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  
 	    }
-	  //wgetch(selectWin);  //used for select export document y/n	  
+
 	  PQclear(res);
 	  rRow = 0;	  
 	}  //if row == 1
       else
 	{
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	  mvwprintw(selectWin,10,1,"Number invalid - press Enter to continue");
 	  wgetch(selectWin);
-	  //mvwscanw(selectWin,8,col*0.8, "%d", &cont);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  
 	}      
     }
   else if (selectOption == 3)
@@ -689,7 +652,8 @@ void selectType()
 	    j = j + (rRow - j);
 	  for (i; i < j; i++)
 	    {
-	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,5));
+	      mvwprintw(selectProWin,list,1,"%-15s %-25s %-20s %-20s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),
+			PQgetvalue(res,i,3),PQgetvalue(res,i,5));
 	      list++;
 	      wclrtoeol(selectProWin);
 	      box(selectProWin,0,0);
@@ -744,14 +708,14 @@ void selectType()
 	  strcpy(providerID, PQgetvalue(res,0,2));
 	  strcpy(proAcctNo,PQgetvalue(res,0,3));
 	  strcpy(sDate, "NONE");
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
-	  //mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);	  
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(8)); 
+
 	  mvwprintw(selectWin,10,1,"AcctID: %s      Name: %s      SupID: %s      AcctRef: %s  ",proAcctID,proName,providerID,proAcctNo);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8)); 
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	  mvwprintw(selectWin,12,1,"Enter start date(optional): ");
 	  mvwscanw(selectWin,12,col*0.35, "%s", sDate);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	  sDate[9] = '\0';
 	  strcpy(startDate, sDate);
 	  PQclear(res);
@@ -760,7 +724,7 @@ void selectType()
 	  wbkgd(docWin,COLOR_PAIR(4));
           wattron(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin, 1, (dcol-lenSeven)/2, titleSeven);
-	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
+
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -769,12 +733,9 @@ void selectType()
 	  i = j = rRow = 0;
 	  list = 6;
 
-	  //strcpy(pType, "PROVIDER");  //GS1
-
 	  paramsDoc[0] = proAcctID;
 	  paramsDoc[1] = startDate;
-	  //paramsDoc[2] = pType;  //GS1 new line
-	  
+		  
 	  ckdate = strcmp(startDate, "NONE");
 	  
 	  if(ckdate < 0 || ckdate > 0)
@@ -816,14 +777,11 @@ void selectType()
 	    }
 
 	  rRow = PQntuples(res);
-	  //mvwprintw(docWin,6,1, "Press Enter to continue");
-	  //wmove(docWin,6,pcol*0.25);
+
 	  mvwprintw(docWin,4,1, "DocumentID      Title                     Invoice         Start_Date           OID             File");
 	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin,6,1, "Press Enter to continue");
 	  wmove(docWin,6,pcol*0.25);
-	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
-	  //mvwprintw(docWin,3,1,"rRow %d ", rRow); //DEBUG
 	  
 	  while((p = wgetch(docWin)) == '\n')
 	    {
@@ -833,8 +791,8 @@ void selectType()
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
-		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
-		  mvwprintw(docWin,list,1,"%-15s %-25s %-15s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4),PQgetvalue(res,i,5));
+		  mvwprintw(docWin,list,1,"%-15s %-25s %-15s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),
+			    PQgetvalue(res,i,3),PQgetvalue(res,i,4),PQgetvalue(res,i,5));
 		  list++;
 		  wclrtobot(docWin);
 		  box(docWin,0,0);
@@ -854,16 +812,7 @@ void selectType()
           PQclear(res);
 
 	  /**** start of section to select document details for export ****/
-	  /* now that we have the docExportId we have to 
-             1. run a query on the documents table filetered in docExportID
-             2. if the query pulls back one row  
-             2. assign the file_name and oid_value to variables
-             3. pass these values to an export function to create the document
-             4. if the query does not pull back one row
-             5. then output message that number entered is invalid and end
-	  */
-
-          val = htonl((uint32_t)docExportID);
+	  val = htonl((uint32_t)docExportID);
 	  params[0] = (int *)&val;
 	  length[0] = sizeof(val);
 	  formats[0] = 1;
@@ -882,11 +831,11 @@ void selectType()
 	    {
 	      strcpy(docFileName, PQgetvalue(res,0,2));
 	      oidValue = atoi(PQgetvalue(res,0,3));
-	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	      mvwprintw(selectWin,15,1, "Document ID to export %d", docExportID);
 	      mvwprintw(selectWin,16,1, "Export document y/n: ");
 	      wmove(selectWin,16,25);
-	      //wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+
 	      echo();
 	      while((ConfirmExport = wgetch(selectWin)) != 'y')
 		{
@@ -895,36 +844,33 @@ void selectType()
 		    break;
 		}
 	      noecho();
-	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  
          
 	      if (ConfirmExport == 'y')
 		{
-		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));
 		  expFName = exportDocument(oidValue, docFileName);
 		  mvwprintw(selectWin,17,1,"exported file %s", expFName);
 		  wgetch(selectWin);
-		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 		}
 	    }
 	  else
 	    {
-	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	      mvwprintw(selectWin,15,1,"Number invalid - press Enter to continue");
-	      //wgetch(selectWin);
-	      //mvwscanw(selectWin,12,col*0.8, "%d", &cont);
-	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   
 	    }
-	  //wgetch(selectWin);  //used for select export document y/n	  
+
 	  PQclear(res);
 	  rRow = 0;	  
-	}  //if row == 1
+	}
       else
 	{
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	  mvwprintw(selectWin,10,1,"Number invalid - press Enter to continue");
 	  wgetch(selectWin);
-	  //mvwscanw(selectWin,8,col*0.8, "%d", &cont);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	}      
     }
    else if (selectOption == 4)
@@ -1012,17 +958,15 @@ void selectType()
 	  echo();
 	  strcpy(proAcctID, PQgetvalue(res,0,0));
 	  strcpy(proName,PQgetvalue(res,0,1));
-	  //strcpy(providerID, PQgetvalue(res,0,2));
-	  //strcpy(proAcctNo,PQgetvalue(res,0,3));
 	  strcpy(sDate, "NONE");
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
-	  //mvwprintw(selectWin,8,1,"** AcctID: %s ** Name: %s ** ProID: %s ** AcctNo: %s **",proAcctID,proName,providerID,proAcctNo);	  
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(8)); 
+
 	  mvwprintw(selectWin,10,1,"TypeID: %s         DocumentType: %s", proAcctID, proName);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8));  //COLORCHG
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(8)); 
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	  mvwprintw(selectWin,12,1,"Enter start date(optional): ");
 	  mvwscanw(selectWin,12,col*0.35, "%s", sDate);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	  sDate[9] = '\0';
 	  strcpy(startDate, sDate);
 	  PQclear(res);
@@ -1031,7 +975,7 @@ void selectType()
 	  wbkgd(docWin,COLOR_PAIR(4));
           wattron(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin, 1, (dcol-lenNine)/2, titleNine);
-	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
+
 	  show_panel(docPanel);
 	  update_panels();
 	  doupdate();
@@ -1040,11 +984,8 @@ void selectType()
 	  i = j = rRow = 0;
 	  list = 6;
 
-	  //strcpy(pType, "PROVIDER");  //GS1
-
 	  paramsDoc[0] = proAcctID;
 	  paramsDoc[1] = startDate;
-	  //paramsDoc[2] = pType;  //GS1 new line
 	  
 	  ckdate = strcmp(startDate, "NONE");
 	  
@@ -1087,17 +1028,13 @@ void selectType()
 	    }
 
 	  rRow = PQntuples(res);
-	  //mvwprintw(docWin,6,1, "Press Enter to continue");
-	  //wmove(docWin,6,pcol*0.25);
+
 	  mvwprintw(docWin,4,1, "DocumentID      Title                               Start_Date           OID             file  \
                     Description                   Post_Code");
 	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin,6,1, "Press Enter to continue");
 	  wmove(docWin,6,pcol*0.25);
-	  // wmove(docWin,6,30);
-	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
-	  //mvwprintw(docWin,3,1,"rRow %d ", rRow); //DEBUG
-	  
+	  	  
 	  while((p = wgetch(docWin)) == '\n')
 	    {
 	      if (j + RANGE < rRow)
@@ -1106,10 +1043,8 @@ void selectType()
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
-		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
 		  mvwprintw(docWin,list,1,"%-15s %-35s %-20s %-15s %-25s %-30s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),
 			    PQgetvalue(res,i,3),PQgetvalue(res,i,4),PQgetvalue(res,i,6),PQgetvalue(res,i,7));
-		  //mvwprintw(docWin,list,1,"%-15s", PQgetvalue(res,i,0));
 		  list++;
 		  wclrtobot(docWin);
 		  box(docWin,0,0);
@@ -1129,16 +1064,7 @@ void selectType()
           PQclear(res);
 
 	  /**** start of section to select document details for export ****/
-	  /* now that we have the docExportId we have to 
-             1. run a query on the documents table filetered in docExportID
-             2. if the query pulls back one row  
-             2. assign the file_name and oid_value to variables
-             3. pass these values to an export fnction to create the document
-             4. if the query does not pull back one row
-             5. then output message that number entered is invalid and end
-	  */
-
-          val = htonl((uint32_t)docExportID);
+	  val = htonl((uint32_t)docExportID);
 	  params[0] = (int *)&val;
 	  length[0] = sizeof(val);
 	  formats[0] = 1;
@@ -1157,11 +1083,11 @@ void selectType()
 	    {
 	      strcpy(docFileName, PQgetvalue(res,0,2));
 	      oidValue = atoi(PQgetvalue(res,0,3));
-	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	      mvwprintw(selectWin,15,1, "Document ID to export %d", docExportID);
 	      mvwprintw(selectWin,16,1, "Export document y/n: ");
 	      wmove(selectWin,16,25);
-	      //wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+
 	      echo();
 	      while((ConfirmExport = wgetch(selectWin)) != 'y')
 		{
@@ -1170,34 +1096,33 @@ void selectType()
 		    break;
 		}
 	      noecho();
-	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));  
          
 	      if (ConfirmExport == 'y')
 		{
-		  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  wattron(selectWin,A_BOLD | COLOR_PAIR(3)); 
 		  expFName = exportDocument(oidValue, docFileName);
 		  mvwprintw(selectWin,17,1,"exported file %s", expFName);
 		  wgetch(selectWin);
-		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+		  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));
 		}
 	    }
 	  else
 	    {
-	      wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattron(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	      mvwprintw(selectWin,15,1,"Number invalid - press Enter to continue");
-	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	      wattroff(selectWin,A_BOLD | COLOR_PAIR(3));
 	    }
-	  //wgetch(selectWin);  //used for select export document y/n	  
+
 	  PQclear(res);
 	  rRow = 0;	  
-	}  //if row == 1
+	} 
       else
 	{
-	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattron(selectWin,A_BOLD | COLOR_PAIR(3));  
 	  mvwprintw(selectWin,10,1,"Number invalid - press Enter to continue");
 	  wgetch(selectWin);
-	  //mvwscanw(selectWin,8,col*0.8, "%d", &cont);
-	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));   //COLORCHG new line
+	  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
 	} 
     }
   else
@@ -1208,7 +1133,6 @@ void selectType()
       doupdate();
       mvwprintw(selectWin,10,1,"No Option");
       wgetch(selectWin);
-      //mvwscanw(selectWin,8,col*0.8, "%d", &cont);
     }
 
   hide_panel(selectPanel);
@@ -1224,6 +1148,7 @@ void selectType()
 }
 
 
+/* Function to export the document as file to tmp folder */
 char * exportDocument(int oid, char fn[])
 {
   char *fullFileName = (char *)malloc(FNAMEEXP*sizeof(char)); 
