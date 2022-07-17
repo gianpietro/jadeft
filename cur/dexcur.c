@@ -103,11 +103,13 @@ void selectType()
   mvwprintw(selectWin,5,1, "3 - Supplier Invoice\n");
   mvwprintw(selectWin,6,1, "4 - Document Type\n");  
   mvwprintw(selectWin,8,1, "Enter option:");
+  box(selectWin,0,0);
 
   echo();
   mvwscanw(selectWin,8,18,"%d",&selectOption);
   noecho();
-  wattroff(selectWin,A_BOLD | COLOR_PAIR(3)); 
+  wattroff(selectWin,A_BOLD | COLOR_PAIR(3));
+  
   if (selectOption == 1)
     {
       hide_panel(selectPanel);
