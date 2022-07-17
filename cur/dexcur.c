@@ -1089,7 +1089,8 @@ void selectType()
 	  rRow = PQntuples(res);
 	  //mvwprintw(docWin,6,1, "Press Enter to continue");
 	  //wmove(docWin,6,pcol*0.25);
-	  mvwprintw(docWin,4,1, "DocumentID      Title                               Start_Date           OID             File                      Description                   Post_Code");
+	  mvwprintw(docWin,4,1, "DocumentID      Title                               Start_Date           OID             File  \
+                    Description                   Post_Code");
 	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin,6,1, "Press Enter to continue");
 	  wmove(docWin,6,pcol*0.25);
@@ -1106,8 +1107,8 @@ void selectType()
 	      for (i; i < j; i++)
 		{
 		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
-		  mvwprintw(docWin,list,1,"%-15s %-35s %-20s %-15s %-25s %-30s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),
-			    PQgetvalue(res,i,4),PQgetvalue(res,i,6),PQgetvalue(res,i,7));
+		  mvwprintw(docWin,list,1,"%-15s %-35s %-20s %-15s %-25s %-30s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),
+			    PQgetvalue(res,i,3),PQgetvalue(res,i,4),PQgetvalue(res,i,6),PQgetvalue(res,i,7));
 		  //mvwprintw(docWin,list,1,"%-15s", PQgetvalue(res,i,0));
 		  list++;
 		  wclrtobot(docWin);
