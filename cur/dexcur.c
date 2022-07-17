@@ -71,7 +71,7 @@ void selectType()
 
   selectWin = newwin(LINES*0.4, COLS*0.4,LINES*0.07,COLS/4);
   selectProWin = newwin(LINES*0.5, COLS*0.5,LINES*0.07,COLS/5);
-  docWin = newwin(LINES*0.4, COLS*0.5, LINES/2, COLS/5);
+  docWin = newwin(LINES*0.4, COLS*0.7, LINES/2, COLS/5);
   selectPanel = new_panel(selectWin);
   selectProPanel = new_panel(selectProWin);
   docPanel = new_panel(docWin);
@@ -284,19 +284,23 @@ void selectType()
 	  while((p = wgetch(docWin)) == '\n')
 	    {
 	      if (j + RANGE < rRow)
-		j + j + RANGE;
+		j = j + RANGE;
 	      else
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
 		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
 		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
-		  list++;		  
+		  list++;
+		  wclrtobot(docWin);
+		  box(docWin,0,0);		    
 		}
 	      list = 6;
 	      if (i == rRow)
 		{
+		  wclrtobot(docWin);
 		  mvwprintw(docWin, drow-9,1, "End of list");
+		  box(docWin,0,0);
 		  break;
 		}
 	    }
@@ -549,19 +553,23 @@ void selectType()
 	  while((p = wgetch(docWin)) == '\n')
 	    {
 	      if (j + RANGE < rRow)
-		j + j + RANGE;
+		j = j + RANGE;
 	      else
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
 		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
 		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
-		  list++;		  
+		  list++;
+		  wclrtobot(docWin);
+		  box(docWin,0,0);
 		}
 	      list = 6;
 	      if (i == rRow)
 		{
+		  wclrtobot(docWin);
 		  mvwprintw(docWin, drow-9,1, "End of list");
+		  box(docWin,0,0);
 		  break;
 		}
 	    }
@@ -820,19 +828,23 @@ void selectType()
 	  while((p = wgetch(docWin)) == '\n')
 	    {
 	      if (j + RANGE < rRow)
-		j + j + RANGE;
+		j = j + RANGE;
 	      else
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
 		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
 		  mvwprintw(docWin,list,1,"%-15s %-25s %-15s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4),PQgetvalue(res,i,5));
-		  list++;		  
+		  list++;
+		  wclrtobot(docWin);
+		  box(docWin,0,0);
 		}
 	      list = 6;
 	      if (i == rRow)
 		{
+		  wclrtobot(docWin);
 		  mvwprintw(docWin, drow-9,1, "End of list");
+		  box(docWin,0,0);
 		  break;
 		}
 	    }
@@ -1038,13 +1050,15 @@ void selectType()
 	  
 	  if(ckdate < 0 || ckdate > 0)
 	    {
-	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, p.provider_name, p.provider_id, pa.provider_acct_id, pa.provider_acct_no \
-                                       FROM provider_account pa \
-                                       INNER JOIN provider p ON (pa.provider_id = p.provider_id) \
-                                       INNER JOIN documents d ON (pa.provider_acct_id = d.parent_id) \
-                                       WHERE pa.provider_acct_id = $1 \
+	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, d.type_id, dt.description, p.post_code \
+                                       FROM documents d \
+                                       LEFT OUTER JOIN	supplier_invoice si ON (si.supplier_invoice_id = d.parent_id AND d.catalog = 'INVOICE') \
+                                       LEFT OUTER JOIN supplier_account sa ON (sa.supplier_acct_id = si.supplier_acct_id) \
+                                       LEFT OUTER JOIN supplier_account sa2 ON (sa2.supplier_acct_id = d.parent_id AND d.catalog = 'SUPPLIER') \
+                                       LEFT OUTER JOIN property p ON (sa.property_id = p.property_id OR sa2.property_id = p.property_id) \
+                                       LEFT OUTER JOIN document_type dt ON (dt.type_id = d.type_id) \
+                                       WHERE d.type_id = $1 \
                                        AND d.start_date >= $2 \
-                                       AND d.catalog = 'PROVIDER' \
                                        ORDER BY d.document_id;"
 				 ,2
 				 ,NULL
@@ -1055,13 +1069,15 @@ void selectType()
 	    }
 	  if(ckdate == 0)
 	    {
-	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, p.provider_name, p.provider_id, pa.provider_acct_id, pa.provider_acct_no \
-                                       FROM provider_account pa \
-                                       INNER JOIN provider p ON (pa.provider_id = p.provider_id) \
-                                       INNER JOIN documents d ON (pa.provider_acct_id = d.parent_id) \
-                                       WHERE pa.provider_acct_id = $1 \
-                                       AND d.catalog = 'PROVIDER' \
-                                       ORDER BY d.document_id;" \
+	      res = PQexecParams(conn,"SELECT d.document_id, d.title, d.start_date, d.oid_value, d.file_name, d.type_id, dt.description, p.post_code\
+                                       FROM documents d \
+                                       LEFT OUTER JOIN	supplier_invoice si ON (si.supplier_invoice_id = d.parent_id AND d.catalog = 'INVOICE') \
+                                       LEFT OUTER JOIN supplier_account sa ON (sa.supplier_acct_id = si.supplier_acct_id) \
+                                       LEFT OUTER JOIN supplier_account sa2 ON (sa2.supplier_acct_id = d.parent_id AND d.catalog = 'SUPPLIER') \
+                                       LEFT OUTER JOIN property p ON (sa.property_id = p.property_id OR sa2.property_id = p.property_id) \
+                                       LEFT OUTER JOIN document_type dt ON (dt.type_id = d.type_id) \
+                                       WHERE d.type_id = $1 \
+                                       ORDER BY d.document_id;" 
        				 ,1
 				 ,NULL
 				 ,(const char *const *)paramsDoc
@@ -1073,29 +1089,36 @@ void selectType()
 	  rRow = PQntuples(res);
 	  //mvwprintw(docWin,6,1, "Press Enter to continue");
 	  //wmove(docWin,6,pcol*0.25);
-	  mvwprintw(docWin,4,1, "DocumentID      Title                     Start_Date           OID             File");
+	  mvwprintw(docWin,4,1, "DocumentID      Title                               Start_Date           OID             File                      Description                   Post_Code");
 	  wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  mvwprintw(docWin,6,1, "Press Enter to continue");
 	  wmove(docWin,6,pcol*0.25);
+	  // wmove(docWin,6,30);
 	  //wattroff(docWin, A_BOLD | COLOR_PAIR(4));
 	  //mvwprintw(docWin,3,1,"rRow %d ", rRow); //DEBUG
 	  
 	  while((p = wgetch(docWin)) == '\n')
 	    {
 	      if (j + RANGE < rRow)
-		j + j + RANGE;
+		j = j + RANGE;
 	      else
 		j = j + (rRow - j);
 	      for (i; i < j; i++)
 		{
 		  //mvwprintw(docWin,list,1,"%s %s", PQgetvalue(res,i,0), PQgetvalue(res,i,1));
-		  mvwprintw(docWin,list,1,"%-15s %-25s %-20s %-15s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),PQgetvalue(res,i,4));
-		  list++;		  
+		  mvwprintw(docWin,list,1,"%-15s %-35s %-20s %-15s %-25s %-30s %-5s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2),PQgetvalue(res,i,3),
+			    PQgetvalue(res,i,4),PQgetvalue(res,i,6),PQgetvalue(res,i,7));
+		  //mvwprintw(docWin,list,1,"%-15s", PQgetvalue(res,i,0));
+		  list++;
+		  wclrtobot(docWin);
+		  box(docWin,0,0);
 		}
 	      list = 6;
 	      if (i == rRow)
 		{
+		  wclrtobot(docWin);
 		  mvwprintw(docWin, drow-9,1, "End of list");
+		  box(docWin,0,0);
 		  break;
 		}
 	    }
