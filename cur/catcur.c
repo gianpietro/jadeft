@@ -24,10 +24,8 @@ void categoryInsert()
   int ch = 0;
   int rows = 0;
   int val = 0, upID = 0, *params[1], length[1], formats[1];
-  //char catIDStr[5];
   int catID = 0;
-  //char catDesc[50];  
-  char *catDesc;  // using a pinter instead of array
+  char *catDesc;  
   int cfUpdate = 0;
   int cf = 0;
   const char *titleOne = "Category Type Form";
@@ -49,11 +47,11 @@ void categoryInsert()
 
   while (newRec == 'y')
     {
-      categoryField[0] = new_field(1,30,6,22,0,0);  /* category */
+      categoryField[0] = new_field(1,30,6,22,0,0);                              /* category */
       categoryField[1] = NULL;
 
-      set_field_fore(categoryField[0], COLOR_PAIR(9));    /* SET_FIELD_FOREGROUND */
-      set_field_back(categoryField[0], COLOR_PAIR(9));    /* SET_FIELD_BACKGROUND */
+      set_field_fore(categoryField[0], COLOR_PAIR(9));                          /* set_field_foreground */
+      set_field_back(categoryField[0], COLOR_PAIR(9));                          /* set_field_background */
 
       set_field_type(categoryField[0],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
       
@@ -64,7 +62,7 @@ void categoryInsert()
       
       categoryPanel = new_panel(categoryWin);
       categoryUpdatePanel = new_panel(categoryUpdateWin);
-      wbkgd(categoryWin, COLOR_PAIR(1));        /* MAIN_WINDOW_BACKGROUND_COLOR */    
+      wbkgd(categoryWin, COLOR_PAIR(1));       
       update_panels();
       doupdate();
       
@@ -77,8 +75,6 @@ void categoryInsert()
       getmaxyx(categoryUpdateWin, urow, ucol);
       box(categoryWin,0,0);      
       box(categoryUpdateWin,0,0);
-      //waddstr(categoryWin,"Category Type Form");
-      //waddstr(categoryUpdateWin,"Category Type");
 
       if (categoryWin == NULL || categoryUpdateWin == NULL)
 	{
@@ -87,9 +83,9 @@ void categoryInsert()
 	  getch();
 	}
 
-      wattron(categoryWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
-      mvwprintw(categoryWin,1,(col-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
-      wattroff(categoryWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      wattron(categoryWin,A_BOLD | COLOR_PAIR(1));                              /* atton_main_win_title */
+      mvwprintw(categoryWin,1,(col-lenOne)/2,titleOne);                         /* set_main_wind_title */
+      wattroff(categoryWin,A_BOLD | COLOR_PAIR(1));                             /* attoff_main_win_title */
 
       post_form(categoryForm);
       wrefresh(categoryWin);
@@ -97,7 +93,6 @@ void categoryInsert()
       mvwprintw(categoryWin,row-(row-8),col-(col-5), "Category:");
       mvwprintw(categoryWin,row-2,col-(col-5),"Press F1 when form complete (F9 for Update)");
       wmove(categoryWin,row-(row-8),col-(col-24));    
-      //wrefresh(categoryWin);
       
       while((ch = wgetch(categoryWin)) != KEY_F(1))
 	{
@@ -112,24 +107,23 @@ void categoryInsert()
 	      list = 6;
 	      wclear(categoryUpdateWin);
 	      box(categoryUpdateWin,0,0);
-	      //waddstr(categoryUpdateWin, "Category Type");
-	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
-	      mvwprintw(categoryUpdateWin,1,(col-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
-	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
+	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));    
+	      mvwprintw(categoryUpdateWin,1,(col-lenTwo)/2, titleTwo); 
+	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));   
 	      wmove(categoryUpdateWin,1,1);	     
 	      show_panel(categoryUpdatePanel);
-	      wbkgd(categoryUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
+	      wbkgd(categoryUpdateWin, COLOR_PAIR(1));          
 	      update_panels();
 	      doupdate();
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      /* assign the required select statement */
 	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(categoryUpdateWin);
-	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
-	      mvwprintw(categoryUpdateWin, 4, 1, "ID    Category");  //+3
-	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
+	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));    
+	      mvwprintw(categoryUpdateWin, 4, 1, "ID    Category"); 
+	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));   
 	  
 	      while((p = wgetch(categoryUpdateWin)) == '\n')
 		{
@@ -139,7 +133,7 @@ void categoryInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {
-		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		      /* change number of pqgetvalue return items as required */
 		      mvwprintw(categoryUpdateWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(categoryUpdateWin);
@@ -151,20 +145,18 @@ void categoryInsert()
 		      wclrtobot(categoryUpdateWin);  
 		      mvwprintw(categoryUpdateWin,13,1,"End of list");
 		      box(categoryUpdateWin,0,0);
-		      //mvwprintw(categoryUpdateWin,0,0, "Category");
-		      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
-		      mvwprintw(categoryUpdateWin,1,(col-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */ 
-		      //mvwprintw(proUpdateWin,0,0, "Provider");
-		      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
+		      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));       
+		      mvwprintw(categoryUpdateWin,1,(col-lenTwo)/2, titleTwo); 
+		      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));  
 		      wmove(categoryUpdateWin,urow-8,1);
 		      break;
 		    }
 		}	  
 	      echo();
-	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */
+	      wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));           
 	      mvwprintw(categoryUpdateWin,row-7,1,"Select Option: ");
 	      mvwscanw(categoryUpdateWin,row-7,col-45, "%d", &upID);
-	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
+	      wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));          
 
 	      PQclear(res);
 	  
@@ -173,7 +165,7 @@ void categoryInsert()
 	      length[0] = sizeof(val);
 	      formats[0] = 1;
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      /* assign the required select statement */
 	      res = PQexecParams(conn, "SELECT * FROM category_type WHERE id = $1;"
 				 ,1
 				 ,NULL
@@ -185,17 +177,14 @@ void categoryInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  // mvwprintw(categoryUpdateWin,13,1, "no or rows %d ",rows);
-		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  // mvwprintw(categoryUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  set_field_buffer(categoryField[0],0,PQgetvalue(res,0,1));
 		  cfUpdate = 1;
 		}
 	      else
 		{
-		  wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  wattron(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));           
 		  mvwprintw(categoryUpdateWin,row-6,1,"Number invalid");
-		  wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */
+		  wattroff(categoryUpdateWin,A_BOLD | COLOR_PAIR(1));          
 		  wrefresh(categoryUpdateWin);		
 		}
 	      noecho();
@@ -208,16 +197,16 @@ void categoryInsert()
 
       form_driver(categoryForm,REQ_VALIDATION);
       
-      catDesc = (char*)malloc(50 * sizeof(char)); //NEW CODE 14NOV21
+      catDesc = (char*)malloc(50 * sizeof(char));                               /* new code 14Nov21 */
       strcpy(catDesc,field_buffer(categoryField[0],0));
 
       if ((form_driver(categoryForm,REQ_VALIDATION) == E_OK) && (!isspace(*catDesc)))
 	{
 	  strcpy(catDesc, trimWS(catDesc));
 	  echo();
-	  wattron(categoryWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SAVE_YN */
+	  wattron(categoryWin,A_BOLD | COLOR_PAIR(1));                          /* atton_save_yn */
 	  mvwprintw(categoryWin,row-8,col-65,"Save y/n: ");
-	  wattroff(categoryWin,A_BOLD | COLOR_PAIR(1));     /* ATTOFF_SAVE_YN */
+	  wattroff(categoryWin,A_BOLD | COLOR_PAIR(1));                         /* attoff_save_yn */
 	  mvwprintw(categoryWin,row-7,col-65,"(d = delete record)");
 	  wmove(categoryWin,row-8,col-54);
 
@@ -232,9 +221,9 @@ void categoryInsert()
 	      if (cf == 'd')
 		{  
 		  catDelete(upID);
-		  wattron(categoryWin, A_BOLD | A_BLINK);             /* ATTON_DELETED */
+		  wattron(categoryWin, A_BOLD | A_BLINK);                       /* atton_deleted */
 		  mvwprintw(categoryWin,row-6,col-65, "Record deleted");
-		  wattroff(categoryWin, A_BOLD | A_BLINK);            /* ATTOFF_DELETED */
+		  wattroff(categoryWin, A_BOLD | A_BLINK);                      /* attoff_deleted */
 		  break;
 		}	      
 	    }
@@ -242,19 +231,18 @@ void categoryInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  catUpdate(upID, catDesc);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
-		  wattron(categoryWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
-		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
+		  catUpdate(upID, catDesc);                                     /* replace with name and paraments of function */
+		  wattron(categoryWin, A_BOLD | A_BLINK);                       /* atton_saved */
+		  /* the update function will have same parameters as insert function plus upid */
 		  mvwprintw(categoryWin,row-6,col-65, "Data updated");
 		  wattroff(categoryWin, A_BOLD | A_BLINK);
-		  //mvwprintw(categoryWin,17,5, "cfUpdate %d, upID %d, catDesc %s", cfUpdate,upID,catDesc);  //DEBUG
 		}
       	      else
 		{
 		  catInsert(catDesc);
-		  wattron(categoryWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
+		  wattron(categoryWin, A_BOLD | A_BLINK);                       /* atton_saved */
 		  mvwprintw(categoryWin,row-6,col-65, "Data saved");
-		  wattroff(categoryWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
+		  wattroff(categoryWin, A_BOLD | A_BLINK);                      /* atton_saved */
 		}
 	    }
 	}
@@ -285,7 +273,7 @@ void categoryInsert()
       doupdate();
       delwin(categoryWin); 
       
-    } //while newRec
+    } /* while newRec */
   PQfinish(conn);
   free(catDesc);
   catDesc = NULL;
@@ -328,18 +316,18 @@ void statementLinkInsert()
   noecho();
   keypad(stdscr, TRUE);
 
-  init_pair(1,COLOR_WHITE,COLOR_BLUE);        /* INIT_PAIR_FOR_WIN_COLOR */
-  init_pair(9,COLOR_WHITE,COLOR_BLACK);      /* INIT_PAIR_FOR_FIELD_COLOR */
+  init_pair(1,COLOR_WHITE,COLOR_BLUE);                                          /* init_pair_for_win_color */
+  init_pair(9,COLOR_WHITE,COLOR_BLACK);                                         /* init_pair_for_field_color */
 
   while (newRec == 'y')
     {
-      stmtLinkField[0] = new_field(1,30,4,22,0,0);  /* alias       */
-      stmtLinkField[1] = new_field(1,8,6,22,0,0);   /* category_id */
-      stmtLinkField[2] = new_field(2,25,8,22,0,0);  /* category    */
+      stmtLinkField[0] = new_field(1,30,4,22,0,0);                              /* alias */
+      stmtLinkField[1] = new_field(1,8,6,22,0,0);                               /* category_id */
+      stmtLinkField[2] = new_field(2,25,8,22,0,0);                              /* category */
       stmtLinkField[3] = NULL;
 
-      set_field_fore(stmtLinkField[0], COLOR_PAIR(9));    /* SET_FIELD_FOREGROUND */
-      set_field_back(stmtLinkField[0], COLOR_PAIR(9));    /* SET_FIELD_BACKGROUND */
+      set_field_fore(stmtLinkField[0], COLOR_PAIR(9));                          /* set_field_foreground */
+      set_field_back(stmtLinkField[0], COLOR_PAIR(9));                          /* set_field_background */
       set_field_fore(stmtLinkField[1], COLOR_PAIR(9));
       set_field_back(stmtLinkField[1], COLOR_PAIR(9));
       set_field_fore(stmtLinkField[2], COLOR_PAIR(9));
@@ -349,18 +337,17 @@ void statementLinkInsert()
       set_field_type(stmtLinkField[1],TYPE_INTEGER,0,1,99999);
       set_field_type(stmtLinkField[2],TYPE_REGEXP,"^[A-Za-z0-9 -]+$");
 
-      field_opts_off(stmtLinkField[2], O_ACTIVE); /* field is inactive cursor skips over */
+      field_opts_off(stmtLinkField[2], O_ACTIVE);                               /* field is inactive cursor skips over */
 
       stmtLinkForm = new_form(stmtLinkField);
       scale_form(stmtLinkForm, &stlrow, &stlcol);
-      //stmtLinkWin = newwin(stlrow+20,stlcol+10,1,1);
       stmtLinkWin = newwin((LINES-10)/2, COLS/3,LINES-(LINES-4),COLS/4);
       catTypeWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+5, COLS/4);
       stmtLinkUpdateWin = newwin((LINES-10)/2, COLS/3,(LINES-10)/2+5, COLS/4);
 
       stmtLinkPanel = new_panel(stmtLinkWin);
       stmtLinkUpdatePanel = new_panel(stmtLinkUpdateWin);
-      wbkgd(stmtLinkWin, COLOR_PAIR(1));        /* MAIN_WINDOW_BACKGROUND_COLOR */    
+      wbkgd(stmtLinkWin, COLOR_PAIR(1));                                        /* main_window_background_color */    
       catTypePanel = new_panel(catTypeWin);
       update_panels();
       doupdate();
@@ -377,9 +364,6 @@ void statementLinkInsert()
       box(stmtLinkWin,0,0);
       box(catTypeWin,0,0);
       box(stmtLinkUpdateWin,0,0);
-      //waddstr(stmtLinkWin,"Statement Link Entry Form");
-      //waddstr(catTypeWin,"Category Type");
-      //waddstr(stmtLinkUpdateWin,"Statement Link");
 
       if (stmtLinkWin == NULL || catTypeWin == NULL || stmtLinkUpdateWin == NULL)
 	{
@@ -388,19 +372,18 @@ void statementLinkInsert()
 	  getch();
 	}
 
-      wattron(stmtLinkWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
-      mvwprintw(stmtLinkWin,1,(stlcol-lenOne)/2, titleOne);   /* SET_MAIN_WIND_TITLE */  
-      wattroff(stmtLinkWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
+      wattron(stmtLinkWin,A_BOLD | COLOR_PAIR(1));                               /* atton_main_win_title */
+      mvwprintw(stmtLinkWin,1,(stlcol-lenOne)/2, titleOne);                      /* set_main_wind_title */  
+      wattroff(stmtLinkWin,A_BOLD | COLOR_PAIR(1));                              /* attoff_main_win_title */
 
       post_form(stmtLinkForm);
       wrefresh(stmtLinkWin);
 
-      mvwprintw(stmtLinkWin,stlrow-(stlrow-6),stlcol-(stlcol-5), "Alias:");
-      mvwprintw(stmtLinkWin,stlrow-(stlrow-8),stlcol-(stlcol-5), "Category_ID(F2):");
-      mvwprintw(stmtLinkWin,stlrow-(stlrow-10),stlcol-(stlcol-5), "Category:");
+      mvwprintw(stmtLinkWin,stlrow-(stlrow-6),stlcol-(stlcol-5),"Alias:");
+      mvwprintw(stmtLinkWin,stlrow-(stlrow-8),stlcol-(stlcol-5),"Category_ID(F2):");
+      mvwprintw(stmtLinkWin,stlrow-(stlrow-10),stlcol-(stlcol-5),"Category:");
       mvwprintw(stmtLinkWin,stlrow-2,5,"Press F1 when form complete (F9 for Update)");
       wmove(stmtLinkWin,stlrow-(stlrow-6),stlcol-(stlcol-24));
-      //wrefresh(stmtLinkWin);
       
       while((ch = wgetch(stmtLinkWin)) != KEY_F(1))
 	{
@@ -416,25 +399,22 @@ void statementLinkInsert()
 	      list = 6;
 	      wclear(catTypeWin);
 	      box(catTypeWin,0,0);
-	      //waddstr(catTypeWin, "Category Type");
-	      wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
-	      mvwprintw(catTypeWin,1,(ctcol-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
-	      wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
+	      wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));   
+	      mvwprintw(catTypeWin,1,(ctcol-lenTwo)/2, titleTwo); 
+	      wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));  
 	      wmove(catTypeWin,1,1);
-	      //wrefresh(catTypeWin);
 	      show_panel(catTypePanel);
-	      wbkgd(catTypeWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
+	      wbkgd(catTypeWin, COLOR_PAIR(1));                                 /* sub_win_background_color */
 	      update_panels();
 	      doupdate();	
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
 	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(catTypeWin);
-	      wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
-	      mvwprintw(catTypeWin, 4, 1, "ID    Category");  //+3
-	      wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */	  
+	      wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));     
+	      mvwprintw(catTypeWin, 4, 1, "ID    Category");  
+	      wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));   
 	      while((p = wgetch(catTypeWin)) == '\n')
 		{
 		  if ( j + RANGE < rows)
@@ -443,35 +423,32 @@ void statementLinkInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {
-		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
 		      mvwprintw(catTypeWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1));
 		      list++;
 		      wclrtoeol(catTypeWin);
 		      box(catTypeWin,0,0);
 		    }
 		  list = 6;      
-		  //wclrtoeol(catTypeWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(catTypeWin);  
 		      mvwprintw(catTypeWin,ctrow-8,1,"End of list");
 		      box(catTypeWin,0,0);
-		      //mvwprintw(catTypeWin,0,0, "Category Type");
-		      wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
-		      mvwprintw(catTypeWin,1,(ctcol-lenTwo)/2,titleTwo);    /* SET_SUB_WIN_TITLE */
-		      wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
+		      wattron(catTypeWin,A_BOLD | COLOR_PAIR(1)); 
+		      mvwprintw(catTypeWin,1,(ctcol-lenTwo)/2,titleTwo); 
+		      wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));  
 		      wmove(catTypeWin,ctrow-8,1);
 		      break;
 		    }
 		}	  
 	      echo();
-	      wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */
+	      wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));           
 	      mvwprintw(catTypeWin,ctrow-7,1,"Select Option: ");
 	      mvwscanw(catTypeWin,ctrow-7,ctcol-45, "%5s", &stlIDStr);
 	      set_field_buffer(stmtLinkField[1],0, stlIDStr);
-	      wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
+	      wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));          
 
-	      // CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES 
+	      /* code to assign variables to field_buffer values */
 	      stlID = atoi(field_buffer(stmtLinkField[1],0));
 	      PQclear(res);
 	  
@@ -480,7 +457,7 @@ void statementLinkInsert()
 	      length[0] = sizeof(val);
 	      formats[0] = 1;
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      /* the required select statement */
 	      res = PQexecParams(conn, "SELECT * FROM category_type WHERE id = $1;"
 				 ,1
 				 ,NULL
@@ -492,51 +469,45 @@ void statementLinkInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  //mvwprintw(catTypeWin,13,1, "no or rows %d ",rows);
-		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  //mvwprintw(catTypeWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  set_field_buffer(stmtLinkField[1],0,PQgetvalue(res,0,0));
-		  set_field_buffer(stmtLinkField[2],0,PQgetvalue(res,0,1));	 //Set category to field 
+		  set_field_buffer(stmtLinkField[2],0,PQgetvalue(res,0,1));	/* set category to field */
 		  wrefresh(catTypeWin);
 		}
 	      else
 		{
 		  set_field_buffer(stmtLinkField[1],0,"");
 		  set_field_buffer(stmtLinkField[2],0,"");	
-		  wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  wattron(catTypeWin,A_BOLD | COLOR_PAIR(1));            
 		  mvwprintw(catTypeWin,ctrow-6,1,"Number invalid");
-		  wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
+		  wattroff(catTypeWin,A_BOLD | COLOR_PAIR(1));          
 		  wrefresh(catTypeWin);		
-		  //wrefresh(stmtLinkWin);
 		}
 	      noecho();
 	      PQclear(res);
-	    } // F2
+	    } /* F2 */
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = rows = 0, cfUpdate = 0;
 	      list = 6;
 	      wclear(stmtLinkUpdateWin);
 	      box(stmtLinkUpdateWin,0,0);
-	      //waddstr(stmtLinkUpdateWin, "Statement Link List");
-	      wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
-	      mvwprintw(stmtLinkUpdateWin,1,(slucol-lenThree)/2, titleThree);     /*SET_SUB_WIM_TITLE */
-	      wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
+	      wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));    
+	      mvwprintw(stmtLinkUpdateWin,1,(slucol-lenThree)/2, titleThree); 
+	      wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));   
 	      wmove(stmtLinkUpdateWin,1,1);
-	      //wrefresh(stmtLinkUpdateWin);
 	      show_panel(stmtLinkUpdatePanel);
-	      wbkgd(stmtLinkUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
+	      wbkgd(stmtLinkUpdateWin, COLOR_PAIR(1));          
 	      update_panels();
 	      doupdate();
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      /* the required select statement */
 	      res = PQexec(conn,"SELECT * FROM statement_link ORDER BY id");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(stmtLinkUpdateWin);
-	      wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
-	      mvwprintw(stmtLinkUpdateWin, 4, 1, "ID    Alias                     Category");  //+3
-	      wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
+	      wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));    
+	      mvwprintw(stmtLinkUpdateWin, 4, 1, "ID    Alias                     Category");  
+	      wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1)); 
 	  
 	      while((p = wgetch(stmtLinkUpdateWin)) == '\n')
 		{
@@ -546,7 +517,6 @@ void statementLinkInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {
-		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
 		      mvwprintw(stmtLinkUpdateWin,list,1,"%-5s %-25s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,3));
 		      list++;
 		      wclrtoeol(stmtLinkUpdateWin);
@@ -558,19 +528,18 @@ void statementLinkInsert()
 		      wclrtobot(stmtLinkUpdateWin);  
 		      mvwprintw(stmtLinkUpdateWin,13,1,"End of list");
 		      box(stmtLinkUpdateWin,0,0);
-		      //mvwprintw(stmtLinkUpdateWin,0,0, "Statement Link List");
-		      wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
-	              mvwprintw(stmtLinkUpdateWin,1,(slucol-lenThree)/2, titleThree);     /*SET_SUB_WIM_TITLE */
-	              wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
+		      wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));
+	              mvwprintw(stmtLinkUpdateWin,1,(slucol-lenThree)/2, titleThree); 
+	              wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));  
 		      wmove(stmtLinkUpdateWin,10,1);
 		      break;
 		    }
 		}	  
 	      echo();
-	      wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));           
 	      mvwprintw(stmtLinkUpdateWin,slurow-7,1,"Select Option: ");
 	      mvwscanw(stmtLinkUpdateWin,slurow-7,slucol-45, "%d", &upID);
-	      wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
+	      wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));          
 
 	      PQclear(res);
 	  
@@ -579,7 +548,6 @@ void statementLinkInsert()
 	      length[0] = sizeof(val);
 	      formats[0] = 1;
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
 	      res = PQexecParams(conn, "SELECT * FROM statement_link WHERE id = $1;"
 				 ,1
 				 ,NULL
@@ -591,9 +559,6 @@ void statementLinkInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  //mvwprintw(stmtLinkUpdateWin,13,1, "no or rows %d ",rows);
-		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  //mvwprintw(stmtLinkUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,1));
 		  set_field_buffer(stmtLinkField[0],0,PQgetvalue(res,0,1));
 		  set_field_buffer(stmtLinkField[1],0,PQgetvalue(res,0,2));
 		  set_field_buffer(stmtLinkField[2],0,PQgetvalue(res,0,3));			 
@@ -601,15 +566,15 @@ void statementLinkInsert()
 		}
 	      else
 		{
-		  wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  wattron(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));          
 		  mvwprintw(stmtLinkUpdateWin,slurow-6,1,"Number invalid");
-		  wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
+		  wattroff(stmtLinkUpdateWin,A_BOLD | COLOR_PAIR(1));         
 		  wrefresh(stmtLinkUpdateWin);		
 		}
 	      noecho();
 	      PQclear(res);
-	    } //F9	 	   
-	} // while F1
+	    } /* F9 */	 	   
+	} /* while F1 */
       hide_panel(catTypePanel);
       hide_panel(stmtLinkUpdatePanel);
       update_panels();
@@ -625,9 +590,9 @@ void statementLinkInsert()
 	{
 	  strcpy(slfAlias, trimWS(slfAlias));
 	  echo();
-	  wattron(stmtLinkWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SAVE_YN */
+	  wattron(stmtLinkWin,A_BOLD | COLOR_PAIR(1));                          /* atton_save_yn */
 	  mvwprintw(stmtLinkWin,stlrow-8,stlcol-65,"Save y/n: ");
-	  wattroff(stmtLinkWin,A_BOLD | COLOR_PAIR(1));     /* ATTOFF_SAVE_YN */
+	  wattroff(stmtLinkWin,A_BOLD | COLOR_PAIR(1));                         /* attoff_save_yn */
 	  mvwprintw(stmtLinkWin,stlrow-7,stlcol-65,"(d = delete record)");
 	  wmove(stmtLinkWin,stlrow-8,stlcol-54);
 
@@ -642,9 +607,9 @@ void statementLinkInsert()
 	      if (cf == 'd')
 		{  
 		  stmtLinkDelete(upID);
-		  wattron(stmtLinkWin, A_BOLD | A_BLINK);             /* ATTON_DELETED */
+		  wattron(stmtLinkWin, A_BOLD | A_BLINK);                       /* atton_deleted */
 		  mvwprintw(stmtLinkWin,stlrow-6,stlcol-65, "Record deleted");
-		  wattroff(stmtLinkWin, A_BOLD | A_BLINK);            /* ATTOFF_DELETED */
+		  wattroff(stmtLinkWin, A_BOLD | A_BLINK);                      /* attoff_deleted */
 		  break;
 		}	      
 	    }
@@ -652,19 +617,18 @@ void statementLinkInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  stmtLinkUpdate(upID, slfAlias, slfCatID, slfCategory);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
-		  wattron(stmtLinkWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
-		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID 
+		  /* the update function will have same parameters as insert function plus upid */
+		  stmtLinkUpdate(upID, slfAlias, slfCatID, slfCategory);  
+		  wattron(stmtLinkWin, A_BOLD | A_BLINK);                       /* atton_saved */
 		  mvwprintw(stmtLinkWin,stlrow-6,stlcol-65, "Data updated");
 		  wattroff(stmtLinkWin, A_BOLD | A_BLINK);
-		  // mvwprintw(stmtLinkWin,18,5, "cfUpdate %d,upID %d, slfAlias %s", cfUpdate,upID, slfAlias);  //DEBUG
 		}
       	      else
 		{
 		  stmtLinkInsert(slfAlias, slfCatID, slfCategory);
-		  wattron(stmtLinkWin, A_BOLD | A_BLINK);      /* ATTON_SAVED */
+		  wattron(stmtLinkWin, A_BOLD | A_BLINK); 
 		  mvwprintw(stmtLinkWin,stlrow-6,stlcol-65, "Data saved");
-		  wattroff(stmtLinkWin, A_BOLD | A_BLINK);    /* ATTOFF_SAVED */
+		  wattroff(stmtLinkWin, A_BOLD | A_BLINK);
 		}
 	    }
 	}
@@ -694,11 +658,8 @@ void statementLinkInsert()
       hide_panel(stmtLinkPanel);
       update_panels();
       doupdate();      
-      //del_panel(stmtLinkUpdatePanel);  // del_panel (3) added 30/10/21
-      //del_panel(catTypePanel);
-      //del_panel(stmtLinkPanel);  
       delwin(stmtLinkWin);
-    } //while newRec
+    } /* while newRec */
   PQfinish(conn);    
     endwin();
 }
