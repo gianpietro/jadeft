@@ -55,12 +55,12 @@ void invInsert()
 
   while (newRec == 'y')
     {
-      invoiceField[0] = new_field(1,30,2,28,0,0);  /* invoice_no */
-      invoiceField[1] = new_field(1,8,4,28,0,0);  /* start_date */
-      invoiceField[2] = new_field(1,8,6,28,0,0);  /* end_date */
-      invoiceField[3] = new_field(1,5,8,28,0,0);  /* supplier_acct_id */
-      invoiceField[4] = new_field(1,30,10,28,0,0);  /* description */
-      invoiceField[5] = new_field(1,12,12,28,0,0);  /* amount */      
+      invoiceField[0] = new_field(1,30,2,28,0,0);                               /* invoice_no       */
+      invoiceField[1] = new_field(1,8,4,28,0,0);                                /* start_date       */
+      invoiceField[2] = new_field(1,8,6,28,0,0);                                /* end_date         */
+      invoiceField[3] = new_field(1,5,8,28,0,0);                                /* supplier_acct_id */
+      invoiceField[4] = new_field(1,30,10,28,0,0);                              /* description      */
+      invoiceField[5] = new_field(1,12,12,28,0,0);                              /* amount           */      
       invoiceField[6] = NULL;
 
       for (fldColor = 0; fldColor < 6; fldColor++)
@@ -101,12 +101,9 @@ void invInsert()
       box(invWin,0,0);
       box(supAcctWin,0,0);
       box(invUpdateWin,0,0);
-      wattron(invWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_MAIN_WIN_TITLE */
-      mvwprintw(invWin,1,(sacol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */      
-      wattroff(invWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_MAIN_WIN_TITLE */
-      //waddstr(invWin,"Invoice Entry Form");
-      //waddstr(supAcctWin,"Supplier Account");
-      //waddstr(invUpdateWin,"invoice");
+      wattron(invWin,A_BOLD | COLOR_PAIR(1));    
+      mvwprintw(invWin,1,(sacol-lenOne)/2,titleOne); 
+      wattroff(invWin,A_BOLD | COLOR_PAIR(1));   
 
       if (invWin == NULL || supAcctWin == NULL || invUpdateWin == NULL)
 	{
@@ -126,7 +123,6 @@ void invInsert()
       mvwprintw(invWin,invrow-(invrow-14),invcol-(invcol-5),"Amount:");
       mvwprintw(invWin,invrow-2,invcol-(invcol-5),"Press F1 when form complete (F9 for Update)");
       wmove(invWin,invrow-(invrow-4),invcol-(invcol-30));
-      //mvwprintw(invWin,24,5,"rows %d cols %d", invrow, invcol);
       wrefresh(invWin);
       
       while((ch = wgetch(invWin)) != KEY_F(1))
@@ -137,36 +133,29 @@ void invInsert()
 	  update_panels();
 	  doupdate();
 	  keyNavigate(ch, invoiceForm);
-	  // I had to set validation for the field at this point as would cause
-	  // navigation to stop when entering subsequent data after first entry
-	  //set_field_type(invoiceField[5],TYPE_NUMERIC,2,-100000,1000000);
 	  if(ch == KEY_F(2))
 	    {
 	      i = j = rows = 0;
 	      list = 6;
 	      wclear(supAcctWin);
 	      box(supAcctWin,0,0);
-	      //waddstr(supAcctWin, "Supplier Account");
-	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
-	      mvwprintw(supAcctWin,1,(sacol-lenTwo)/2, titleTwo);     /*SET_SUB_WIM_TITLE */
-	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
+	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1)); 
+	      mvwprintw(supAcctWin,1,(sacol-lenTwo)/2, titleTwo);
+	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));   
 	      wmove(supAcctWin,1,1);
-	      //wrefresh(supAcctWin);
 	      show_panel(supAcctPanel);
-	      wbkgd(supAcctWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
+	      wbkgd(supAcctWin, COLOR_PAIR(1));         
 	      update_panels();
 	      doupdate();	
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      /* assign the required select statement */
 	      res = PQexec(conn,"SELECT * FROM supplier_account WHERE active_ind = 1 ORDER BY supplier_acct_id");	  
 	      rows = PQntuples(res);
 
-	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
-	      mvwprintw(supAcctWin, 4, 1, "ID    Supplier Account");  //+3
-	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */
+	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));  
+	      mvwprintw(supAcctWin, 4, 1, "ID    Supplier Account"); 
+	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));   
 
-	      //wrefresh(supAcctWin);
-	  
 	      while((p = wgetch(supAcctWin)) == '\n')
 		{
 		  if ( j + RANGE < rows)
@@ -175,34 +164,32 @@ void invInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {
-		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		      /* change number of pqgetvalue return items as required */
 		      mvwprintw(supAcctWin,list,1,"%-5s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,2));
 		      list++;
 		      wclrtoeol(supAcctWin);  
 		    }
 		  list = 6;      
-		  //wclrtoeol(supAcctWin);  
 		  if  (i == rows)
 		    {
 		      wclrtobot(supAcctWin);  
 		      mvwprintw(supAcctWin,13,1,"End of list");
 		      box(supAcctWin,0,0);
-		      //mvwprintw(supAcctWin,0,0, "Supplier Account");
-		      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
-		      mvwprintw(supAcctWin,1,(sacol-lenTwo)/2, titleTwo);    /* SET_SUB_WIN_TITLE */
-		      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
+		      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));      
+		      mvwprintw(supAcctWin,1,(sacol-lenTwo)/2, titleTwo); 
+		      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));  
 		      wmove(supAcctWin,10,1);
 		      break;
 		    }
 		}	  
 	      echo();
-	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));           
 	      mvwprintw(supAcctWin,sarow-7,1,"Select Option: ");
 	      mvwscanw(supAcctWin,sarow-7, sacol-45, "%5s", &supAcctIDstr);
 	      set_field_buffer(invoiceField[3],0, supAcctIDstr);
-	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
+	      wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));          
 
-	      // CODE TO ASSIGN VARIABLES TO FIELD_BUFFER VALUES 
+	      /* code to assign variables to field_buffer values */
 	      supAcctID = atoi(field_buffer(invoiceField[3],0));
 	      PQclear(res);
 	  
@@ -211,7 +198,7 @@ void invInsert()
 	      length[0] = sizeof(val);
 	      formats[0] = 1;
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      /* assign the required select statement */
 	      res = PQexecParams(conn, "SELECT * FROM supplier_account WHERE active_ind = 1 AND supplier_acct_id = $1 ORDER BY supplier_acct_id;"
 				 ,1
 				 ,NULL
@@ -224,47 +211,41 @@ void invInsert()
 	      if (rows == 1)
 		{
 		  set_field_buffer(invoiceField[3],0,PQgetvalue(res,0,0));
-		  //mvwprintw(supAcctWin,13,1, "no or rows %d ",rows);
-		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  //mvwprintw(supAcctWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
 		  wrefresh(supAcctWin);
 		}
 	      else
 		{
 		  set_field_buffer(invoiceField[3],0,"");
-		  wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  wattron(supAcctWin,A_BOLD | COLOR_PAIR(1));            
 		  mvwprintw(supAcctWin,sarow-6,1,"Number invalid");
-		  wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
+		  wattroff(supAcctWin,A_BOLD | COLOR_PAIR(1));         
 		  wrefresh(supAcctWin);		
-		  //wrefresh(invWin);
 		}
 	      noecho();
 	      PQclear(res);
-	    } // F2
+	    } /* F2 */
 	  if(ch == KEY_F(9))
 	    {
 	      i = j = rows = 0, cfUpdate = 0;
 	      list = 6;
 	      wclear(invUpdateWin);
 	      box(invUpdateWin,0,0);
-	      //waddstr(invUpdateWin, "Invoice");
-	      wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTON_SUB_WIN */
-	      mvwprintw(invUpdateWin,1,(ucols-lenThree)/2, titleThree);     /*SET_SUB_WIM_TITLE */
-	      wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SUB_WIN */
+	      wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));   
+	      mvwprintw(invUpdateWin,1,(ucols-lenThree)/2, titleThree);  
+	      wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));   
 	      wmove(invUpdateWin,1,1);
-	      //wrefresh(invUpdateWin);
 	      show_panel(invUpdatePanel);
-	      wbkgd(invUpdateWin, COLOR_PAIR(1));           /* SUB_WIN_BACKGROUND_COLOR */
+	      wbkgd(invUpdateWin, COLOR_PAIR(1));        
 	      update_panels();
 	      doupdate();
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      /* assign the required select statement */
 	      res = PQexec(conn,"SELECT * FROM supplier_invoice ORDER BY supplier_invoice_id");	  
 	      rows = PQntuples(res);
 
-	      wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));     /* ATTON_SEARCH_ITEM_HEADERS */
-	      mvwprintw(invUpdateWin, 4, 1, "ID    Invoice_no      Supplier Account");  //+3
-	      wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));    /* ATTOFF_SEARCH_ITEM_HEADERS */	
+	      wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));   
+	      mvwprintw(invUpdateWin, 4, 1, "ID    Invoice_no      Supplier Account"); 
+	      wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));   
 
 	      wrefresh(invUpdateWin);
 	  
@@ -276,7 +257,7 @@ void invInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {
-		      // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
+		      /* change number of pqgetvalue return items as required */
 		      mvwprintw(invUpdateWin,list,1,"%-5s %-15s %-25s", PQgetvalue(res,i,0),PQgetvalue(res,i,1),PQgetvalue(res,i,2));
 		      list++;
 		      wclrtoeol(invUpdateWin);
@@ -287,19 +268,18 @@ void invInsert()
 		      wclrtobot(invUpdateWin);  
 		      mvwprintw(invUpdateWin,13,1,"End of list");
 		      box(invUpdateWin,0,0);
-		      wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));        /* ATTON_SUB_WIN_TITLE */
-		      mvwprintw(invUpdateWin,1,(ucols-lenThree)/2, titleThree);    /* SET_SUB_WIN_TITLE */
-		      wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));   /* ATTOFF_SUB_WIN_TITLE */
-		      //mvwprintw(invUpdateWin,0,0, "Invoice");
+		      wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));       
+		      mvwprintw(invUpdateWin,1,(ucols-lenThree)/2, titleThree);   
+		      wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));  
 		      wmove(invUpdateWin,10,1);
 		      break;
 		    }
 		}	  
 	      echo();
-	      wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));             /* ATTON_SELECT_OPTION */		
+	      wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));            
 	      mvwprintw(invUpdateWin,urows-7,1,"Select Option: ");
 	      mvwscanw(invUpdateWin,urows-7, ucols-45, "%d", &upID);
-	      wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));           /* ATTOFF_SELECT_OPTION */
+	      wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));           
 
 	      PQclear(res);
 	  
@@ -308,7 +288,7 @@ void invInsert()
 	      length[0] = sizeof(val);
 	      formats[0] = 1;
 
-	      // ASSIGN THE REQUIRED SELECT STATEMENT 
+	      /* assign the required select statement */
 	      res = PQexecParams(conn, "SELECT * FROM supplier_invoice WHERE supplier_invoice_id = $1;"
 				 ,1
 				 ,NULL
@@ -320,10 +300,6 @@ void invInsert()
 	      rows = PQntuples(res);
 	      if (rows == 1)
 		{
-		  //mvwprintw(invUpdateWin,13,1, "no or rows %d ",rows);
-		  // CHANGE NUMBER OF PQgetvalue RETURN ITEMS AS REQUIRED 
-		  //mvwprintw(invUpdateWin,12,1,"Value selected %s %s", PQgetvalue(res,0,0), PQgetvalue(res,0,2));
-		  //wrefresh(invUpdateWin);
 		  set_field_buffer(invoiceField[0],0,PQgetvalue(res,0,1));
 		  set_field_buffer(invoiceField[1],0,PQgetvalue(res,0,2));
 		  set_field_buffer(invoiceField[2],0,PQgetvalue(res,0,3));
@@ -334,16 +310,15 @@ void invInsert()
 		}
 	      else
 		{
-		  wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));            /* ATTON_NUMBER_INVALID */
+		  wattron(invUpdateWin,A_BOLD | COLOR_PAIR(1));         
 		  mvwprintw(invUpdateWin,urows-6,1,"Number invalid");
-		  wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));          /* ATTOFF_NUMBER_INVALID */                   
+		  wattroff(invUpdateWin,A_BOLD | COLOR_PAIR(1));        
 		  wrefresh(invUpdateWin);		
-		  //wrefresh(PARENT_WIN);
 		}
 	      noecho();
 	      PQclear(res);
-	    } //F9	 	   
-	} // while F1
+	    } /* F9 */	 	   
+	} /* while F1 */
       hide_panel(supAcctPanel);
       hide_panel(invUpdatePanel);
       update_panels();
@@ -389,12 +364,11 @@ void invInsert()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  invoiceUpdate(upID, invfNo, invfStartDt, invfEndDt, invfSupAcctID, invfDesc, invfAmount);  //REPLACE WITH NAME AND PARAMENTS OF FUNCTION
-		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID
+		  /* the update function will have same parameters as insert function plus upid */
+		  invoiceUpdate(upID, invfNo, invfStartDt, invfEndDt, invfSupAcctID, invfDesc, invfAmount); 
 		  wattron(invWin,A_BOLD | A_BLINK);
 		  mvwprintw(invWin,invrow-8,invcol-64, "Data updated");
 		  wattroff(invWin,A_BOLD | A_BLINK);
-		  //mvwprintw(invWin,28,5, "cfUpdate %d,upID %d, invfNo %s, invfSupAcctID %d", cfUpdate,upID, invfNo, invfSupAcctID);  //DEBUG
 		}
       	      else
 		{
@@ -419,7 +393,6 @@ void invInsert()
       free_field(invoiceField[3]);
       free_field(invoiceField[4]);
       free_field(invoiceField[5]);
-      //free_field(invoiceField[6]);
 
       cfUpdate = 0;
 
@@ -436,7 +409,7 @@ void invInsert()
       update_panels();
       doupdate();
       delwin(invWin);	
-    } //while newRec
+    } /* while newRec */
   PQfinish(conn);
   endwin();
 }
