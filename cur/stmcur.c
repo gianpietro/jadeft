@@ -24,12 +24,12 @@ void stmtDataAudit()
   int ch, mrow, mcol, urow, ucol, srow, scol;
   int rows = 0; 
   int upID = 0, stID = 0;
-  int val = 0, *params[3], length[3], formats[3];     /* PQexecParams  */
+  int val = 0, *params[3], length[3], formats[3];                               /* PQexecParams  */
   char *paramsStmt[3];  
-  int fv1, fv2;                                            
-  char fv3[4], fv4[150], fv6[50], fv7[30];
-  float fv5;
-  int cf;                                             /* confirm save to DB */
+  int fv1, fv2;                                                                 /* statement table  fv1-statement_id, fv2-date */
+  char fv3[4], fv4[150], fv6[50], fv7[30];                                      /* statement table fv3-type, fv4-description, fv6-account, fv7-alias */  
+  float fv5;                                                                    /* statement table fv5-value */
+  int cf;                                                                       /* confirm save to DB */
   int newRec = 'y';
   int cfUpdate = 0;
   const char *titleOne = "Statement Form";
@@ -38,10 +38,10 @@ void stmtDataAudit()
   int lenOne = strlen(titleOne);
   int lenFour = strlen(titleFour);
   int lenFive = strlen(titleFive);
-  char df[9];                                         /* date from */  
-  char dt[9];                                         /* date to   */
-  char datef[9];                                      /* used to copy df */ 
-  char datet[9];                                      /* used to copy dt */  
+  char df[9];                                                                   /* date from       */  
+  char dt[9];                                                                   /* date to         */
+  char datef[9];                                                                /* used to copy df */ 
+  char datet[9];                                                                /* used to copy dt */  
   int ckdate = 0;
   int strows = 0;
   char desc[150];
@@ -61,13 +61,13 @@ void stmtDataAudit()
   
   while (newRec == 'y')
     {
-      inputField[0] = new_field(1,6,4,28,0,0);        /* statement_id */
-      inputField[1] = new_field(1,8,6,28,0,0);        /* date */
-      inputField[2] = new_field(1,3,8,28,0,0);        /* type */
-      inputField[3] = new_field(5,30,10,28,0,0);      /* description */
-      inputField[4] = new_field(1,10,16,28,0,0);      /* value */
-      inputField[5] = new_field(1,30,18,28,0,0);      /* account */
-      inputField[6] = new_field(1,30,20,28,0,0);      /* alias */
+      inputField[0] = new_field(1,6,4,28,0,0);                                  /* statement_id */
+      inputField[1] = new_field(1,8,6,28,0,0);                                  /* date         */
+      inputField[2] = new_field(1,3,8,28,0,0);                                  /* type         */
+      inputField[3] = new_field(5,30,10,28,0,0);                                /* description  */
+      inputField[4] = new_field(1,10,16,28,0,0);                                /* value        */
+      inputField[5] = new_field(1,30,18,28,0,0);                                /* account      */
+      inputField[6] = new_field(1,30,20,28,0,0);                                /* alias        */
       inputField[7] = NULL;
 
       set_field_fore(inputField[0], COLOR_PAIR(1));   
@@ -172,7 +172,7 @@ void stmtDataAudit()
 
 	      wrefresh(updateWin);
 	      wattron(updateWin,A_BOLD | COLOR_PAIR(1));    
-	      mvwprintw(updateWin, 4, 1, "ID    Provider_ID     Account Number");  //+3
+	      mvwprintw(updateWin, 4, 1, "ID    Provider_ID     Account Number"); 
 	      wattroff(updateWin,A_BOLD | COLOR_PAIR(1));   
 	  
 	      while((p = wgetch(updateWin)) == '\n')
@@ -203,7 +203,7 @@ void stmtDataAudit()
 		}	  
 	      echo();
 	      wattron(updateWin,A_BOLD | COLOR_PAIR(1));           
-	      mvwprintw(updateWin,urow-14,1,"Select Option: ");  //urow-7
+	      mvwprintw(updateWin,urow-14,1,"Select Option: "); 
 	      mvwscanw(updateWin,urow-14, ucol-45, "%d", &upID);
 	      wattroff(updateWin,A_BOLD | COLOR_PAIR(1));           
 
@@ -229,15 +229,13 @@ void stmtDataAudit()
 		  if (upID > 0)
 		    {		      
 		      mvwprintw(updateWin, urow-11,1,"Date From:");
-  	              mvwscanw(updateWin,urow-11, ucol-45, "%s", df);    // need to scan in as string
+  	              mvwscanw(updateWin,urow-11, ucol-45, "%s", df);           /* need to scan in as string */
 		      df[9] = '\0';		   
 		      strcpy(datef, df);
-		      //box(stmtSelectWin,0,0);
 		      mvwprintw(updateWin, urow-10,1,"Date To:");
 		      mvwscanw(updateWin,urow-10, ucol-45, "%s", dt);
 		      dt[9] = '\0';
 		      strcpy(datet,dt);
-		      //wgetch(updateWin);
 		    }
 		  cfUpdate = 1;
 		  upID = 0;
@@ -366,7 +364,7 @@ void stmtDataAudit()
 		      wattroff(stmtSelectWin,A_BOLD | COLOR_PAIR(1));      
 		    }
 		  noecho();		  		  
-		} // if rows == 1 provider
+		} /* if rows == 1 provider */
 	      else
 		{
 		  wattron(updateWin,A_BOLD | COLOR_PAIR(1));       
@@ -376,8 +374,8 @@ void stmtDataAudit()
 		}
 	      noecho();
 	      PQclear(res);
-	    } //F9	  
-	}//while F1
+	    } /* F9 */	  
+	}/* while F1 */
       hide_panel(stmtSelectPanel);
       hide_panel(updatePanel);
       update_panels();
@@ -424,8 +422,7 @@ void stmtDataAudit()
 	    {
 	      if (cfUpdate == 1)
 		{
-		  recordUpdate(stID, fv2, fv3, fv4, fv5, fv6, fv7); // REPLACE WITH NAME AND PARAMENTS OF FUNCTION
-		  //THE UPDATE FUNCTION WILL HAVE SAME PARAMETERS AS INSERT FUNCTION PLUS upID
+		  recordUpdate(stID, fv2, fv3, fv4, fv5, fv6, fv7); 
 		  wattron(mainWin,A_BOLD | A_BLINK);
 		  mvwprintw(mainWin,mrow-8, mcol-64, "Data updated");
 		  wattroff(mainWin,A_BOLD | A_BLINK);
