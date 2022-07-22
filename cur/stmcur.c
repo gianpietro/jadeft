@@ -347,7 +347,7 @@ void stmtDataAudit()
 		  
 		  if (strows == 1)
 		    {		      
-		      //assign values
+		      /* assign values */
 		      set_field_buffer(inputField[0],0,PQgetvalue(res,0,0));
 		      set_field_buffer(inputField[1],0,PQgetvalue(res,0,1));
 		      set_field_buffer(inputField[2],0,PQgetvalue(res,0,2));
