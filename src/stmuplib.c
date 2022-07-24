@@ -5,8 +5,9 @@
 #include <ncurses.h>
 #include "../inc/stmuplibf.h"
 
-
-struct statement *importStmt(char transactionDate[], char transactionType[], char transactionDescription[], char transactionValue[], char accountNumber[], char transactionAlias[])
+/* structure used for import of statment file */
+struct statement *importStmt(char transactionDate[], char transactionType[], char transactionDescription[],
+			     char transactionValue[], char accountNumber[], char transactionAlias[])
 {
   struct statement *ptr;
   int i = 0;
@@ -67,7 +68,9 @@ void freeStatement(struct statement *start)
     }    
 }
 
-
+/* function to match string pattern. Used to match
+   alias from statement_link table to description string of statement 
+   file to identify if the alias if part of the description string */
 int aliasMatch(char *a, char *b)
 {
   int position = 0;
