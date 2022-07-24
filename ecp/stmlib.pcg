@@ -7,7 +7,8 @@
 #include "../inc/stmuplibf.h"
 #include "../inc/fdbcon.h"
 
-void stmtInsert(int stmtTranDate, char stmtTranType[], char stmtTranDesc[], double stmtValue, char stmtAcctNo[], char stmtTranAlias[])
+void stmtInsert(int stmtTranDate, char stmtTranType[], char stmtTranDesc[], double stmtValue,
+                char stmtAcctNo[], char stmtTranAlias[])
 {
   EXEC SQL BEGIN DECLARE SECTION;
    int v_stmtTranDate;
@@ -28,7 +29,8 @@ void stmtInsert(int stmtTranDate, char stmtTranType[], char stmtTranDesc[], doub
   strcpy(v_stmtTranAlias, stmtTranAlias);
 
   EXEC SQL
-   INSERT INTO statement(date, type, description,value, account, alias)VALUES(:v_stmtTranDate, :v_stmtTranType, :v_stmtTranDesc, :v_stmtValue, :v_stmtAcctNo, :v_stmtTranAlias);
+   INSERT INTO statement(date, type, description,value, account, alias)VALUES(:v_stmtTranDate, :v_stmtTranType,
+                        :v_stmtTranDesc, :v_stmtValue, :v_stmtAcctNo, :v_stmtTranAlias);
   EXEC SQL COMMIT;
 
   EXEC SQL DISCONNECT;
@@ -57,7 +59,8 @@ void recordUpdate(int stID, int fv2, char fv3[], char fv4[], double fv5, char fv
   strcpy(v_fv7, fv7);
 
   EXEC SQL
-   UPDATE statement SET date = :v_fv2, type = :v_fv3, description = :v_fv4, value = :v_fv5, account = :v_fv6, alias = :v_fv7 WHERE statement_id = :v_stID;
+   UPDATE statement SET date = :v_fv2, type = :v_fv3, description = :v_fv4, value = :v_fv5, account = :v_fv6,
+                        alias = :v_fv7 WHERE statement_id = :v_stID;
 
   EXEC SQL COMMIT;
 
