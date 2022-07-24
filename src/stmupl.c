@@ -19,41 +19,41 @@ void upLoadStatement()
   WINDOW *stmtWin;
   PANEL *stmtPanel;
   struct statement *start, *newStmtPtr, *end, *ptr;
-  FILE *cp,*np;  /* pointers to file */
+  FILE *cp,*np;                                                                 /* pointers to file */
   int row, col;
-  int i = 0;                                                             /* count of rows in the statement file download */
-  int j = 0;                                                             /* count of characters in the date column */
-  int j2 = 0;                                                            /* count of characters in the type column */ 
-  int j3 = 0;                                                            /* count of characters in the description column */ 
-  int j4 = 0;                                                            /* count of character in the value column */
-  int j5 = 0;                                                            /* count of characters in the account number column */
-  int c = 0, n = 0;                                                      /* character selected from file */
-  int h = 0;                                                             /* various counters for loops and array */
+  int i = 0;                                                                    /* count of rows in the statement file download */
+  int j = 0;                                                                    /* count of characters in the date column */
+  int j2 = 0;                                                                   /* count of characters in the type column */ 
+  int j3 = 0;                                                                   /* count of characters in the description column */ 
+  int j4 = 0;                                                                   /* count of character in the value column */
+  int j5 = 0;                                                                   /* count of characters in the account number column */
+  int c = 0, n = 0;                                                             /* character selected from file */
+  int h = 0;                                                                    /* various counters for loops and array */
   int q = 0;
   int x = 0;
   int l = 0;
-  int g = 0;                                                             /* count for free up of memory */ 
-  int qcount = 0;                                                        /* count of quotation marks seperating columns in file */
-  int kr= 0, kc = 0;                                                     /* count of rows kr and characters kc in the file */
-  char **tmpDate;                                                        /* temporary store for date */
-  char **transDate;                                                      /* transaction date on statement formatted yyyymmdd */
-  char **transType;                                                      /* Type column contains up to 3 characters */
-  char **transDescription;                                               /* Description column on statement */
-  char **transValue;                                                     /* Value column on statement */
-  char **accountNumber;                                                  /* Account Number on statement */
-  char **transAlias;                                                     /* Alias value matched from statement_link table */
-  char **stmtAliasRtn;                                                   /* alias value returned from statement_link table */  
+  int g = 0;                                                                    /* count for free up of memory */ 
+  int qcount = 0;                                                               /* count of quotation marks seperating columns in file */
+  int kr= 0, kc = 0;                                                            /* count of rows kr and characters kc in the file */
+  char **tmpDate;                                                               /* temporary store for date */
+  char **transDate;                                                             /* transaction date on statement formatted yyyymmdd */
+  char **transType;                                                             /* Type column contains up to 3 characters */
+  char **transDescription;                                                      /* Description column on statement */
+  char **transValue;                                                            /* Value column on statement */
+  char **accountNumber;                                                         /* Account Number on statement */
+  char **transAlias;                                                            /* Alias value matched from statement_link table */
+  char **stmtAliasRtn;                                                          /* alias value returned from statement_link table */  
   int w = 0;
-  int aliasPos = 0;                                                      /* position where alias is found in description */ 
-  int resRow = 0;                                                        /* number of rows returned from statment_link table */
+  int aliasPos = 0;                                                             /* position where alias is found in description */ 
+  int resRow = 0;                                                               /* number of rows returned from statment_link table */
   int cr, cc;  
-  int tr = 0;                                                            /* number or lines before first QM, top rows */
-  int rs = 0;                                                            /* number of statement rows excluding top rows before data. */
-  long int pos = 0;                                                      /* position of file cursor c */
-  long int posn = 0;                                                     /* position of file cursor n */  
-  int charCount = 0;                                                     /* number of characters in each data column */
+  int tr = 0;                                                                   /* number or lines before first QM, top rows */
+  int rs = 0;                                                                   /* number of statement rows excluding top rows before data. */
+  long int pos = 0;                                                             /* position of file cursor c */
+  long int posn = 0;                                                            /* position of file cursor n */  
+  int charCount = 0;                                                            /* number of characters in each data column */
 
-  char * upf = fStmtName();                                              /* function to obtain filename to load and if exists */
+  char * upf = fStmtName();                                                     /* function to obtain filename to load and if exists */
  
   initscr();
   cbreak();
@@ -74,26 +74,26 @@ void upLoadStatement()
 
       while (c != EOF) 
 	{
-	  kc++;                                                          /* number of characters in the file */       
+	  kc++;                                                                 /* number of characters in the file */       
 	  c = fgetc(cp);      
 	  if (c == '\n')	
-	    kr++;                                                        /* number of rows in the file */
+	    kr++;                                                               /* number of rows in the file */
 	}
 
-      rewind(cp);                                                        /* return cursor to beginning of file */
+      rewind(cp);                                                               /* return cursor to beginning of file */
 
       while (c!= QM)
 	{
 	  c = fgetc(cp);  
 	  n = fgetc(np);
 	  if (c == '\n')
-	    tr++;	                                                 /* number of rows before first qm */
+	    tr++;	                                                        /* number of rows before first qm */
 	}
 
       fseek(cp, -1, SEEK_CUR);
       fseek(np, -1, SEEK_CUR);
        
-      rs = kr - tr;                                                      /* number of valid rows in statement excludes top empty rows */
+      rs = kr - tr;                                                             /* number of valid rows in statement excludes top empty rows */
 
       tmpDate = (char **) malloc(rs * sizeof(char *));
       transDate = (char **) malloc (rs * sizeof(char *));
@@ -129,7 +129,7 @@ void upLoadStatement()
 	  pos = ftell(cp);      
 	  if (c == '\n')
 	    {
-	      tmpDate[i][j] = '\0';                                    /* add end of string char when reach end of row */
+	      tmpDate[i][j] = '\0';                                             /* add end of string char when reach end of row */
 	      transType[i][j2] = '\0';
 	      transDescription[i][j3] = '\0';
 	      transValue[i][j4] = '\0';
@@ -139,24 +139,24 @@ void upLoadStatement()
 	      qcount = 0;
 	    }
 
-	  if ( c == QM || qcount == 6 || qcount == 8)                    /* 6 and 8 required for data Value with no qm */
+	  if ( c == QM || qcount == 6 || qcount == 8)                           /* 6 and 8 required for data Value with no qm */
 	    {
 	      qcount++;
-	      fseek(np, pos, SEEK_SET);                                  /* cursor np at first qm */
+	      fseek(np, pos, SEEK_SET);                                         /* cursor np at first qm */
 	      do{                            
-		n = fgetc(np);                                           /* move one char until next qm */ 
+		n = fgetc(np);                                                  /* move one char until next qm */ 
 		posn = ftell(np);
-		charCount++;                                             /* count no. of characters between qms */
-		if (n != SP && n != CM && n != FS && n != AP)            /* not space, comma, forward slash, apostrophe */
+		charCount++;                                                    /* count no. of characters between qms */
+		if (n != SP && n != CM && n != FS && n != AP)                   /* not space, comma, forward slash, apostrophe */
 		  {
-		    if (qcount == 1 && n != QM)                          /* Date column */ 
+		    if (qcount == 1 && n != QM)                                 /* Date column */ 
 		      {
 			tmpDate[i][j] = n;
 			++j;
 		      }
-		    if (qcount == 3)                                     /* Type column */
+		    if (qcount == 3)                                            /* Type column */
 		      {
-			if (charCount == 1 && n == QM)                   /* If Type blank */
+			if (charCount == 1 && n == QM)                          /* If Type blank */
 			  {
 			    transType[i][j2] = 'Z';
 			    ++j2;
@@ -167,31 +167,31 @@ void upLoadStatement()
 			    ++j2;
 			  }
 		      }
-		    if (qcount == 5 && n != QM)                          /* Description column */
+		    if (qcount == 5 && n != QM)                                 /* Description column */
 		      {
 			transDescription[i][j3] = n;
 			++j3;
 		      }
-		    if (qcount == 7 && n != QM)                          /* Value column */ 
+		    if (qcount == 7 && n != QM)                                 /* Value column */ 
 		      {
 			transValue[i][j4] = n;
 			++j4;
 		      }
-		    if (qcount == 13 && n != QM)                         /* Account number column */
+		    if (qcount == 13 && n != QM)                                /* Account number column */
 		      {
 			accountNumber[i][j5] = n;
 			++j5;
 		      }		
 		  }	                                    
 	      }while (n != QM);	  
-	      fseek(cp, posn, SEEK_SET);                                 /* move cursor cp to current np pos */
+	      fseek(cp, posn, SEEK_SET);                                        /* move cursor cp to current np pos */
 	      qcount++;
 	      pos = ftell(cp);
 	    }
 	  charCount = 0;
 	}
 
-      for (q = 0; q < i; q++)                                            /* arrange date format to yyyymmdd */
+      for (q = 0; q < i; q++)                                                   /* arrange date format to yyyymmdd */
 	{
 	  transDate[q][0] = tmpDate[q][4];
 	  transDate[q][1] = tmpDate[q][5];
@@ -204,8 +204,8 @@ void upLoadStatement()
 	  transDate[q][8] = tmpDate[q][8];
 	}
  
-      resRow = resultRows();                                             /* return number of rows in the statement_link table */
-      stmtAliasRtn = addAlias();                                         /* string array of alias column in the statement_link table */
+      resRow = resultRows();                                                    /* return number of rows in the statement_link table */
+      stmtAliasRtn = addAlias();                                                /* string array of alias column in the statement_link table */
 
       /* match the string patter in the Decription to the alias in the
 	 statement_link table */
@@ -216,15 +216,15 @@ void upLoadStatement()
 	      aliasPos = aliasMatch(transDescription[x], stmtAliasRtn[w]);
 	      if (aliasPos != -1)
 		{
-		  strcpy(transAlias[x], stmtAliasRtn[w]);	         // assign alias to array 
+		  strcpy(transAlias[x], stmtAliasRtn[w]);	                /* assign alias to array */
 		  break;
 		}
 	      else	     
-		strcpy(transAlias[x],"NA");	                         // if no alias match found assign NA 
+		strcpy(transAlias[x],"NA");	                                /* if no alias match found assign NA */
 	    }
 	    }
 
-      for (x = 0; x < i; x++)                                            // assign statement data to the linked list
+	 for (x = 0; x < i; x++)                                                /* assign statement data to the linked list */
 	{
 	  if (l == 0)
 	    {
@@ -343,16 +343,13 @@ void statementInsert(struct statement *start, int rs)
   const char *titleOne = "Statement Import";
   int lenOne = strlen(titleOne);
   chtype *chSlide;
-  //const char *bgcolor;
   int selection;
   int importRows = rs;
   int curValue = 0;
   ptr = start;
 
   chSlide = (chtype *)malloc(sizeof(chtype));
-  // bgcolor = (char *)malloc(sizeof(char));
   *chSlide = KEY_UP;
-  //*bgcolor = WHITE;
   initCDKColor();    
   
   initscr();
@@ -375,8 +372,8 @@ void statementInsert(struct statement *start, int rs)
   keypad(stmtInsertWin, TRUE);
   getmaxyx(stmtInsertWin, srow, scol);
   box(stmtInsertWin, 0, 0);
-  wattron(stmtInsertWin,A_BOLD | COLOR_PAIR(2));     /* ATTON_MAIN_WIN_TITLE */
-  mvwprintw(stmtInsertWin,1,(scol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+  wattron(stmtInsertWin,A_BOLD | COLOR_PAIR(2)); 
+  mvwprintw(stmtInsertWin,1,(scol-lenOne)/2,titleOne); 
   wattroff(stmtInsertWin,A_BOLD | COLOR_PAIR(2)); 
 
   if(stmtInsertWin == NULL)
@@ -387,23 +384,23 @@ void statementInsert(struct statement *start, int rs)
     }
 
   importSlider = newCDKSlider(
-			      cdkscreen,                              // screen
-			      0,                                      // int xpos 
-			      srow,                                   // int ypos
-			      "record",                              // const char *title
-			      "count",                                // const char *label
-			      A_REVERSE | COLOR_PAIR(3) | ' ',        // chtype fillerCharacter --10
-			      scol,                                   // int fieldWidth  
-			      curValue,                               // int currentValue
-			      0,                                      // int lowValue
-			      importRows,                             // int highValue   
-			      1,                                      // int increment
-			      5,                                      // int fastIncrement
-			      TRUE,                                   // boolean box
-			      FALSE                                   // boolean shadow
+			      cdkscreen,                                        /* screen */
+			      0,                                                /* int xpos */
+			      srow,                                             /* int ypos */
+			      "record",                                         /* const char *title */
+			      "count",                                          /* const char *label */
+			      A_REVERSE | COLOR_PAIR(3) | ' ',                  /* chtype fillerCharacter --10 */
+			      scol,                                             /* int fieldWidth */
+			      curValue,                                         /* int currentValue */
+			      0,                                                /* int lowValue */
+			      importRows,                                       /* int highValue */
+			      1,                                                /* int increment */
+			      5,                                                /* int fastIncrement */
+			      TRUE,                                             /* boolean box */
+			      FALSE                                             /* boolean shadow */
 			      );
 
-  setCDKSliderBackgroundColor (importSlider, "</2>");   // slider backgroung color, takes from the init_pair colors 
+  setCDKSliderBackgroundColor (importSlider, "</2>");                           /* slider backgroung color, takes from the init_pair colors */
 					     
   mvwprintw(stmtInsertWin, 3, 2, "Confirm insert statement (y/n): ");
   wmove(stmtInsertWin, srow*0.33, scol*0.33);
@@ -428,8 +425,7 @@ void statementInsert(struct statement *start, int rs)
 	  stmtValue = atof(ptr->tValue);
 	  strcpy(stmtAcctNo, ptr->actNumber);
 	  strcpy(stmtTranAlias, ptr->tAlias);
-	  //stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
-	  selection = activateCDKSlider(importSlider, chSlide);
+ 	  selection = activateCDKSlider(importSlider, chSlide);
 	  napms(10);
 	  ptr = ptr->next;
 	}      
@@ -480,7 +476,6 @@ void printStmtFile(struct statement *start)
   scrollok(upLoadStmtWindow, TRUE);
 
   box(upLoadStmtWindow, 0, 0);
-  //waddstr(upLoadStmtWindow, "Statement Up Load");
 
   if(upLoadStmtWindow == NULL) 
      {
@@ -489,10 +484,8 @@ void printStmtFile(struct statement *start)
       getch();
       }
 
-  //wclear(upLoadStmtWindow);
-  //wrefresh(upLoadStmtWindow);
-  wattron(upLoadStmtWindow,A_BOLD | COLOR_PAIR(11));     /* ATTON_MAIN_WIN_TITLE */
-  mvwprintw(upLoadStmtWindow,1,(scol-lenOne)/2,titleOne);   /* SET_MAIN_WIND_TITLE */
+  wattron(upLoadStmtWindow,A_BOLD | COLOR_PAIR(11));
+  mvwprintw(upLoadStmtWindow,1,(scol-lenOne)/2,titleOne); 
 
   show_panel(upLoadStmtPanel);
   update_panels();
@@ -506,8 +499,8 @@ void printStmtFile(struct statement *start)
       if (i == 20)                                                       
 	{
 	  box(upLoadStmtWindow, 0, 0);
-	  wgetch(upLoadStmtWindow);	                                 /* if 20 rows hit enter */
-	  i = 0;                                                         /* if 20 rows set i to 0 */
+	  wgetch(upLoadStmtWindow);	                                        /* if 20 rows hit enter */
+	  i = 0;                                                                /* if 20 rows set i to 0 */
 	} 
       ptr = ptr->next;
       wclrtobot(upLoadStmtWindow);
@@ -529,12 +522,12 @@ char * fStmtName()
   WINDOW *fStmtUpWindow;
   PANEL *fStmtUpPanel;
   int frow, fcol;
-  char *str;                                                             /* string array of entered characters */
-  char ch;                                                               /* char entered at keyboard */
+  char *str;                                                                    /* string array of entered characters */
+  char ch;                                                                      /* char entered at keyboard */
  
   int i = 0;
-  char f[FNAME] = "/tmp/";                                               /* directory where file saved */
-  char *e;                                                               /* full file name with path */
+  char f[FNAME] = "/tmp/";                                                      /* directory where file saved */
+  char *e;                                                                      /* full file name with path */
   int fExist = 0;
   const char *titleOne = "Upload File";
   int lenOne = strlen(titleOne);
@@ -546,18 +539,15 @@ char * fStmtName()
   
   init_pair(2,COLOR_BLUE,COLOR_WHITE);
 
-  fStmtUpWindow = newwin(LINES/5, COLS/2, LINES-(LINES-4), COLS/4); //(10, 110, 1, 1);
+  fStmtUpWindow = newwin(LINES/5, COLS/2, LINES-(LINES-4), COLS/4); 
   fStmtUpPanel = new_panel(fStmtUpWindow);
   wbkgd(fStmtUpWindow, COLOR_PAIR(2));
-  //touchwin(fStmtUpWindow);
-  //touchwin(stdscr);
   update_panels();
   doupdate();
 
   keypad(fStmtUpWindow, TRUE);
   getmaxyx(fStmtUpWindow, frow, fcol);
   box(fStmtUpWindow, 0, 0);
-  //waddstr(fStmtUpWindow, "Upload File");
   wattron(fStmtUpWindow,A_BOLD | COLOR_PAIR(2));
   mvwprintw(fStmtUpWindow,1,(fcol-lenOne)/2, titleOne);
   wattroff(fStmtUpWindow,A_BOLD | COLOR_PAIR(2));
@@ -576,7 +566,7 @@ char * fStmtName()
 
   for (i=0; (ch = wgetch(fStmtUpWindow))!= '\n';)
     {
-      if(ch != BACKSP)                                                    /* used showkey -a  ctrl G = 7 */
+      if(ch != BACKSP)                                                          /* used showkey -a  ctrl G = 7 */
 	{
 	  str[i] = ch;
 	  wprintw(fStmtUpWindow, "%c", ch);
@@ -597,13 +587,13 @@ char * fStmtName()
 	    wprintw(fStmtUpWindow, "\b \b");
 	}      
     }
-  str[i] = '\0';                                                         /* if new line add the string terminate char */
-  strcat(f,str);                                                         /* concantenate f and str */
+  str[i] = '\0';                                                                /* if new line add the string terminate char */
+  strcat(f,str);                                                                /* concantenate f and str */
   mvwprintw(fStmtUpWindow, 5, 2, "file to upload %s\n", f);
   wrefresh(fStmtUpWindow);
-  fExist = checkFileExists(f);                                           /* use library function to check file exists */
+  fExist = checkFileExists(f);                                                  /* use library function to check file exists */
 
-  if(fExist == 2 || i == 0)                                              /* if no file */
+  if(fExist == 2 || i == 0)                                                     /* if no file */
     {
       mvwprintw(fStmtUpWindow, 6, 3, "Error no file\n");
       wgetch(fStmtUpWindow);
@@ -616,7 +606,7 @@ char * fStmtName()
     }
   else
     {
-      strcpy(e,f);                                                       /* copy path and file name to char pointer */
+      strcpy(e,f);                                                              /* copy path and file name to char pointer */
       hide_panel(fStmtUpPanel);
       free(str);
       endwin();
