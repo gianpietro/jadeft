@@ -1000,7 +1000,7 @@ void documentInsert()
 	    {
 	      if (cfUpdate == 1)
 		{		  
-		  /* mvwprintw(docWin, 3,65,  "%d", docfParentID);
+		  /*mvwprintw(docWin, 3,65,  "%d", docfParentID);
 		  mvwprintw(docWin, 5,65,  "%s", e);
 		  mvwprintw(docWin, 7,65,  "%d", docfOid);
 		  mvwprintw(docWin, 9,65,  "%d", docfTypeID);
