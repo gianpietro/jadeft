@@ -1658,7 +1658,6 @@ int suppAccountInsert()
 	      doupdate();
 
 	      /* assign the required select statement */
-	      //res = PQexec(conn,"SELECT * FROM provider_account WHERE active_ind = 1 ORDER BY provider_acct_id");
 	      res = PQexec(conn,"SELECT pa.provider_acct_id, pa.provider_id, pa.provider_acct_no, p.provider_name, pt.description \
                                  FROM provider_account pa \
                                  INNER JOIN provider p ON (p.provider_id = pa.provider_id) \
@@ -1667,8 +1666,7 @@ int suppAccountInsert()
 	      rows = PQntuples(res);
 
 	      wrefresh(paWin);
-	      wattron(paWin,A_BOLD | COLOR_PAIR(1));
-	      //mvwprintw(paWin, 4, 1, "ID    Provider_ID     Account Number");
+	      wattron(paWin,A_BOLD | COLOR_PAIR(1));	      
 	      mvwprintw(paWin, 4, 1, "ID    Acct_No         Name                      Description");  
 	      wattroff(paWin,A_BOLD | COLOR_PAIR(1));   
 	  
@@ -1679,8 +1677,7 @@ int suppAccountInsert()
 		  else
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
-		    {
-		      //mvwprintw(paWin,list,1,"%-5s %-15s %-15s", PQgetvalue(res,i,0),PQgetvalue(res,i,2),PQgetvalue(res,i,3));
+		    {		      
 		      mvwprintw(paWin,list,1,"%-5s %-15s %-25s %-15s", PQgetvalue(res,i,0),PQgetvalue(res,i,2),
 				PQgetvalue(res,i,3),PQgetvalue(res,i,4));
 		      list++;
