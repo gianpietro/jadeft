@@ -58,7 +58,7 @@ int main (void) {
 
   menulist[3][0] = "</07/B>Core Admin     <!07>";
   menulist[3][1] = "</05>Property         <!05>";
-  menulist[3][2] = "</05>Payment period   <!05>";
+  menulist[3][2] = "</05>Payment Period   <!05>";
   menulist[3][3] = "</05>Category         <!05>";
   menulist[3][4] = "</05>Statement Config <!05>";
   menulist[3][5] = "</05>Statement Upload <!05>";
