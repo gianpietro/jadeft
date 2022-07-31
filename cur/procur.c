@@ -894,8 +894,7 @@ int provAccountInsert()
 	      update_panels();
 	      doupdate();
 
-	      /* assign the required select statement */
-	      //res = PQexec(conn,"SELECT * FROM provider_account WHERE active_ind = 1 ORDER BY provider_acct_id");
+	      /* assign the required select statement */	      
 	      res = PQexec(conn,"SELECT pa.provider_acct_id, pa.provider_id, pa.provider_acct_no, p.provider_name, pt.description \
                                  FROM provider_account pa \
                                  INNER JOIN provider p ON (p.provider_id = pa.provider_id) \
@@ -916,8 +915,7 @@ int provAccountInsert()
 		    j = j + (rows - j);
 		  for (i; i < j; i++)
 		    {
-		      /* change number of pqgetvalue return items as required */ 
-		      //mvwprintw(proAccountUpdateWin,list,1,"%-5s %-15s %-15s", PQgetvalue(res,i,0),PQgetvalue(res,i,2),PQgetvalue(res,i,3));
+		      /* change number of pqgetvalue return items as required */ 		      
 		      mvwprintw(proAccountUpdateWin,list,1,"%-5s %-15s %-25s %-15s", PQgetvalue(res,i,0),PQgetvalue(res,i,2),
 				PQgetvalue(res,i,3),PQgetvalue(res,i,4));
 		      list++;
