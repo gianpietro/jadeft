@@ -425,6 +425,7 @@ void statementInsert(struct statement *start, int rs)
 	  stmtValue = atof(ptr->tValue);
 	  strcpy(stmtAcctNo, ptr->actNumber);
 	  strcpy(stmtTranAlias, ptr->tAlias);
+	  stmtInsert(stmtTranDate, stmtTranType, stmtTranDesc, stmtValue, stmtAcctNo, stmtTranAlias);
  	  selection = activateCDKSlider(importSlider, chSlide);
 	  napms(10);
 	  ptr = ptr->next;
