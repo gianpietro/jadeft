@@ -1,11 +1,12 @@
-/* Processed by ecpg (13.1) */
+/* Processed by ecpg (15.3 (Debian 15.3-0+deb12u1)) */
 /* These include files are added by the preprocessor */
 #include <ecpglib.h>
 #include <ecpgerrno.h>
 #include <sqlca.h>
 /* End of automatic include section */
 
-#line 1 "catlib.pcg"
+#line 1 "catlib.pgc"
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,10 +19,10 @@ void catInsert(char catDesc[])
   /* exec sql begin declare section */
     
   
-#line 11 "catlib.pcg"
+#line 12 "catlib.pgc"
  char v_catDesc [ 50 ] ;
 /* exec sql end declare section */
-#line 12 "catlib.pcg"
+#line 13 "catlib.pgc"
 
 
   connectToDB();
@@ -31,14 +32,14 @@ void catInsert(char catDesc[])
   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into category_type ( category ) values ( $1  )", 
 	ECPGt_char,(v_catDesc),(long)50,(long)1,(50)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 19 "catlib.pcg"
+#line 20 "catlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 20 "catlib.pcg"
+#line 21 "catlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 22 "catlib.pcg"
+#line 23 "catlib.pgc"
 
 }
 
@@ -48,13 +49,13 @@ void catUpdate(int upID,char catDesc[])
     
     
   
-#line 28 "catlib.pcg"
+#line 29 "catlib.pgc"
  int v_upID ;
  
-#line 29 "catlib.pcg"
+#line 30 "catlib.pgc"
  char v_catDesc [ 50 ] ;
 /* exec sql end declare section */
-#line 30 "catlib.pcg"
+#line 31 "catlib.pgc"
 
 
   connectToDB();
@@ -67,14 +68,14 @@ void catUpdate(int upID,char catDesc[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 38 "catlib.pcg"
+#line 39 "catlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 39 "catlib.pcg"
+#line 40 "catlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 41 "catlib.pcg"
+#line 42 "catlib.pgc"
 
 }
 
@@ -83,10 +84,10 @@ void catDelete(int upID)
  /* exec sql begin declare section */
       
   
-#line 47 "catlib.pcg"
+#line 48 "catlib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 48 "catlib.pcg"
+#line 49 "catlib.pgc"
 
 
   connectToDB();
@@ -96,14 +97,14 @@ void catDelete(int upID)
   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from category_type where id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 55 "catlib.pcg"
+#line 56 "catlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 56 "catlib.pcg"
+#line 57 "catlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 58 "catlib.pcg"
+#line 59 "catlib.pgc"
 
 }
 
@@ -114,16 +115,16 @@ void stmtLinkInsert(char slfAlias[], int slfCatID, char slfCategory[])
     
     
   
-#line 64 "catlib.pcg"
+#line 65 "catlib.pgc"
  char v_slfAlias [ 50 ] ;
  
-#line 65 "catlib.pcg"
+#line 66 "catlib.pgc"
  int v_slfCatID ;
  
-#line 66 "catlib.pcg"
+#line 67 "catlib.pgc"
  char v_slfCategory [ 50 ] ;
 /* exec sql end declare section */
-#line 67 "catlib.pcg"
+#line 68 "catlib.pgc"
 
 
   connectToDB();
@@ -139,14 +140,14 @@ void stmtLinkInsert(char slfAlias[], int slfCatID, char slfCategory[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_slfCategory),(long)50,(long)1,(50)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 76 "catlib.pcg"
+#line 77 "catlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 77 "catlib.pcg"
+#line 78 "catlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 79 "catlib.pcg"
+#line 80 "catlib.pgc"
 
 }
 
@@ -158,19 +159,19 @@ void stmtLinkUpdate(int upID, char slfAlias[], int slfCatID, char slfCategory[])
     
     
   
-#line 85 "catlib.pcg"
+#line 86 "catlib.pgc"
  int v_upID ;
  
-#line 86 "catlib.pcg"
+#line 87 "catlib.pgc"
  char v_slfAlias [ 50 ] ;
  
-#line 87 "catlib.pcg"
+#line 88 "catlib.pgc"
  int v_slfCatID ;
  
-#line 88 "catlib.pcg"
+#line 89 "catlib.pgc"
  char v_slfCategory [ 50 ] ;
 /* exec sql end declare section */
-#line 89 "catlib.pcg"
+#line 90 "catlib.pgc"
 
 
   connectToDB();
@@ -189,14 +190,14 @@ void stmtLinkUpdate(int upID, char slfAlias[], int slfCatID, char slfCategory[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 99 "catlib.pcg"
+#line 100 "catlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 100 "catlib.pcg"
+#line 101 "catlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 102 "catlib.pcg"
+#line 103 "catlib.pgc"
 
 }
 
@@ -205,10 +206,10 @@ void stmtLinkDelete(int upID)
   /* exec sql begin declare section */
       
   
-#line 108 "catlib.pcg"
+#line 109 "catlib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 109 "catlib.pcg"
+#line 110 "catlib.pgc"
 
 
   connectToDB();
@@ -218,13 +219,13 @@ void stmtLinkDelete(int upID)
   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from statement_link where id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 116 "catlib.pcg"
+#line 117 "catlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 117 "catlib.pcg"
+#line 118 "catlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 119 "catlib.pcg"
+#line 120 "catlib.pgc"
 
 }

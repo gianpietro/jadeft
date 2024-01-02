@@ -1,11 +1,11 @@
-/* Processed by ecpg (13.3) */
+/* Processed by ecpg (15.3 (Debian 15.3-0+deb12u1)) */
 /* These include files are added by the preprocessor */
 #include <ecpglib.h>
 #include <ecpgerrno.h>
 #include <sqlca.h>
 /* End of automatic include section */
 
-#line 1 "stmlib.pcg"
+#line 1 "stmlib.pgc"
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,7 +15,8 @@
 #include "../inc/stmuplibf.h"
 #include "../inc/fdbcon.h"
 
-void stmtInsert(int stmtTranDate, char stmtTranType[], char stmtTranDesc[], double stmtValue, char stmtAcctNo[], char stmtTranAlias[])
+void stmtInsert(int stmtTranDate, char stmtTranType[], char stmtTranDesc[], double stmtValue,
+                char stmtAcctNo[], char stmtTranAlias[])
 {
   /* exec sql begin declare section */
     
@@ -25,25 +26,25 @@ void stmtInsert(int stmtTranDate, char stmtTranType[], char stmtTranDesc[], doub
     
     
   
-#line 13 "stmlib.pcg"
+#line 14 "stmlib.pgc"
  int v_stmtTranDate ;
  
-#line 14 "stmlib.pcg"
+#line 15 "stmlib.pgc"
  char v_stmtTranType [ TTYPE ] ;
  
-#line 15 "stmlib.pcg"
+#line 16 "stmlib.pgc"
  char v_stmtTranDesc [ TDESC ] ;
  
-#line 16 "stmlib.pcg"
+#line 17 "stmlib.pgc"
  double v_stmtValue ;
  
-#line 17 "stmlib.pcg"
+#line 18 "stmlib.pgc"
  char v_stmtAcctNo [ ANUM ] ;
  
-#line 18 "stmlib.pcg"
+#line 19 "stmlib.pgc"
  char v_stmtTranAlias [ ALIAS ] ;
 /* exec sql end declare section */
-#line 19 "stmlib.pcg"
+#line 20 "stmlib.pgc"
 
   
   connectToDB();
@@ -68,14 +69,14 @@ void stmtInsert(int stmtTranDate, char stmtTranType[], char stmtTranDesc[], doub
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_stmtTranAlias),(long)ALIAS,(long)1,(ALIAS)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 31 "stmlib.pcg"
+#line 33 "stmlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 32 "stmlib.pcg"
+#line 34 "stmlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 34 "stmlib.pcg"
+#line 36 "stmlib.pgc"
 
 }
 
@@ -90,28 +91,28 @@ void recordUpdate(int stID, int fv2, char fv3[], char fv4[], double fv5, char fv
     
     
   
-#line 40 "stmlib.pcg"
+#line 42 "stmlib.pgc"
  int v_stID ;
  
-#line 41 "stmlib.pcg"
+#line 43 "stmlib.pgc"
  int v_fv2 ;
  
-#line 42 "stmlib.pcg"
+#line 44 "stmlib.pgc"
  char v_fv3 [ TTYPE ] ;
  
-#line 43 "stmlib.pcg"
+#line 45 "stmlib.pgc"
  char v_fv4 [ TDESC ] ;
  
-#line 44 "stmlib.pcg"
+#line 46 "stmlib.pgc"
  double v_fv5 ;
  
-#line 45 "stmlib.pcg"
+#line 47 "stmlib.pgc"
  char v_fv6 [ ANUM ] ;
  
-#line 46 "stmlib.pcg"
+#line 48 "stmlib.pgc"
  char v_fv7 [ ALIAS ] ;
 /* exec sql end declare section */
-#line 47 "stmlib.pcg"
+#line 49 "stmlib.pgc"
 
 
   connectToDB();
@@ -139,15 +140,15 @@ void recordUpdate(int stID, int fv2, char fv3[], char fv4[], double fv5, char fv
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_stID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 60 "stmlib.pcg"
+#line 63 "stmlib.pgc"
 
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 62 "stmlib.pcg"
+#line 65 "stmlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 64 "stmlib.pcg"
+#line 67 "stmlib.pgc"
  
 }
 
@@ -156,10 +157,10 @@ void recordDelete(int stID)
  /* exec sql begin declare section */
       
   
-#line 70 "stmlib.pcg"
+#line 73 "stmlib.pgc"
  int v_stID ;
 /* exec sql end declare section */
-#line 71 "stmlib.pcg"
+#line 74 "stmlib.pgc"
 
 
   connectToDB();
@@ -169,14 +170,14 @@ void recordDelete(int stID)
   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from statement where statement_id = $1 ", 
 	ECPGt_int,&(v_stID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 78 "stmlib.pcg"
+#line 81 "stmlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 79 "stmlib.pcg"
+#line 82 "stmlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 81 "stmlib.pcg"
+#line 84 "stmlib.pgc"
 
 }
 

@@ -1,11 +1,12 @@
-/* Processed by ecpg (13.1) */
+/* Processed by ecpg (15.3 (Debian 15.3-0+deb12u1)) */
 /* These include files are added by the preprocessor */
 #include <ecpglib.h>
 #include <ecpgerrno.h>
 #include <sqlca.h>
 /* End of automatic include section */
 
-#line 1 "doclib.pcg"
+#line 1 "doclib.pgc"
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,10 +19,10 @@ void docTypeInsert(char dtDesc[])
   /* exec sql begin declare section */
     
   
-#line 11 "doclib.pcg"
+#line 12 "doclib.pgc"
  char v_dtDesc [ 30 ] ;
 /* exec sql end declare section */
-#line 12 "doclib.pcg"
+#line 13 "doclib.pgc"
 
 
   connectToDB();
@@ -31,14 +32,14 @@ void docTypeInsert(char dtDesc[])
   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into document_type ( description ) values ( $1  )", 
 	ECPGt_char,(v_dtDesc),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 19 "doclib.pcg"
+#line 20 "doclib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 20 "doclib.pcg"
+#line 21 "doclib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 22 "doclib.pcg"
+#line 23 "doclib.pgc"
 
 }
 
@@ -48,13 +49,13 @@ void docTypeUpdate(int upID,char dtDesc[])
     
     
   
-#line 28 "doclib.pcg"
+#line 29 "doclib.pgc"
  int v_upID ;
  
-#line 29 "doclib.pcg"
+#line 30 "doclib.pgc"
  char v_dtDesc [ 30 ] ;
 /* exec sql end declare section */
-#line 30 "doclib.pcg"
+#line 31 "doclib.pgc"
 
 
   connectToDB();
@@ -67,14 +68,14 @@ void docTypeUpdate(int upID,char dtDesc[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 38 "doclib.pcg"
+#line 39 "doclib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 39 "doclib.pcg"
+#line 40 "doclib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 41 "doclib.pcg"
+#line 42 "doclib.pgc"
 
 }
 
@@ -83,10 +84,10 @@ void docTypeDelete(int upID)
  /* exec sql begin declare section */
       
   
-#line 47 "doclib.pcg"
+#line 48 "doclib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 48 "doclib.pcg"
+#line 49 "doclib.pgc"
 
 
   connectToDB();
@@ -96,14 +97,14 @@ void docTypeDelete(int upID)
   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from document_type where type_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 55 "doclib.pcg"
+#line 56 "doclib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 56 "doclib.pcg"
+#line 57 "doclib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 58 "doclib.pcg"
+#line 59 "doclib.pgc"
 
 }
 
@@ -121,37 +122,37 @@ void docImportInsert(int dParentID, char e[], int objImportID, int dTypeID, char
     
     
  
-#line 64 "doclib.pcg"
+#line 65 "doclib.pgc"
  int v_dParentID ;
  
-#line 65 "doclib.pcg"
+#line 66 "doclib.pgc"
  char v_e [ 30 ] ;
  
-#line 66 "doclib.pcg"
+#line 67 "doclib.pgc"
  int v_objImportID ;
  
-#line 67 "doclib.pcg"
+#line 68 "doclib.pgc"
  int v_dTypeID ;
  
-#line 68 "doclib.pcg"
+#line 69 "doclib.pgc"
  char v_dRef [ 50 ] ;
  
-#line 69 "doclib.pcg"
+#line 70 "doclib.pgc"
  char v_dTitle [ 100 ] ;
  
-#line 70 "doclib.pcg"
+#line 71 "doclib.pgc"
  char v_dDesc [ 150 ] ;
  
-#line 71 "doclib.pcg"
+#line 72 "doclib.pgc"
  int v_dStartDt ;
  
-#line 72 "doclib.pcg"
+#line 73 "doclib.pgc"
  int v_dEndDt ;
  
-#line 73 "doclib.pcg"
+#line 74 "doclib.pgc"
  char v_dCatalog [ 30 ] ;
 /* exec sql end declare section */
-#line 74 "doclib.pcg"
+#line 75 "doclib.pgc"
 
 
  connectToDB();
@@ -188,15 +189,15 @@ void docImportInsert(int dParentID, char e[], int objImportID, int dTypeID, char
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_dCatalog),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 91 "doclib.pcg"
+#line 92 "doclib.pgc"
 
 
  { ECPGtrans(__LINE__, NULL, "commit");}
-#line 93 "doclib.pcg"
+#line 94 "doclib.pgc"
 
 
  { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 95 "doclib.pcg"
+#line 96 "doclib.pgc"
 
 }
 
@@ -215,40 +216,40 @@ void docImportUpdate(int upID, int dParentID, char e[], int objImportID, int dTy
     
     
  
-#line 101 "doclib.pcg"
+#line 102 "doclib.pgc"
  int v_upID ;
  
-#line 102 "doclib.pcg"
+#line 103 "doclib.pgc"
  int v_dParentID ;
  
-#line 103 "doclib.pcg"
+#line 104 "doclib.pgc"
  char v_e [ 30 ] ;
  
-#line 104 "doclib.pcg"
+#line 105 "doclib.pgc"
  int v_objImportID ;
  
-#line 105 "doclib.pcg"
+#line 106 "doclib.pgc"
  int v_dTypeID ;
  
-#line 106 "doclib.pcg"
+#line 107 "doclib.pgc"
  char v_dRef [ 50 ] ;
  
-#line 107 "doclib.pcg"
+#line 108 "doclib.pgc"
  char v_dTitle [ 100 ] ;
  
-#line 108 "doclib.pcg"
+#line 109 "doclib.pgc"
  char v_dDesc [ 150 ] ;
  
-#line 109 "doclib.pcg"
+#line 110 "doclib.pgc"
  int v_dStartDt ;
  
-#line 110 "doclib.pcg"
+#line 111 "doclib.pgc"
  int v_dEndDt ;
  
-#line 111 "doclib.pcg"
+#line 112 "doclib.pgc"
  char v_dCatalog [ 30 ] ;
 /* exec sql end declare section */
-#line 112 "doclib.pcg"
+#line 113 "doclib.pgc"
 
 
  connectToDB();
@@ -287,15 +288,15 @@ void docImportUpdate(int upID, int dParentID, char e[], int objImportID, int dTy
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 128 "doclib.pcg"
+#line 129 "doclib.pgc"
 
  
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 130 "doclib.pcg"
+#line 131 "doclib.pgc"
 
  
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 132 "doclib.pcg"
+#line 133 "doclib.pgc"
 
 }
 
@@ -304,10 +305,10 @@ void docImportDelete(int upID)
  /* exec sql begin declare section */
     
   
-#line 138 "doclib.pcg"
+#line 139 "doclib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 139 "doclib.pcg"
+#line 140 "doclib.pgc"
 
 
   connectToDB();
@@ -317,14 +318,14 @@ void docImportDelete(int upID)
   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from documents where document_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 146 "doclib.pcg"
+#line 147 "doclib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 147 "doclib.pcg"
+#line 148 "doclib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 149 "doclib.pcg"
+#line 150 "doclib.pgc"
 
 }
 

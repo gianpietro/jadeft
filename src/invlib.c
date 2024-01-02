@@ -1,11 +1,12 @@
-/* Processed by ecpg (13.1) */
+/* Processed by ecpg (15.3 (Debian 15.3-0+deb12u1)) */
 /* These include files are added by the preprocessor */
 #include <ecpglib.h>
 #include <ecpgerrno.h>
 #include <sqlca.h>
 /* End of automatic include section */
 
-#line 1 "invlib.pcg"
+#line 1 "invlib.pgc"
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,25 +24,25 @@ void invoiceInsert(char invfNo[], int invfStartDt, int invfEndDt, int invfSupAcc
     
     
   
-#line 11 "invlib.pcg"
+#line 12 "invlib.pgc"
  char v_invfNo [ 30 ] ;
  
-#line 12 "invlib.pcg"
+#line 13 "invlib.pgc"
  int v_invfStartDt ;
  
-#line 13 "invlib.pcg"
+#line 14 "invlib.pgc"
  int v_invfEndDt ;
  
-#line 14 "invlib.pcg"
+#line 15 "invlib.pgc"
  int v_invfSupAcctID ;
  
-#line 15 "invlib.pcg"
+#line 16 "invlib.pgc"
  char v_invfDesc [ 30 ] ;
  
-#line 16 "invlib.pcg"
+#line 17 "invlib.pgc"
  double v_invfAmount ;
 /* exec sql end declare section */
-#line 17 "invlib.pcg"
+#line 18 "invlib.pgc"
 
 
   connectToDB();
@@ -66,14 +67,14 @@ void invoiceInsert(char invfNo[], int invfStartDt, int invfEndDt, int invfSupAcc
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_double,&(v_invfAmount),(long)1,(long)1,sizeof(double), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 30 "invlib.pcg"
+#line 31 "invlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 31 "invlib.pcg"
+#line 32 "invlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 33 "invlib.pcg"
+#line 34 "invlib.pgc"
 
 }
 
@@ -89,28 +90,28 @@ void invoiceUpdate(int upID, char invfNo[], int invfStartDt, int invfEndDt, int 
     
     
   
-#line 40 "invlib.pcg"
+#line 41 "invlib.pgc"
  int v_upID ;
  
-#line 41 "invlib.pcg"
+#line 42 "invlib.pgc"
  char v_invfNo [ 30 ] ;
  
-#line 42 "invlib.pcg"
+#line 43 "invlib.pgc"
  int v_invfStartDt ;
  
-#line 43 "invlib.pcg"
+#line 44 "invlib.pgc"
  int v_invfEndDt ;
  
-#line 44 "invlib.pcg"
+#line 45 "invlib.pgc"
  int v_invfSupAcctID ;
  
-#line 45 "invlib.pcg"
+#line 46 "invlib.pgc"
  char v_invfDesc [ 30 ] ;
  
-#line 46 "invlib.pcg"
+#line 47 "invlib.pgc"
  double v_invfAmount ;
 /* exec sql end declare section */
-#line 47 "invlib.pcg"
+#line 48 "invlib.pgc"
 
 
   connectToDB();
@@ -138,14 +139,14 @@ void invoiceUpdate(int upID, char invfNo[], int invfStartDt, int invfEndDt, int 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 62 "invlib.pcg"
+#line 63 "invlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 63 "invlib.pcg"
+#line 64 "invlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 65 "invlib.pcg"
+#line 66 "invlib.pgc"
 
 }
 
@@ -154,10 +155,10 @@ void invoiceDelete(int upID)
   /* exec sql begin declare section */
     
   
-#line 71 "invlib.pcg"
+#line 72 "invlib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 72 "invlib.pcg"
+#line 73 "invlib.pgc"
 
 
   connectToDB();
@@ -167,14 +168,14 @@ void invoiceDelete(int upID)
   { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from supplier_invoice where supplier_invoice_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 79 "invlib.pcg"
+#line 80 "invlib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 80 "invlib.pcg"
+#line 81 "invlib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 82 "invlib.pcg"
+#line 83 "invlib.pgc"
 
 }
 

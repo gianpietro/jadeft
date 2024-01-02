@@ -1,11 +1,12 @@
-/* Processed by ecpg (13.1) */
+/* Processed by ecpg (15.3 (Debian 15.3-0+deb12u1)) */
 /* These include files are added by the preprocessor */
 #include <ecpglib.h>
 #include <ecpgerrno.h>
 #include <sqlca.h>
 /* End of automatic include section */
 
-#line 1 "suplib.pcg"
+#line 1 "suplib.pgc"
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,13 +21,13 @@ void supplierInsert(int activeInd,char supName[])
        
        
    
-#line 12 "suplib.pcg"
+#line 13 "suplib.pgc"
  int v_activeInd ;
  
-#line 13 "suplib.pcg"
+#line 14 "suplib.pgc"
  char v_supName [ 30 ] ;
 /* exec sql end declare section */
-#line 14 "suplib.pcg"
+#line 15 "suplib.pgc"
 
    
    connectToDB();
@@ -39,14 +40,14 @@ void supplierInsert(int activeInd,char supName[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_supName),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 22 "suplib.pcg"
+#line 23 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 23 "suplib.pcg"
+#line 24 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 25 "suplib.pcg"
+#line 26 "suplib.pgc"
 
 }
 
@@ -57,16 +58,16 @@ void supplierUpdate(int upID, int activeInd,char supName[])
        
        
    
-#line 31 "suplib.pcg"
+#line 32 "suplib.pgc"
  int v_upID ;
  
-#line 32 "suplib.pcg"
+#line 33 "suplib.pgc"
  int v_activeInd ;
  
-#line 33 "suplib.pcg"
+#line 34 "suplib.pgc"
  char v_supName [ 30 ] ;
 /* exec sql end declare section */
-#line 34 "suplib.pcg"
+#line 35 "suplib.pgc"
 
    
    connectToDB();
@@ -82,14 +83,14 @@ void supplierUpdate(int upID, int activeInd,char supName[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 43 "suplib.pcg"
+#line 44 "suplib.pgc"
   
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 44 "suplib.pcg"
+#line 45 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 46 "suplib.pcg"
+#line 47 "suplib.pgc"
 
 }
 
@@ -98,10 +99,10 @@ void supplierDelete(int upID)
    /* exec sql begin declare section */
        
    
-#line 52 "suplib.pcg"
+#line 53 "suplib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 53 "suplib.pcg"
+#line 54 "suplib.pgc"
 
    
    connectToDB();
@@ -111,14 +112,14 @@ void supplierDelete(int upID)
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from supplier where supplier_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 60 "suplib.pcg"
+#line 61 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 61 "suplib.pcg"
+#line 62 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 63 "suplib.pcg"
+#line 64 "suplib.pgc"
 
 }
 
@@ -127,10 +128,10 @@ void supTypeInsert(char supTypeDesc[])
   /* exec sql begin declare section */
       
    
-#line 69 "suplib.pcg"
+#line 70 "suplib.pgc"
  char v_supTypeDesc [ 30 ] ;
 /* exec sql end declare section */
-#line 70 "suplib.pcg"
+#line 71 "suplib.pgc"
 
   
    connectToDB();
@@ -140,14 +141,14 @@ void supTypeInsert(char supTypeDesc[])
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into supplier_type ( description ) values ( $1  )", 
 	ECPGt_char,(v_supTypeDesc),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 77 "suplib.pcg"
+#line 78 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 78 "suplib.pcg"
+#line 79 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 80 "suplib.pcg"
+#line 81 "suplib.pgc"
 
 }
 
@@ -157,13 +158,13 @@ void supTypeUpdate(int upID, char supTypeDesc[])
       
       
    
-#line 86 "suplib.pcg"
+#line 87 "suplib.pgc"
  int v_upID ;
  
-#line 87 "suplib.pcg"
+#line 88 "suplib.pgc"
  char v_supTypeDesc [ 30 ] ;
 /* exec sql end declare section */
-#line 88 "suplib.pcg"
+#line 89 "suplib.pgc"
 
   
    connectToDB();
@@ -176,14 +177,14 @@ void supTypeUpdate(int upID, char supTypeDesc[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 96 "suplib.pcg"
+#line 97 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 97 "suplib.pcg"
+#line 98 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 99 "suplib.pcg"
+#line 100 "suplib.pgc"
 
 }
 
@@ -192,10 +193,10 @@ void supTypeDelete(int upID)
    /* exec sql begin declare section */
       
    
-#line 105 "suplib.pcg"
+#line 106 "suplib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 106 "suplib.pcg"
+#line 107 "suplib.pgc"
 
   
    connectToDB();
@@ -205,14 +206,14 @@ void supTypeDelete(int upID)
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from supplier_type where supplier_type_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 113 "suplib.pcg"
+#line 114 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 114 "suplib.pcg"
+#line 115 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 116 "suplib.pcg"
+#line 117 "suplib.pgc"
 
 }
 
@@ -222,10 +223,10 @@ void payPeriodInsert(char payPeriod[])
   /* exec sql begin declare section */
       
    
-#line 123 "suplib.pcg"
+#line 124 "suplib.pgc"
  char v_payPeriod [ 30 ] ;
 /* exec sql end declare section */
-#line 124 "suplib.pcg"
+#line 125 "suplib.pgc"
 
   
    connectToDB();
@@ -235,14 +236,14 @@ void payPeriodInsert(char payPeriod[])
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "insert into payment_period ( period ) values ( $1  )", 
 	ECPGt_char,(v_payPeriod),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 131 "suplib.pcg"
+#line 132 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 132 "suplib.pcg"
+#line 133 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 134 "suplib.pcg"
+#line 135 "suplib.pgc"
 
 }
 
@@ -252,13 +253,13 @@ void payPerUpdate(int upID, char payPeriod[])
        
        
    
-#line 140 "suplib.pcg"
+#line 141 "suplib.pgc"
  int v_upID ;
  
-#line 141 "suplib.pcg"
+#line 142 "suplib.pgc"
  char v_payPeriod [ 30 ] ;
 /* exec sql end declare section */
-#line 142 "suplib.pcg"
+#line 143 "suplib.pgc"
 
    
    connectToDB();
@@ -271,14 +272,14 @@ void payPerUpdate(int upID, char payPeriod[])
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 150 "suplib.pcg"
+#line 151 "suplib.pgc"
   
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 151 "suplib.pcg"
+#line 152 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 153 "suplib.pcg"
+#line 154 "suplib.pgc"
 
 }
 
@@ -287,10 +288,10 @@ void payPerDelete(int upID)
    /* exec sql begin declare section */
        
    
-#line 159 "suplib.pcg"
+#line 160 "suplib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 160 "suplib.pcg"
+#line 161 "suplib.pgc"
 
    
    connectToDB();
@@ -300,14 +301,14 @@ void payPerDelete(int upID)
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from payment_period where payment_period_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 167 "suplib.pcg"
+#line 168 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 168 "suplib.pcg"
+#line 169 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 170 "suplib.pcg"
+#line 171 "suplib.pgc"
 
 }
 
@@ -320,19 +321,19 @@ void prtInsert(int actInd, char prtPostCode[], char prtAddress[], char prtCity[]
       
       
    
-#line 177 "suplib.pcg"
+#line 178 "suplib.pgc"
  int v_actInd ;
  
-#line 178 "suplib.pcg"
+#line 179 "suplib.pgc"
  char v_prtPostCode [ 10 ] ;
  
-#line 179 "suplib.pcg"
+#line 180 "suplib.pgc"
  char v_prtAddress [ 30 ] ;
  
-#line 180 "suplib.pcg"
+#line 181 "suplib.pgc"
  char v_prtCity [ 30 ] ;
 /* exec sql end declare section */
-#line 181 "suplib.pcg"
+#line 182 "suplib.pgc"
 
   
    connectToDB();
@@ -351,14 +352,14 @@ void prtInsert(int actInd, char prtPostCode[], char prtAddress[], char prtCity[]
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_char,(v_prtCity),(long)30,(long)1,(30)*sizeof(char), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 192 "suplib.pcg"
+#line 193 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 193 "suplib.pcg"
+#line 194 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 195 "suplib.pcg"
+#line 196 "suplib.pgc"
 
 }
 
@@ -371,22 +372,22 @@ void prtUpdate(int upID, int actInd, char prtPostCode[], char prtAddress[], char
       
       
    
-#line 201 "suplib.pcg"
+#line 202 "suplib.pgc"
  int v_upID ;
  
-#line 202 "suplib.pcg"
+#line 203 "suplib.pgc"
  int v_actInd ;
  
-#line 203 "suplib.pcg"
+#line 204 "suplib.pgc"
  char v_prtPostCode [ 10 ] ;
  
-#line 204 "suplib.pcg"
+#line 205 "suplib.pgc"
  char v_prtAddress [ 30 ] ;
  
-#line 205 "suplib.pcg"
+#line 206 "suplib.pgc"
  char v_prtCity [ 30 ] ;
 /* exec sql end declare section */
-#line 206 "suplib.pcg"
+#line 207 "suplib.pgc"
 
   
    connectToDB();
@@ -408,14 +409,14 @@ void prtUpdate(int upID, int actInd, char prtPostCode[], char prtAddress[], char
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 218 "suplib.pcg"
+#line 219 "suplib.pgc"
   		 		 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 219 "suplib.pcg"
+#line 220 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 221 "suplib.pcg"
+#line 222 "suplib.pgc"
 
 }
 
@@ -424,10 +425,10 @@ void prtDelete(int upID)
    /* exec sql begin declare section */
       
    
-#line 227 "suplib.pcg"
+#line 228 "suplib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 228 "suplib.pcg"
+#line 229 "suplib.pgc"
 
   
    connectToDB();
@@ -437,14 +438,14 @@ void prtDelete(int upID)
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from property where property_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 235 "suplib.pcg"
+#line 236 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 236 "suplib.pcg"
+#line 237 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 238 "suplib.pcg"
+#line 239 "suplib.pgc"
 
 }
 
@@ -466,43 +467,43 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
       
       
    
-#line 246 "suplib.pcg"
+#line 247 "suplib.pgc"
  int v_safActiveID ;
  
-#line 247 "suplib.pcg"
+#line 248 "suplib.pgc"
  char v_safSupAcctRef [ 30 ] ;
  
-#line 248 "suplib.pcg"
+#line 249 "suplib.pgc"
  int v_safSupID ;
  
-#line 249 "suplib.pcg"
+#line 250 "suplib.pgc"
  int v_safPrtID ;
  
-#line 250 "suplib.pcg"
+#line 251 "suplib.pgc"
  int v_safSupTypeID ;
  
-#line 251 "suplib.pcg"
+#line 252 "suplib.pgc"
  int v_safStartDt ;
  
-#line 252 "suplib.pcg"
+#line 253 "suplib.pgc"
  int v_safEndDt ;
  
-#line 253 "suplib.pcg"
+#line 254 "suplib.pgc"
  int v_safPayID ;
  
-#line 254 "suplib.pcg"
+#line 255 "suplib.pgc"
  double v_safAmount ;
  
-#line 255 "suplib.pcg"
+#line 256 "suplib.pgc"
  char v_safComment [ 30 ] ;
  
-#line 256 "suplib.pcg"
+#line 257 "suplib.pgc"
  char v_safAlias [ 10 ] ;
  
-#line 257 "suplib.pcg"
+#line 258 "suplib.pgc"
  int v_safProAcctID ;
 /* exec sql end declare section */
-#line 258 "suplib.pcg"
+#line 259 "suplib.pgc"
 
   
    connectToDB();
@@ -545,14 +546,14 @@ void supAccountInsert(int safActiveID ,char safSupAcctRef[],int safSupID, int sa
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_safProAcctID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 279 "suplib.pcg"
+#line 280 "suplib.pgc"
 
   { ECPGtrans(__LINE__, NULL, "commit");}
-#line 280 "suplib.pcg"
+#line 281 "suplib.pgc"
 
 
   { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 282 "suplib.pcg"
+#line 283 "suplib.pgc"
 
 }
 
@@ -575,46 +576,46 @@ void supAccountUpdate(int upID,int safActiveID ,char safSupAcctRef[],int safSupI
       
       
    
-#line 290 "suplib.pcg"
+#line 291 "suplib.pgc"
  int v_upID ;
  
-#line 291 "suplib.pcg"
+#line 292 "suplib.pgc"
  int v_safActiveID ;
  
-#line 292 "suplib.pcg"
+#line 293 "suplib.pgc"
  char v_safSupAcctRef [ 30 ] ;
  
-#line 293 "suplib.pcg"
+#line 294 "suplib.pgc"
  int v_safSupID ;
  
-#line 294 "suplib.pcg"
+#line 295 "suplib.pgc"
  int v_safPrtID ;
  
-#line 295 "suplib.pcg"
+#line 296 "suplib.pgc"
  int v_safSupTypeID ;
  
-#line 296 "suplib.pcg"
+#line 297 "suplib.pgc"
  int v_safStartDt ;
  
-#line 297 "suplib.pcg"
+#line 298 "suplib.pgc"
  int v_safEndDt ;
  
-#line 298 "suplib.pcg"
+#line 299 "suplib.pgc"
  int v_safPayID ;
  
-#line 299 "suplib.pcg"
+#line 300 "suplib.pgc"
  double v_safAmount ;
  
-#line 300 "suplib.pcg"
+#line 301 "suplib.pgc"
  char v_safComment [ 30 ] ;
  
-#line 301 "suplib.pcg"
+#line 302 "suplib.pgc"
  char v_safAlias [ 10 ] ;
  
-#line 302 "suplib.pcg"
+#line 303 "suplib.pgc"
  int v_safProAcctID ;
 /* exec sql end declare section */
-#line 303 "suplib.pcg"
+#line 304 "suplib.pgc"
 
   
    connectToDB();
@@ -660,14 +661,14 @@ void supAccountUpdate(int upID,int safActiveID ,char safSupAcctRef[],int safSupI
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 326 "suplib.pcg"
+#line 327 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 327 "suplib.pcg"
+#line 328 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 329 "suplib.pcg"
+#line 330 "suplib.pgc"
 
 }
 
@@ -676,10 +677,10 @@ void supAccountDelete(int upID)
    /* exec sql begin declare section */
       
    
-#line 335 "suplib.pcg"
+#line 336 "suplib.pgc"
  int v_upID ;
 /* exec sql end declare section */
-#line 336 "suplib.pcg"
+#line 337 "suplib.pgc"
 
   
    connectToDB();
@@ -689,14 +690,14 @@ void supAccountDelete(int upID)
    { ECPGdo(__LINE__, 0, 1, NULL, 0, ECPGst_normal, "delete from supplier_account where supplier_acct_id = $1 ", 
 	ECPGt_int,&(v_upID),(long)1,(long)1,sizeof(int), 
 	ECPGt_NO_INDICATOR, NULL , 0L, 0L, 0L, ECPGt_EOIT, ECPGt_EORT);}
-#line 343 "suplib.pcg"
+#line 344 "suplib.pgc"
 
    { ECPGtrans(__LINE__, NULL, "commit");}
-#line 344 "suplib.pcg"
+#line 345 "suplib.pgc"
 
 
    { ECPGdisconnect(__LINE__, "CURRENT");}
-#line 346 "suplib.pcg"
+#line 347 "suplib.pgc"
 
 }
  
