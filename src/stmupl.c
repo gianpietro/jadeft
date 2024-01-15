@@ -82,18 +82,25 @@ void upLoadStatement()
 
       rewind(cp);                                                               /* return cursor to beginning of file */
 
-      while (c!= QM)
+      /*while (tr < 1)
 	{
 	  c = fgetc(cp);  
 	  n = fgetc(np);
 	  if (c == '\n')
-	    tr++;	                                                        /* number of rows before first qm */
-	}
+	    tr++;	                                                        
+	}*/
+
+      c = fgetc(cp);
+      n = fgetc(np);
 
       fseek(cp, -1, SEEK_CUR);
       fseek(np, -1, SEEK_CUR);
-       
-      rs = kr - tr;                                                             /* number of valid rows in statement excludes top empty rows */
+
+      //c = fgetc(cp);
+      //n = fgetc(np);
+
+    
+      rs = kr;                                                             /* number of valid rows in statement excludes top empty rows */
 
       tmpDate = (char **) malloc(rs * sizeof(char *));
       transDate = (char **) malloc (rs * sizeof(char *));
@@ -121,12 +128,19 @@ void upLoadStatement()
 	  accountNumber == NULL ||
 	  transAlias == NULL)
 	  printf ("Memory not available");
-	  
-  
+
       while (c != EOF)
-	{
-	  c = fgetc(cp);
-	  pos = ftell(cp);      
+	{	   
+          c = fgetc(cp);
+	  	FILE* f5 = fopen("debug5.txt", "w");  
+           if (f5 != NULL)                 
+            {
+              fprintf(f5, "%c\n", c);      
+              fclose(f5);                  
+              f5 = NULL;                   
+             }
+	  
+          pos = ftell(cp);                                                   /* current position of the cp stream */
 	  if (c == '\n')
 	    {
 	      tmpDate[i][j] = '\0';                                             /* add end of string char when reach end of row */
@@ -138,25 +152,100 @@ void upLoadStatement()
 	      ++i;
 	      qcount = 0;
 	    }
+	  fseek(np, pos, SEEK_SET);	                                        /* move the stream pointer np to where cp is */
+	  do {
+	    n = fgetc(np);
+	    posn = ftell(np);
+	    charCount++;
+	    if (qcount == 0 && n != CM)
+	      {
+		tmpDate[i][j] = n;
+		++j;
+		FILE* f = fopen("debug.txt", "w");  
+           if (f != NULL)                 
+            {
+              fprintf(f, "%d %d\n", j, qcount);      
+              fclose(f);                  
+              f = NULL;                   
+             }
+	      }
+	    if (qcount == 1 && n != CM)
+	      {
+		transType[i][j2] = n;
+		++j2;
+		FILE* f1 = fopen("debug1.txt", "w");  
+           if (f1 != NULL)                 
+            {
+              fprintf(f1, "%d %d\n", j2, qcount);      
+              fclose(f1);                  
+              f1 = NULL;                   
+             }
+	      }
+	    if (qcount == 2 && n != CM)
+	      {
+		transDescription[i][j3] = n;
+		++j3;
+		FILE* f2 = fopen("debug2.txt", "w");  
+           if (f2 != NULL)                 
+            {
+              fprintf(f2, "%d %d\n", j3, qcount);      
+              fclose(f2);                  
+              f2 = NULL;                   
+             }
+	      }
+	    if (qcount == 3 && n != CM)
+	      {
+		transValue[i][j4] = n;
+		  ++j4;
+		  FILE* f3 = fopen("debug3.txt", "w");  
+           if (f3 != NULL)                 
+            {
+              fprintf(f3, "%d %d\n", j4, qcount);      
+              fclose(f3);                  
+              f3 = NULL;                   
+             }
 
-	  if ( c == QM || qcount == 6 || qcount == 8)                           /* 6 and 8 required for data Value with no qm */
+	      }
+	    if (qcount == 6 && n != CM)
+	      {
+		accountNumber[i][j5] = n;
+		++j5;
+		FILE* f4 = fopen("debug4.txt", "w");  
+           if (f4 != NULL)                 
+            {
+              fprintf(f4, "%d %d\n", j5, qcount);      
+              fclose(f4);                  
+              f4 = NULL;                   
+             }
+
+	      } 	    
+	  } while (qcount <= 6);
+	      fseek(cp, posn, SEEK_SET);                                        // move cursor cp to current np pos
+	      qcount++;
+	      pos = ftell(cp);
+	      charCount = 0;
+	}
+	      
+
+	  /* 
+	  if ( c == QM || qcount == 6 || qcount == 8)                           // 6 and 8 required for data Value with no qm 
 	    {
 	      qcount++;
-	      fseek(np, pos, SEEK_SET);                                         /* cursor np at first qm */
+	      fseek(np, pos, SEEK_SET);                                         // cursor np at first qm 
 	      do{                            
-		n = fgetc(np);                                                  /* move one char until next qm */ 
+		n = fgetc(np);                                                  // move one char until next qm 
 		posn = ftell(np);
-		charCount++;                                                    /* count no. of characters between qms */
-		if (n != SP && n != CM && n != FS && n != AP)                   /* not space, comma, forward slash, apostrophe */
+		charCount++;                                                    // count no. of characters between qms 
+		if (n != SP && n != CM && n != FS && n != AP)                   // not space, comma, forward slash, apostrophe 
 		  {
-		    if (qcount == 1 && n != QM)                                 /* Date column */ 
+		    if (qcount == 1 && n != QM)                                 // Date column 
 		      {
 			tmpDate[i][j] = n;
 			++j;
 		      }
-		    if (qcount == 3)                                            /* Type column */
+		    if (qcount == 3)                                            // Type column 
 		      {
-			if (charCount == 1 && n == QM)                          /* If Type blank */
+			if (charCount == 1 && n == QM)                          // If Type blank 
 			  {
 			    transType[i][j2] = 'Z';
 			    ++j2;
@@ -167,29 +256,30 @@ void upLoadStatement()
 			    ++j2;
 			  }
 		      }
-		    if (qcount == 5 && n != QM)                                 /* Description column */
+		    if (qcount == 5 && n != QM)                                 // Description column 
 		      {
 			transDescription[i][j3] = n;
 			++j3;
 		      }
-		    if (qcount == 7 && n != QM)                                 /* Value column */ 
+		    if (qcount == 7 && n != QM)                                 // Value column 
 		      {
 			transValue[i][j4] = n;
 			++j4;
 		      }
-		    if (qcount == 13 && n != QM)                                /* Account number column */
+		    if (qcount == 13 && n != QM)                                // Account number column 
 		      {
 			accountNumber[i][j5] = n;
 			++j5;
 		      }		
 		  }	                                    
 	      }while (n != QM);	  
-	      fseek(cp, posn, SEEK_SET);                                        /* move cursor cp to current np pos */
+	      fseek(cp, posn, SEEK_SET);                                        // move cursor cp to current np pos
 	      qcount++;
 	      pos = ftell(cp);
 	    }
-	  charCount = 0;
-	}
+	      charCount = 0;
+	      }
+	  */
 
       for (q = 0; q < i; q++)                                                   /* arrange date format to yyyymmdd */
 	{
