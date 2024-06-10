@@ -19,7 +19,7 @@ void upLoadStatement()
   WINDOW *stmtWin;
   PANEL *stmtPanel;
   struct statement *start, *newStmtPtr, *end, *ptr;
-  FILE *cp,*np;                                                                 /* pointers to file */
+  FILE *cp;                                                                 /* pointers to file */
   int row, col;
   int i = 0;                                                                    /* count of rows in the statement file download */
   int j = 0;                                                                    /* count of characters in the date column */
@@ -71,8 +71,6 @@ void upLoadStatement()
   if(upf != NULL)
     {       
       cp = fopen(upf, "r");
-      np = fopen(upf, "r");
-
       while (c != EOF) 
 	{
 	  kc++;                                                                 /* number of characters in the file */       
@@ -80,74 +78,13 @@ void upLoadStatement()
 	  if (c == '\n')	
 	    kr++;                                                               /* number of rows in the file */
 	}
-   FILE* f1 = fopen("debug1.txt", "w");
-    if (f1 != NULL)                 
-            {
-              fprintf(f1, "%i\n", kr);      
-              fclose(f1);                  
-              f1 = NULL;                   
-             }
 
-   FILE* f2 = fopen("debug2.txt", "w");
-   if (f2 != NULL)                 
-            {
-              fprintf(f2, "%i\n", kc);      
-              fclose(f2);                  
-              f2 = NULL;                   
-             }
       rewind(cp);                                                               /* return cursor to beginning of file */
-
-      /*while (tr < 1)
-	{
-	  c = fgetc(cp);  
-	  n = fgetc(np);
-	  if (c == '\n')
-	    tr++;	                                                        
-	}*/
-      
-      /*   
-      c = fgetc(cp);
-       FILE* f10 = fopen("debug10.txt", "w");
-   if (f10 != NULL)                 
-            {
-              fprintf(f10, "%c\n", c);      
-              fclose(f10);                  
-              f10 = NULL;                   
-             }
-      */
-   /*
-      n = fgetc(np);
-       FILE* f4 = fopen("debug4.txt", "w");
-   if (f4 != NULL)                 
-            {
-              fprintf(f4, "%c\n", n);      
-              fclose(f4);                  
-              f4 = NULL;                   
-             }
-      */
-      
       c = fgetc(cp);
       fseek(cp, -1, SEEK_CUR);
-      /*
-      n = fgetc(np);
       
-      fseek(cp, -1, SEEK_CUR);
-      fseek(np, -1, SEEK_CUR);
-      */
+      rs = kr;                                                                  /* number of valid rows in statement excludes top empty rows */
       
-      //c = fgetc(cp);
-      //n = fgetc(np);
-
-    
-      rs = kr;                                                             /* number of valid rows in statement excludes top empty rows */
-      	  	FILE* f7 = fopen("debug7.txt", "w");  
-           if (f7 != NULL)                 
-            {
-              fprintf(f7, "%i\n", rs);      
-              fclose(f7);                  
-              f7 = NULL;                   
-             }
-
       tmpDate = (char **) malloc(rs * sizeof(char *));
       transDate = (char **) malloc (rs * sizeof(char *));
       transType = (char **) malloc (rs * sizeof(char *));
@@ -174,32 +111,11 @@ void upLoadStatement()
 	  accountNumber == NULL ||
 	  transAlias == NULL)
 	  printf ("Memory not available");
-
-      FILE* f8 = fopen("debug8.txt","w");
-      fprintf(f8, "%s\n", "memory end test");
-      fclose(f8);
-      f8 = NULL;
-
+      
       while (c != EOF)
           {
-	    
           c = fgetc(cp);
-	  /*FILE* f3 = fopen("debug3.txt", "a");  
-	  if (f3 != NULL)                 
-            {
-              fprintf(f3, "%c\n", c);      
-              fclose(f3);                  
-              f3 = NULL;                   
-	      }*/
-	  
-          pos = ftell(cp);                                                   /* current position of the cp stream */
-	  FILE* f4 = fopen("debug4.txt", "a");  
-	  if (f4 != NULL)                 
-            {
-              fprintf(f4, "%c %i  %i\n",c, pos,qcount);      
-              fclose(f4);                  
-              f4 = NULL;                   
-	    }
+          pos = ftell(cp);                                                      /* current position of the cp stream */
 	  if (c == '\n')
 	    {
 	      tmpDate[i][j] = '\0';                                             /* add end of string char when reach end of row */
@@ -212,7 +128,6 @@ void upLoadStatement()
 	      qcount = 0;
 	      charCount = 0;
 	    }
-
 	  if (c != '\n' && c != -1) // 10 is line feed -1 s/b eof
 	    {
 	      if (c == CM)
@@ -224,274 +139,41 @@ void upLoadStatement()
 		{
 		  charCount++;
 		}
-	      if (qcount == 0 && c !=  CM)  //date
+	      if (qcount == 0 && c !=  CM)  
 		  {
 		    tmpDate[i][j] = c;
 		    ++j;
-		    FILE* D1 = fopen("D1.txt", "a");  
-		    if (D1 != NULL)                 
-		      {
-			fprintf(D1, "%c %i %i  %i\n", c, pos, charCount, qcount);      
-			fclose(D1);                  
-			D1 = NULL;                   
-		      }
 		  }
-	      if (qcount == 1 && c != CM)  //type
+	      if (qcount == 1 && c != CM)  
 		  {
 		    if (charCount == 0)
 		      {
 			transType[i][j2] = 'Z';
 			++j2;
-			FILE* D2 = fopen("D2.txt", "a");  
-			if (D2 != NULL)                 
-			  {
-			    fprintf(D2, "%s %i  %i  %i\n", "Z", pos,charCount, qcount);      
-			    fclose(D2);                  
-			    D2 = NULL;                   
-			  }
 		      }
 		    else
 		      {
 			transType[i][j2] = c;
-			    ++j2;
-			FILE* D2 = fopen("D2.txt", "a");  
-			if (D2 != NULL)                 
-			  {
-			    fprintf(D2, "%c %i  %i  %i\n", c, pos,charCount, qcount);      
-			    fclose(D2);                  
-			    D2 = NULL;                   
-			  }
+			++j2;
 		      }			
 		  }
-	      if (qcount == 2 && c != CM)  //desc
+	      if (qcount == 2 && c != CM)  
 		  {
 		    transDescription[i][j3] = c;
-			++j3;
-		    FILE* D3 = fopen("D3.txt", "a");  
-			if (D3 != NULL)                 
-			  {
-			    fprintf(D3, "%c %i  %i  %i\n", c, pos, charCount, qcount);      
-			    fclose(D3);                  
-			    D3 = NULL;                   
-			  }
+		    ++j3;
 		  }
-	      if (qcount == 3 && c != CM)  //value
+	      if (qcount == 3 && c != CM)  
 		  {
 		    transValue[i][j4] = c;
 			++j4;
-		    FILE* D4 = fopen("D4.txt", "a");  
-			if (D4 != NULL)                 
-			  {
-			    fprintf(D4, "%c %i  %i  %i\n", c, pos,charCount, qcount);      
-			    fclose(D4);                  
-			    D4 = NULL;                   
-			  }
 		  }
-	      if ( qcount == 6 && c != CM)  //account
+	      if ( qcount == 6 && c != CM) 
 		{
 		  accountNumber[i][j5] = c;
-			++j5;
-		  FILE* D5 = fopen("D5.txt", "a");  
-		  if (D5 != NULL)                 
-		    {
-		      fprintf(D5, "%c %i  %i  %i\n",  c, pos,charCount, qcount);      
-		      fclose(D5);                  
-		      D5 = NULL;                   
-		    }
+		  ++j5;
 		}	      
-	    }
-
-	  /*	  do
-	    {
-	      n = fgetc(np);
-	      posn = ftell(np);
-	      charCount++;
-	      FILE* D1 = fopen("D1.txt", "a");  
-	      if (D1 != NULL)                 
-		{
-		  fprintf(D1, "%c %i  %i  %i\n", n, posn,charCount, qcount);      
-		  fclose(D1);                  
-		  D1 = NULL;                   
-		}
-		}while (charCount < 20);*/
-	  //  }
-
-	  
-	  //fseek(np, pos, SEEK_CUR);	                                        /* move the stream pointer np to where cp is */
-
-	  /******************** may substitute this code*********************
-	  	  
-	  if (c == CM || qcount == 6)
-	     {
-	      // if (qcount == 0)
-	      //{
-	      //qcount++;
-	       //if (qcount == 6) 
-	       //fseek(np, pos, SEEK_CUR);     
-	      do {		
-		n = fgetc(np);
-		posn = ftell(np);
-		charCount++;
-		//if (n == CM)
-		//qcount++;
-		if (qcount == 0 && n !=  CM)
-		  {
-		    // if (n != CM)
-		    //{
-		    FILE* f5 = fopen("debug5.txt", "a");  
-		    if (f5 != NULL)                 
-		      {
-			fprintf(f5, "%c %i  %i  %i  %i\n", n, pos,posn,charCount, qcount);      
-			fclose(f5);                  
-			f5 = NULL;                   
-		      }
-		    //}
-		  }
-		if (qcount == 1)
-		  {
-		    if (charCount == 1 && n == CM)
-		      {
-			FILE* f6 = fopen("debug6.txt", "a");  
-			if (f6 != NULL)                 
-			  {
-			    fprintf(f6, "%s %i  %i  %i  %i\n", "Z", pos,posn,charCount, qcount);      
-			    fclose(f6);                  
-			    f6 = NULL;                   
-			  }
-		      }
-		    else if (n != CM)
-		      {
-			FILE* f6 = fopen("debug6.txt", "a");  
-			if (f6 != NULL)                 
-			  {
-			    fprintf(f6, "%c %i  %i  %i  %i\n", n, pos,posn,charCount, qcount);      
-			    fclose(f6);                  
-			    f6 = NULL;                   
-			  }
-		      }			
-		  }
-		if (qcount == 2 && n != CM)
-		  {
-		    FILE* f9 = fopen("debug9.txt", "a");  
-			if (f9 != NULL)                 
-			  {
-			    fprintf(f9, "%c %i  %i  %i  %i\n", n, pos,posn,charCount, qcount);      
-			    fclose(f9);                  
-			    f9 = NULL;                   
-			  }
-		  }
-		if (qcount == 3 && n != CM)
-		  {
-		    FILE* f10 = fopen("debug10.txt", "a");  
-			if (f10 != NULL)                 
-			  {
-			    fprintf(f10, "%c %i  %i  %i  %i\n", n, pos,posn,charCount, qcount);      
-			    fclose(f10);                  
-			    f10 = NULL;                   
-			  }
-		  }
-		if (qcount == 6 && n != '\n')
-		  {
-		       FILE* f11 = fopen("debug11.txt", "a");  
-			if (f11 != NULL)                 
-			  {
-			    fprintf(f11, "%c %i  %i  %i  %i\n", n, pos,posn,charCount, qcount);      
-			    fclose(f11);                  
-			    f11 = NULL;                   
-			  }
-		  }
-		if (n == CM)
-		  qcount++;
-	      } while (n != CM && n != '\n'); //(qcount < 1);
-	    
-		  fseek(cp, posn, SEEK_SET);                                
-		  //qcount++;
-		  pos = ftell(cp); 
-		  charCount = 0;
-		  //}
-	          //qcount++;
-	    }
-	    *************************** above code may substitute this code **************/
+	    }	  
 	  }
-	       /***********    
-	    if (qcount == 0 && n != CM)
-	      {
-		tmpDate[i][j] = n;
-		++j;
-		FILE* f = fopen("debug.txt", "w");  
-           if (f != NULL)                 
-            {
-              fprintf(f, "%d %d\n", j, qcount);      
-              fclose(f);                  
-              f = NULL;                   
-             }
-	      }
-	    if (qcount == 1 && n != CM)
-	      {
-		transType[i][j2] = n;
-		++j2;
-		FILE* f1 = fopen("debug1.txt", "w");  
-           if (f1 != NULL)                 
-            {
-              fprintf(f1, "%d %d\n", j2, qcount);      
-              fclose(f1);                  
-              f1 = NULL;                   
-             }
-	      }
-	    if (qcount == 2 && n != CM)
-	      {
-		transDescription[i][j3] = n;
-		++j3;
-		FILE* f2 = fopen("debug2.txt", "w");  
-           if (f2 != NULL)                 
-            {
-              fprintf(f2, "%d %d\n", j3, qcount);      
-              fclose(f2);                  
-              f2 = NULL;                   
-             }
-	      }
-	    if (qcount == 3 && n != CM)
-	      {
-		transValue[i][j4] = n;
-		  ++j4;
-		  FILE* f3 = fopen("debug3.txt", "w");  
-           if (f3 != NULL)                 
-            {
-              fprintf(f3, "%d %d\n", j4, qcount);      
-              fclose(f3);                  
-              f3 = NULL;                   
-             }
-
-	      }
-	    if (qcount == 6 && n != CM)
-	      {
-		accountNumber[i][j5] = n;
-		++j5;
-		FILE* f4 = fopen("debug4.txt", "w");  
-           if (f4 != NULL)                 
-            {
-              fprintf(f4, "%d %d\n", j5, qcount);      
-              fclose(f4);                  
-              f4 = NULL;                   
-             }
-	      }
-	       
- 	     } while (n != CM);                                   // 6 number of commas in row seperating fields
-	      fseek(cp, posn, SEEK_SET);                                        //  move cursor cp to current np pos 
-	      qcount++;
-	      pos = ftell(cp);
-	     }
-	  charCount = 0;
-	  }
-	       *****************/
-	   //	  fseek(cp, posn, SEEK_SET);                                        //  move cursor cp to current np pos 
-	   //  qcount++;
-	   //    pos = ftell(cp);
-	   //   charCount = 0;
-	   //	}
-	      
-
-	
       for (q = 0; q < i; q++)                                                   // arrange date format to yyyymmdd 
 	{
 	  transDate[q][0] = tmpDate[q][4];
@@ -566,7 +248,7 @@ void upLoadStatement()
       freeStatement(start);
 
       fclose(cp);
-      fclose(np);  
+      //fclose(np);  
       
       //return start;
     }
