@@ -48,7 +48,7 @@ void selectType()
   int docExportID;
   char docFileName[30];
   int oidValue;
-  char *expFName;
+  char *expFName = (char *)malloc(FNAMEEXP*sizeof(char)); 
   int ConfirmExport = 'n';
   
   PGconn *conn =  fdbcon();
@@ -1153,7 +1153,8 @@ void selectType()
   noecho();
   endwin();
 
-  free(expFName);
+  free(expFName);               
+    
 }
 
 
