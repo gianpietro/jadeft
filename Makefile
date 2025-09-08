@@ -20,7 +20,7 @@ program : $(OBJ)
 	$(OBJDIR)/procur.so $(OBJDIR)/supcur.so $(OBJDIR)/invcur.so $(OBJDIR)/jadlib.so $(OBJDIR)/suplib.so \
 	$(OBJDIR)/invlib.so $(OBJDIR)/doccur.so $(OBJDIR)/doclib.so $(OBJDIR)/catcur.so $(OBJDIR)/catlib.so \
 	$(OBJDIR)/stmupl.so $(OBJDIR)/stmuplib.so $(OBJDIR)/stmlib.so $(OBJDIR)/stmcur.so $(OBJDIR)/dexcur.so  \
-	-o $(BINDIR)/jadeft -I/usr/include -lncursesw #-lpq -lecpg -lform -lpanel -lcdk -lncurses 
+	-o $(BINDIR)/jadeft -I/usr/include -lpq -lecpg -lform -lpanel -lcdk -lncurses 
 
 fdbcon.so : fdbcon.c fdbcon.h
 	gcc -c $(CFLAGS) $< -o $(OBJDIR)/$@
