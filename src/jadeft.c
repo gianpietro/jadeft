@@ -30,11 +30,11 @@
 static const char *menulist[MAX_MENU_ITEMS][MAX_SUB_ITEMS];
 
 int main (void) {
-  struct statement *ptr;
+  //struct statement *ptr;
   CDKSCREEN *cdkscreen = 0;
   CDKMENU *menu = 0;
-  int submenusize[5], menuloc[5];
-  int selection;
+  int submenusize[6], menuloc[6];
+  int selection = 0;
   char temp[256];
   const char *mesg[2];
  
@@ -68,22 +68,27 @@ int main (void) {
   menulist[4][1] = "</05>Document Type    <!05>";
   menulist[4][2] = "</05>Document Insert  <!05>";
   menulist[4][3] = "</05>Document Export  <!05>";
+
+  menulist[5][0] = "</07/B>Reports        <!07>";
+  menulist[5][1] = "</05>Under Development<!07>";
   
   submenusize[0] = 3;
   submenusize[1] = 4;
   submenusize[2] = 5;
   submenusize[3] = 7;
-  submenusize[4] = 4;  
+  submenusize[4] = 4;
+  submenusize[5] = 2;  
 
   menuloc[0] = LEFT;
   menuloc[1] = LEFT;
   menuloc[2] = LEFT;
   menuloc[3] = LEFT;
   menuloc[4] = LEFT;
+  menuloc[5] = LEFT;
 
   //  mesg[0]= "                         ";
 
-  menu = newCDKMenu(cdkscreen, menulist, 5, submenusize, menuloc,
+  menu = newCDKMenu(cdkscreen, menulist, 6, submenusize, menuloc,
 		    TOP, A_UNDERLINE, A_REVERSE);
 
   refreshCDKScreen(cdkscreen);

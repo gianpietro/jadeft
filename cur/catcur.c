@@ -117,7 +117,7 @@ void categoryInsert()
 	      doupdate();
 
 	      /* assign the required select statement */
-	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY id");	  
+	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY category");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(categoryUpdateWin);
@@ -408,7 +408,7 @@ void statementLinkInsert()
 	      update_panels();
 	      doupdate();	
 
-	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY id");	  
+	      res = PQexec(conn,"SELECT * FROM category_type ORDER BY category");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(catTypeWin);
@@ -501,7 +501,7 @@ void statementLinkInsert()
 	      doupdate();
 
 	      /* the required select statement */
-	      res = PQexec(conn,"SELECT * FROM statement_link ORDER BY id");	  
+	      res = PQexec(conn,"SELECT * FROM statement_link ORDER BY alias");	  
 	      rows = PQntuples(res);
 
 	      wrefresh(stmtLinkUpdateWin);

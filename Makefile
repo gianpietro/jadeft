@@ -9,7 +9,7 @@ SRCDIR = src
 CURDIR = cur
 INCDIR = inc
 
-CFLAGS = -g
+CFLAGS = -g 
 
 OBJ =  fdbcon.so prolib.so procur.so supcur.so invcur.so jadlib.so suplib.so invlib.so \
 	doccur.so doclib.so catcur.so catlib.so stmupl.so stmuplib.so stmlib.so stmcur.so \
